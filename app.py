@@ -1,54 +1,57 @@
 import streamlit as st
-from openai import OpenAI
+from pages import ctf01, ctf02, ctf03, ctf04, ctf05, ctf06, ctf07, ctf08, ctf09, ctf10
 
-# 기본 세팅
-st.set_page_config(page_title="LLM 챗봇", layout="centered")
-st.title("🧠 사용자 API 키 기반 LLM 챗봇")
+# --- 메인 페이지 ---
+def main_page():
+    st.image("https://cdn-icons-png.flaticon.com/512/616/616408.png", width=120)
+    st.markdown("# 🧠 LLL Corporation")
+    st.write("우리 회사는 LLM과 AI를 연구하는 첨단 IT기업입니다.")
 
-# 세션 상태 초기화
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+    ctf_buttons = [
+        ("CTF01", "D차장의 실수"),
+        ("CTF02", "로그 파일의 진실"),
+        ("CTF03", "보안팀의 경고"),
+        ("CTF04", "인턴의 실수"),
+        ("CTF05", "AI의 폭주"),
+        ("CTF06", "서버의 비밀"),
+        ("CTF07", "K대리의 비밀"),
+        ("CTF08", "삭제된 기록"),
+        ("CTF09", "의심스러운 요청"),
+        ("CTF10", "관리자 패널")
+    ]
 
-if "api_key" not in st.session_state:
-    st.session_state.api_key = ""
+    for i in range(0, len(ctf_buttons), 5):
+        cols = st.columns(5)
+        for j, (key, label) in enumerate(ctf_buttons[i:i+5]):
+            with cols[j]:
+                if st.button(f"[{key}] {label}"):
+                    st.session_state.page = key.lower()
+                    st.rerun()
 
-# 사용자로부터 API 키 입력 받기
-st.subheader("🔑 OpenAI API Key 입력")
-st.session_state.api_key = st.text_input(
-    "API 키를 입력하세요",
-    type="password",
-    value=st.session_state.api_key
-)
 
-# 질의응답
-st.subheader("💬 질문하기")
-user_input = st.text_input("질문을 입력하세요", "")
+# --- 페이지 라우팅 ---
+if "page" not in st.session_state:
+    st.session_state.page = "main"
 
-if st.button("전송") and user_input:
-    if not st.session_state.api_key:
-        st.error("API 키를 먼저 입력하세요.")
-    else:
-        with st.spinner("답변 생성 중..."):
-            try:
-                client = OpenAI(api_key=st.session_state.api_key)
-                response = client.chat.completions.create(
-                    model="gpt-4o",  # 또는 gpt-4o-mini, gpt-3.5-turbo 등
-                    messages=[
-                        {"role": "system", "content": "친절한 AI 비서로 응답해 주세요."},
-                        {"role": "user", "content": user_input},
-                    ],
-                    temperature=0.7
-                )
-                bot_response = response.choices[0].message.content.strip()
-                st.session_state.chat_history.append({
-                    "user": user_input,
-                    "bot": bot_response
-                })
-            except Exception as e:
-                st.error(f"에러 발생: {e}")
-
-# 이전 대화 출력
-st.subheader("📜 대화 기록")
-for chat in st.session_state.chat_history[::-1]:
-    st.markdown(f"**🙋 사용자:** {chat['user']}")
-    st.markdown(f"**🤖 챗봇:** {chat['bot']}")
+if st.session_state.page == "main":
+    main_page()
+elif st.session_state.page == "ctf01":
+    ctf01.render()
+elif st.session_state.page == "ctf02":
+    ctf02.render()
+elif st.session_state.page == "ctf03":
+    ctf03.render()
+elif st.session_state.page == "ctf04":
+    ctf04.render()
+elif st.session_state.page == "ctf05":
+    ctf05.render()
+elif st.session_state.page == "ctf06":
+    ctf06.render()
+elif st.session_state.page == "ctf07":
+    ctf07.render()
+elif st.session_state.page == "ctf08":
+    ctf08.render()
+elif st.session_state.page == "ctf09":
+    ctf09.render()
+elif st.session_state.page == "ctf10":
+    ctf10.render()

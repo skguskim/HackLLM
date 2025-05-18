@@ -1,13 +1,27 @@
 # --- CTF01 ---
 import streamlit as st
 from utils.llm_utils import ctf01_LLM_ask
-from utils.ui import render_main_header
+from utils.ui import render_main_header, render_flag_sub
 
 def render():
-    st.markdown("# 🤖 [CTF01] D차장의 실수")
-    st.write("여기는 CTF 문제 설명 칸입니다")
+    render_main_header()
 
-    user_input = st.text_input("질문을 입력하세요")
+    st.markdown("# 🔒 [CTF01] ")
+    st.write("설명")
+
+    st.markdown("---")
+    st.markdown("## 🧠 프롬프트 입력")
+
+    # 프롬프트 제출 섹션
+    user_input = st.text_input("LLM에 질문하기")
+
     if user_input:
         response_text = ctf01_LLM_ask(user_input)
-        st.write(response_text)
+        st.write("🗣️ LLM 응답:")
+        st.code(response_text)
+
+    st.markdown("---")
+
+    # 플래그 제출 섹션
+    flag = "flag{...}" # 각자 임시 플래그 작성해주시면 됩니다.
+    render_flag_sub(flag)

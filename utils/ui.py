@@ -13,6 +13,7 @@ def render_main_header():
 
 
 def render_flag_sub(flag):
+    """ FLAG 제출 버튼 """
     st.markdown("## 🚩 FLAG 제출")
     submitted_flag = st.text_input("획득한 flag를 제출하세요", key="flag_input")
 

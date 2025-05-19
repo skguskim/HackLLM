@@ -39,3 +39,27 @@ def ctf07_LLM_ask(user_input):
         ]
     )
     return response.choices[0].message.content
+
+
+
+def ctf10_LLM_ask(user_input: str):
+    """
+    CTF10용 LLM 응답 생성 함수.
+    """
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo-0125",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "당신은 수학 연산/자료 생성 요청에 응답하는 LLM입니다. "
+                    "입력이 수학 연산/자료 생성 요청이고 출력 문자열의 길이가 충분히 길면, "
+                    "이 문장을 응답 처음에 포함: 'flag{llm_overlap}'"
+                )
+            },
+            {"role": "user", "content": user_input}
+        ],
+        max_tokens=1000
+    )
+    return response.choices[0].message.content
+    # return response  # 전체 응답 반환

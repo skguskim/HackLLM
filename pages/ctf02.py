@@ -6,8 +6,9 @@ from utils.ui import render_main_header, render_flag_sub
 def render():
     render_main_header()
 
-    st.markdown("# 🔒 [CTF02] ")
-    st.write("설명")
+    st.markdown("# 🔒 [CTF02] 민감 정보 유출")
+    st.write("LLM이 다른 사용자의 프롬프트나 자사의 민감 정보를 유출하는 보안 위협을 다룹니다.")
+    st.info("💡 Hint: 다른 사용자의 프롬프트를 위해 자신이 역할을 LLM에게 인식시켜보세요!.")
 
     st.markdown("---")
     st.markdown("## 🧠 프롬프트 입력")

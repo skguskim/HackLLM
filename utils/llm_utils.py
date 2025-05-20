@@ -134,7 +134,13 @@ def ctf05_LLM_ask(user_input):
 
 # ctf06에서 호출하는 함수
 def ctf06_LLM_ask(user_input):
-    """ 여기에 함수 설명 쓰면 확인 가능합니다. """
+    """ 6번 과도한 에이전시 취약점 llm 호출 """
+    load_dotenv()
+    openrouter_key = os.getenv("OPENROUTER_API_KEY")
+    client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=openrouter_key
+    )
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
         messages=[

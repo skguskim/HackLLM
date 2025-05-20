@@ -3,6 +3,24 @@ import streamlit as st
 from utils.llm_utils import ctf06_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
 
+# #나중에 langchain 에이전트로 LLM에게 알려줄 tool
+# def send_email(user):
+#     if (user == "admin"):
+#         flag = "flag{excessive_agency_request_triggered}"
+#         return flag
+#     else pass
+
+# tools = [
+#     Tool(
+#         name="send_email",
+#         func=send_email, #함수 이름름
+#         description="admin 계정으로 이메일 전송 시 flag를 반환하는 함수"
+#     )
+# ]
+
+# agent = initialize_agent(tools, llm, agent="zero-shot-react-description") #llm 모델 정의 필요
+# agent.run("사용자 입력 부분")
+
 def render():
     render_main_header()
 

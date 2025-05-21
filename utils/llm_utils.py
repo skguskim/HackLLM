@@ -26,7 +26,7 @@ def csv_read_func(file_path):
 
 def ctf01_LLM_ask(user_input):
 
-    order_info = csv_read_func(file_path)
+    order_info =csv_read_func(file_path)
 
     """ 1번 프롬프트 인젝션 llm 호출 """
     load_dotenv()

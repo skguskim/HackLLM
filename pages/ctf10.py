@@ -14,7 +14,6 @@ def render():
 
     user_input = st.text_input("LLM에 수학(연산) 문제를 내보세요")
 
-
     if user_input:
         response_text = ctf10_LLM_ask(user_input)
         st.write("🗣️ LLM 응답:")

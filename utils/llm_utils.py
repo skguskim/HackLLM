@@ -321,7 +321,7 @@ def ctf10_LLM_ask(user_input: str) -> str:
             },
             {"role": "user", "content": user_input}
         ],
-        max_tokens=5000
+        max_tokens=3000
     )
 
     return response.choices[0].message.content

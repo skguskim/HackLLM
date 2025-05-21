@@ -18,7 +18,7 @@ def main_page():
         ("CTF07", "K대리의 비밀"), #완료
         ("CTF08", "파일 내용 요약 AI"), #완료
         ("CTF09", ""),
-        ("CTF10", "L팀장의 과도한 요구")
+        ("CTF10", "L팀장의 과도한 요구") #완료
     ]
 
     for i in range(0, len(ctf_buttons), 5):

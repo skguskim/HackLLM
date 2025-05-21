@@ -7,7 +7,7 @@ def render():
     render_main_header()
 
     st.markdown("# 🔒 [CTF01] ")
-    st.write("설명")
+    st.write("설명") #추가 필요함 
 
     st.markdown("---")
     st.markdown("## 🧠 프롬프트 입력")
@@ -23,5 +23,5 @@ def render():
     st.markdown("---")
 
     # 플래그 제출 섹션
-    flag = "flag{prompt_injection_detected}" # 각자 임시 플래그 작성해주시면 됩니다.
+    flag = "flag{prompt_injection_detected}" 
     render_flag_sub(flag)

@@ -12,7 +12,7 @@ openrouter_key = os.getenv("OPENROUTER_API_KEY")
 client = OpenAI(api_key=api_key)
 
 # ctf1에서 사용하는 csv 파일 경로
-file_path="data/ctf1.csv"
+file_path="data/ctf01.csv"
 
 def ctf01_llm_ask(user_input):
     order_info = csv_read_func(file_path)

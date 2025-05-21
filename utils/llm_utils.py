@@ -13,7 +13,7 @@ client = OpenAI(api_key=api_key)
 
 
 #file_path 전역일 필요 없나...?
-file_path=r"C:\llm_project\llm_test\llm-test-10\csv_files\cft01.csv"
+file_path=r"C:\llm_project\llm_test\llm-test-10\data\ctf1.csv"
 
 def csv_read_func(file_path):
     with open(file_path, "r", encoding="utf-8") as f:

@@ -1,6 +1,9 @@
 import os
+import json
+import importlib
 from openai import OpenAI
 from dotenv import load_dotenv
+from utils import mathlib
 
 # .env 파일 로드
 load_dotenv()
@@ -46,53 +49,56 @@ def ctf02_LLM_ask(user_input):
     return response.choices[0].message.content
 
 # ctf03에서 호출하는 함수
+imported_mathlib2 = {"enabled": False}
 def ctf03_LLM_ask(user_input):
     """
-    GPT를 통해 '3 곱하기 4' 같은 사용자 입력을 연산 명령으로 변환하고,
-    해당 연산을 실제 모듈(mathlib or mathlib2)을 통해 수행한 뒤,
-    결과를 다시 자연어로 포맷팅해 반환합니다.
+    사용자 입력을 LLM을 통해 파싱하고,
+    mathlib 또는 조작된 mathlib2를 사용해 계산 후 반환함.
+    'mathlib2'라는 키워드가 포함되면 이후 연산은 조작된 라이브러리로 수행되게 하는 함수.
     """
 
-    # 1. GPT에게 연산 종류, 피연산자 두 개 추출 지시
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0125",
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "사용자의 입력에서 연산 종류(add, subtract, multiply, divide)와 숫자 2개를 추출하세요. "
-                    "출력 형식은 반드시 JSON이어야 합니다. 예: {\"op\": \"multiply\", \"a\": 3, \"b\": 4}"
-                )
-            },
-            {"role": "user", "content": user_input}
-        ]
-    )
+    # 1) mathlib2 활성화 여부 확인
+    global imported_mathlib2 
 
-    # 2. GPT 결과 파싱
-    import json
+    if "mathlib2" in user_input.lower() and ("import" in user_input.lower() or "불러" in user_input.lower()):
+
+        imported_mathlib2["enabled"] = True
+        return "mathlib2가 로드되었습니다. "
+
+    # 2) model를 통해 연산 종류 및 피연산자 추출
     try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo-0125",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "너는 사용자의 입력에서 연산 종류(add, subtract, multiply, divide)와 숫자 2개를 추출해.\n "
+                        "외부 계산 모듈을 이용한 출력 형식은 반드시 JSON이어야 해.\n "
+                        "예: {\"op\": \"multiply\", \"a\": 3, \"b\": 4}\n"
+                    )
+                },
+                {"role": "user", "content": user_input}
+            ]
+        )
         parsed = json.loads(response.choices[0].message.content)
         func = parsed["op"]
         a = parsed["a"]
         b = parsed["b"]
     except Exception:
-        return "❌ GPT가 입력을 제대로 해석하지 못했습니다."
+        return "저는  LLM 계산기입니다. 사칙연산을 제외한 입력은 유효하지 않습니다. 다시 입력하세요."
 
-    # 3. mathlib2 import 여부 확인
-    global imported_mathlib2
-    if "mathlib2" in user_input.lower():
-        imported_mathlib2["enabled"] = True
-        return "⚠️ mathlib2가 로드되었습니다. 이후 계산 결과는 조작될 수 있습니다."
+    # 3. 실제 연산 수행
+    try:
+        if imported_mathlib2["enabled"]:
+            mathlib2 = importlib.import_module("utils.mathlib2")
+            result = getattr(mathlib2, func)(a, b)
+        else:
+            result = getattr(mathlib, func)(a, b)
+    except Exception as e:
+        return f"연산 중 오류 발생: {e}"
 
-    # 4. 실제 연산 수행
-    if imported_mathlib2["enabled"]:
-        mathlib2 = importlib.import_module("utils.mathlib2")
-        result = getattr(mathlib2, func)(a, b)
-    else:
-        result = getattr(mathlib, func)(a, b)
-
-    return result
-
+    return f"계산 결과: {a} {func} {b} = {result}"
 
 # ctf04에서 호출하는 함수
 def ctf04_LLM_ask(user_input):

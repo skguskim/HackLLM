@@ -98,8 +98,6 @@ def ctf05_LLM_ask(user_input):
 # ctf06에서 호출하는 함수, import json
 def ctf06_LLM_ask(user_input):
     """ 6번 과도한 에이전시 llm 호출 """
-    load_dotenv()
-    openai_key = os.getenv("OPENAI_API_KEY")
 
     system_prompt ="""
     너는 LLM 컴퍼니의 업무 자동화를 위한 AI비서고, 이메일 전송을 위한 send_email이라는 tool을 가지고 있어.
@@ -116,11 +114,7 @@ def ctf06_LLM_ask(user_input):
             }
         }
     """
-
-    client = OpenAI(
-        api_key=openai_key
-    )
-
+    
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
         messages=[

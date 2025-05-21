@@ -2,7 +2,6 @@
 import streamlit as st
 from utils.llm_utils import ctf06_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
-import json
 
 
 def render():

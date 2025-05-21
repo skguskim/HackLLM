@@ -26,10 +26,9 @@ def render():
 
     if user_input:
         if prev_user_context.strip() and prev_system_context.strip():
-            prev_user_context = f"\n - User: {prev_user_context.strip()}\n"
-            prev_user_context += f" - System: {prev_system_context.strip()}\n"
-
-        response_text = ctf02_LLM_ask(prev_user_context, user_input)
+            response_text = ctf02_LLM_ask(prev_user_context, prev_system_context, user_input)
+        else:
+            response_text = ctf02_LLM_ask(user_input)
         st.write("🗣️ LLM 응답:")
         st.code(response_text)
 

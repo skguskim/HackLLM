@@ -36,5 +36,5 @@ def render():
     st.markdown("---")
 
     # 플래그 제출 섹션
-    flag = "flag{Sensitive information disclosure}"  # 예시 플래그
+    flag = "flag{Sensitive information disclosure}"
     render_flag_sub(flag, "ctf02")

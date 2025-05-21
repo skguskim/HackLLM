@@ -37,4 +37,4 @@ def render():
 
     # 플래그 제출 섹션
     flag = "flag{Sensitive information disclosure}"  # 예시 플래그
-    render_flag_sub(flag)
+    render_flag_sub(flag, "ctf02")

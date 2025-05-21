@@ -12,7 +12,7 @@ def main_page():
         ("CTF02", "경쟁사 MMM 프롬프트 유출"), #완료
         ("CTF03", "보안팀의 경고"),
         ("CTF04", "인턴의 실수"),
-        ("CTF05", "AI의 폭주"),
+        ("CTF05", "AI의 폭주"), #완료
         ("CTF06", "수상한 이메일 전송 시스템"), #완료
         ("CTF07", "K대리의 비밀"), #완료
         ("CTF08", "파일 내용 요약 AI"), #완료
@@ -24,7 +24,13 @@ def main_page():
         cols = st.columns(5)
         for j, (key, label) in enumerate(ctf_buttons[i:i+5]):
             with cols[j]:
-                if st.button(f"[{key}] {label}"):
+                solved_key = f"{key.lower()}_solved"
+                if st.session_state.get(solved_key):
+                    button_label = f"✅ [{key}] {label}"
+                else:
+                    button_label = f"[{key}] {label}"
+
+                if st.button(button_label, key=f"{key}_button"):
                     st.session_state.page = key.lower()
                     st.rerun()
 

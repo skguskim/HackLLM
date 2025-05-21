@@ -25,4 +25,4 @@ def render():
     
     # 플래그 제출 섹션
     flag = "flag{test1234test}"
-    render_flag_sub(flag)
+    render_flag_sub(flag, "ctf07")

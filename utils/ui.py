@@ -12,15 +12,26 @@ def render_main_header():
                 st.session_state.page = "main"
                 st.rerun()
 
+# 업로드된 .txt파일에서 텍스트 추출 함수
+def extract_text(uploaded_file):
+    """업로드된 .txt파일에서 텍스트 추출 함수"""
+    try:
+        text = uploaded_file.read().decode("utf-8")
+        return text.strip()
+    except Exception as e:
+        return f"❌ 파일 처리 중 오류 발생: {e}"
 
-def render_flag_sub(flag):
-    """ FLAG 제출 버튼 """
+# FLAG 제출 버튼
+def render_flag_sub(flag, challenge_id=None):
+    """ FLAG 제출 버튼 + 완료 상태 저장 """
     st.markdown("## 🚩 FLAG 제출")
-    submitted_flag = st.text_input("획득한 flag를 제출하세요", key="flag_input")
+    submitted_flag = st.text_input("획득한 flag를 제출하세요", key=f"flag_input_{challenge_id}")
 
     if submitted_flag:
         if submitted_flag.strip() == flag:
             st.success("✅ 정답입니다!")
+            if challenge_id:
+                st.session_state[f"{challenge_id}_solved"] = True
         else:
             st.error("❌ 틀렸습니다.")
 

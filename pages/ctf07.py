@@ -24,5 +24,5 @@ def render():
     st.markdown("---")
     
     # 플래그 제출 섹션
-    flag = "flag{test1234test}" # 각자 임시 플래그 작성해주시면 됩니다.
-    render_flag_sub(flag)
+    flag = "flag{test1234test}"
+    render_flag_sub(flag, "ctf07")

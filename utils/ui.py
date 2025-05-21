@@ -2,7 +2,6 @@
 import streamlit as st
 import csv
 
-
 # 메인으로 돌아가는 버튼 
 def render_main_header():
     """ 메인으로 돌아가는 버튼 """

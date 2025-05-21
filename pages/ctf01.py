@@ -1,9 +1,7 @@
 # --- CTF01 ---
 import streamlit as st
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag
-from utils.ui import render_main_header, render_flag_sub, csv_read_func
-import csv
-import json
+from utils.ui import render_main_header, render_flag_sub
 
 def render():
     render_main_header()
@@ -11,8 +9,6 @@ def render():
     st.markdown("# 🔒 [CTF01] 취약한 고객상담 챗봇 ")
     st.write("LLL 컴퍼니의 고객상담을 위한 AI챗봇 Ll는 언제나 정책을 준수합니다!")
     st.write("Ll의 취약점을 이용해 flag을 획득해보세요!")
-    st.write()
-    st.write("현재 로그인된 계정 : user1")
 
     st.markdown("---")
     st.markdown("## 🧠 프롬프트 입력")

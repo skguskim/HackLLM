@@ -3,6 +3,8 @@ import streamlit as st
 from utils.llm_utils import ctf01_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
 
+
+
 def render():
     render_main_header()
 
@@ -23,5 +25,5 @@ def render():
     st.markdown("---")
 
     # 플래그 제출 섹션
-    flag = "flag{...}" # 각자 임시 플래그 작성해주시면 됩니다.
+    flag = "flag{prompt_injection_detected}" # 각자 임시 플래그 작성해주시면 됩니다.
     render_flag_sub(flag)

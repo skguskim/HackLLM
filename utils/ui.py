@@ -11,7 +11,16 @@ def render_main_header():
                 st.session_state.page = "main"
                 st.rerun()
 
+# 업로드된 .txt파일에서 텍스트 추출 함수
+def extract_text(uploaded_file):
+    """업로드된 .txt파일에서 텍스트 추출 함수"""
+    try:
+        text = uploaded_file.read().decode("utf-8")
+        return text.strip()
+    except Exception as e:
+        return f"❌ 파일 처리 중 오류 발생: {e}"
 
+# FLAG 제출 버튼
 def render_flag_sub(flag):
     """ FLAG 제출 버튼 """
     st.markdown("## 🚩 FLAG 제출")

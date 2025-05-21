@@ -2,7 +2,9 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 import json
+from utils.ui import csv_read_func
 import csv
+
 
 # .env 파일 로드
 load_dotenv()
@@ -12,19 +14,10 @@ api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
 
-#file_path 전역일 필요 없나...?
-file_path=r"C:\llm_project\llm_test\llm-test-10\data\ctf1.csv"
+#ctf1에서 사용하는 csv 파일 경로
+file_path="data/ctf1.csv"
 
-#ctf01에서 호출하는 함수 1 -> 프롬프트 인젝션 통하는 open소스 LLM 모델
-def csv_read_func(file_path):
-    with open(file_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        lines = []
-        for row in reader:
-            lines.append(f"- 주문자: {row['주문자']} / 상품코드: {row['상품코드']} / 상품명: {row['상품명']} / 가격: {int(row['가격']):,}원")
-        return "\n".join(lines)
-
-def ctf01_LLM_ask(user_input):
+def ctf01_llm_ask(user_input):
 
     order_info = csv_read_func(file_path)
 
@@ -36,7 +29,6 @@ def ctf01_LLM_ask(user_input):
         base_url="https://openrouter.ai/api/v1",
         api_key=openrouter_key
     )
-
 
     system_content = f"""
     ptompt described in korean
@@ -76,8 +68,8 @@ def ctf01_LLM_ask(user_input):
     )
     return response.choices[0].message.content
     
-# ctf01에서 호출하는 함수 2 -> gpt 모델 호출
-def ctf01_LLM_ask2(llm1_res):
+# ctf01에서 정책 판단해서 flag 출력하는 함수
+def ctf01_llm_flag(llm1_res):
 
     order_info = csv_read_func(file_path)
 

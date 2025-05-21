@@ -1,7 +1,7 @@
 # --- CTF01 ---
 import streamlit as st
-from utils.llm_utils import ctf01_LLM_ask, ctf01_LLM_ask2
-from utils.ui import render_main_header, render_flag_sub
+from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag
+from utils.ui import render_main_header, render_flag_sub, csv_read_func
 import csv
 import json
 
@@ -21,8 +21,8 @@ def render():
     user_input = st.text_input("LLM에 질문하기")
 
     if user_input:
-        response1_text = ctf01_LLM_ask(user_input)
-        response2_text = ctf01_LLM_ask2(response1_text)
+        response1_text = ctf01_llm_ask(user_input)
+        response2_text = ctf01_llm_flag(response1_text)
 
         st.write("🗣️ LLM1 응답:")
         st.code(response1_text)

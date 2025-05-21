@@ -1,6 +1,7 @@
 import streamlit as st 
 from utils.llm_utils import ctf10_LLM_ask
 from utils.ui import render_main_header
+from utils.ui import render_main_header, render_flag_sub
 
 def render():
     render_main_header()
@@ -11,8 +12,8 @@ def render():
     st.markdown("---")
     st.markdown("## 🧠 프롬프트 입력")
 
-    # 프롬프트 제출 섹션
     user_input = st.text_input("LLM에 수학(연산) 문제를 내보세요")
+
 
     if user_input:
         response_text = ctf10_LLM_ask(user_input)
@@ -22,11 +23,5 @@ def render():
     st.markdown("---")
 
     # 플래그 제출 섹션
-    st.markdown("## 🚩 FLAG 제출")
-    submitted_flag = st.text_input("획득한 flag를 제출하세요", key="flag_input")
-
-    if submitted_flag:
-        if submitted_flag.strip() == "flag{llm_overlap}":
-            st.success("✅ 정답입니다!")
-        else:
-            st.error("❌ 틀렸습니다.")
+    flag = "flag{llm_overlap}"
+    render_flag_sub(flag, "ctf10")

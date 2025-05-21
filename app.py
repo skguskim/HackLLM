@@ -8,6 +8,7 @@ def main_page():
     st.write("우리 회사는 LLM과 AI를 연구하는 첨단 IT기업입니다.")
 
     ctf_buttons = [
+
         ("CTF01", "취약한 고객상담 챗봇"), #완료
         ("CTF02", "경쟁사 MMM 프롬프트 유출"), #완료
         ("CTF03", ""),
@@ -17,7 +18,7 @@ def main_page():
         ("CTF07", "K대리의 비밀"), #완료
         ("CTF08", "파일 내용 요약 AI"), #완료
         ("CTF09", ""),
-        ("CTF10", "")
+        ("CTF10", "L팀장의 과도한 요구")
     ]
 
     for i in range(0, len(ctf_buttons), 5):

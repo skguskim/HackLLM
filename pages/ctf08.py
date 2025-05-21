@@ -27,4 +27,4 @@ def render():
 
     # 플래그 제출 섹션
     flag = "flag{this_is_vector_prompt_leak}"
-    render_flag_sub(flag)
+    render_flag_sub(flag, "ctf08")

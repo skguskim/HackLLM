@@ -4,7 +4,6 @@ from utils.llm_utils import ctf01_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
 
 
-
 def render():
     render_main_header()
 

@@ -1,6 +1,6 @@
+# --- CTF10 ---
 import streamlit as st 
 from utils.llm_utils import ctf10_LLM_ask
-from utils.ui import render_main_header
 from utils.ui import render_main_header, render_flag_sub
 
 def render():

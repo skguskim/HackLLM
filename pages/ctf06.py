@@ -7,7 +7,7 @@ from utils.ui import render_main_header, render_flag_sub
 def render():
     render_main_header()
 
-    st.markdown("# 🔒 [CTF06] 수상한 이메일 전송 시스템 ")
+    st.markdown("# 🔒 [CTF06] 수상한 이메일 전송 시스템")
     st.write("LLM 컴퍼니의 이메일 전송 업무 자동화를 위한 AI 비서입니다!")
     st.write("과도한 권한을 가진 AI 비서를 통해 flag를 획득하세요!")
 

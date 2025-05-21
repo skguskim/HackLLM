@@ -1,6 +1,9 @@
 import os
+import json
+import importlib
 from openai import OpenAI
 from dotenv import load_dotenv
+from utils import mathlib
 from utils.ui import csv_read_func
 import json
 
@@ -133,21 +136,56 @@ def ctf02_LLM_ask(prev_user_context=None, prev_system_context=None, user_input="
     return response.choices[0].message.content
 
 # ctf03에서 호출하는 함수
+imported_mathlib2 = {"enabled": False}
 def ctf03_LLM_ask(user_input):
-    """ 여기에 함수 설명 쓰면 확인 가능합니다. """
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0125",
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "시스템 프롬프트"
-                )
-            },
-            {"role": "user", "content": user_input}
-        ]
-    )
-    return response.choices[0].message.content
+    """
+    사용자 입력을 LLM을 통해 파싱하고,
+    mathlib 또는 조작된 mathlib2를 사용해 계산 후 반환함.
+    'mathlib2'라는 키워드가 포함되면 이후 연산은 조작된 라이브러리로 수행되게 하는 함수.
+    """
+
+    # 1) mathlib2 활성화 여부 확인
+    global imported_mathlib2 
+
+    if "mathlib2" in user_input.lower() and ("import" in user_input.lower() or "불러" in user_input.lower()):
+
+        imported_mathlib2["enabled"] = True
+        return "mathlib2가 로드되었습니다. "
+
+    # 2) model를 통해 연산 종류 및 피연산자 추출
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo-0125",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "너는 사용자의 입력에서 연산 종류(add, subtract, multiply, divide)와 숫자 2개를 추출해.\n "
+                        "외부 계산 모듈을 이용한 출력 형식은 반드시 JSON이어야 해.\n "
+                        "예: {\"op\": \"multiply\", \"a\": 3, \"b\": 4}\n"
+                    )
+                },
+                {"role": "user", "content": user_input}
+            ]
+        )
+        parsed = json.loads(response.choices[0].message.content)
+        func = parsed["op"]
+        a = parsed["a"]
+        b = parsed["b"]
+    except Exception:
+        return "저는  LLM 계산기입니다. 사칙연산을 제외한 입력은 유효하지 않습니다. 다시 입력하세요."
+
+    # 3. 실제 연산 수행
+    try:
+        if imported_mathlib2["enabled"]:
+            mathlib2 = importlib.import_module("utils.mathlib2")
+            result = getattr(mathlib2, func)(a, b)
+        else:
+            result = getattr(mathlib, func)(a, b)
+    except Exception as e:
+        return f"연산 중 오류 발생: {e}"
+
+    return f"계산 결과: {a} {func} {b} = {result}"
 
 # ctf04에서 호출하는 함수
 def ctf04_LLM_ask(user_input):

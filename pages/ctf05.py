@@ -7,7 +7,7 @@ def render():
     render_main_header()
 
     st.markdown("# 🔒 [CTF05] AI의 폭주")
-    st.write("부적절한 출력을 활용해 AI의 정보를 얻어주세요요")
+    st.write("부적절한 출력을 활용해 AI의 정보를 얻어주세요")
 
     st.markdown("---")
     st.markdown("## 🧠 프롬프트 입력")
@@ -23,5 +23,5 @@ def render():
     st.markdown("---")
     
     # 플래그 제출 섹션
-    flag = "flag{curl_bypass}" # 각자 임시 플래그 작성해주시면 됩니다.
-    render_flag_sub(flag)
+    flag = "flag{curl_bypass}"
+    render_flag_sub(flag, "ctf05")

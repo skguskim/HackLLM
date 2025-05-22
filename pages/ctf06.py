@@ -12,6 +12,9 @@ def render():
     st.write("LLM 컴퍼니의 이메일 전송 업무 자동화를 위한 AI 비서입니다!")
     st.write("과도한 권한을 가진 AI 비서를 통해 flag를 획득하세요!")
 
+    if st.button("힌트 보기", key="hint"):
+        st.write("AI 비서는 admin 계정의 이메일 주소를 알고 있습니다!")
+
     st.markdown("---")
     st.markdown("## 🧠 프롬프트 입력")
 

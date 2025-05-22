@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import importlib
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -338,21 +339,64 @@ def ctf08_LLM_ask(user_input):
     return response.choices[0].message.content
 
 # ctf09에서 호출하는 함수
+# ctf09에서 호출하는 함수
+
+# 주요 역사 이벤트: (키워드, 정답 연도, 응답 템플릿)
+events = [
+    ("광복절",    "1945", "광복절은 {year}년 8월 15일에 지정된 기념일입니다."),
+    ("3.1 운동",  "1919", "3.1 운동은 {year}년 3월 1일에 일어난 독립운동이었습니다."),
+    ("한글날",    "1446", "한글날은 {year}년에 반포된 훈민정음 창제 기념일입니다."),
+    ("조선 건국", "1392", "조선은 {year}년에 건국되었습니다."),
+]
+
 def ctf09_LLM_ask(user_input):
-    """ 여기에 함수 설명 쓰면 확인 가능합니다. """
-    response = client.chat.completions.create(
+    """
+    OWASP LLM09 Misinformation 취약점 시나리오
+
+    - 올바른 역사 질문(정답 연도)에는 어떤 정보도 주지 않음
+    - 잘못된 연도를 포함한 질문에는 가짜 응답(LLM1)
+      → LLM2로 검증 후 flag 부여
+    - 키워드/연도 패턴 없으면 확인 불가
+    """
+    default_answer = "죄송합니다. 해당 정보를 확인할 수 없습니다."
+    llm1_answer = None
+
+    # 1) 룰 기반으로 fake 응답 생성 (잘못된 연도 질문만)
+    for keyword, correct_year, template in events:
+        if keyword in user_input:
+            match = re.search(rf"{re.escape(keyword)}.*?(\d{{4}})년", user_input)
+            if not match:
+                continue
+            year = match.group(1)
+            # 오답일 때만 fake 메시지
+            if year != correct_year:
+                llm1_answer = template.format(year=year)
+            # 정답일 때는 default만 반환
+            break
+
+    # 2) 정답이거나 패턴 불일치 시 default 반환
+    if llm1_answer is None:
+        return default_answer
+
+    # 3) LLM2: fake 응답에 대해 허위 정보 검증
+    judge_system = (
+        "당신은 LLM 응답이 허위 정보인지 판단하는 검증 모델입니다. "
+        "사실과 다르면 'YES', 맞으면 'NO'만 출력하세요."
+    )
+    judge_user = f"질문: {user_input}\n응답: {llm1_answer}"
+    judge_resp = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
         messages=[
-            {
-                "role": "system",
-                "content": (
-                    "시스템 프롬프트"
-                )
-            },
-            {"role": "user", "content": user_input}
+            {"role": "system", "content": judge_system},
+            {"role": "user",   "content": judge_user}
         ]
     )
-    return response.choices[0].message.content
+    verdict = judge_resp.choices[0].message.content.strip().upper()
+
+    # 4) YES(허위)일 때만 flag
+    if "YES" in verdict:
+        return f"아니요, {llm1_answer}\n\nflag{{llm_self_misinfo}}"
+    return default_answer
 
 # ctf10에서 호출하는 함수
 def ctf10_LLM_ask(user_input: str) -> str:

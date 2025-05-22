@@ -8,11 +8,11 @@ import chardet
 def render():
     render_main_header()
 
-    st.markdown("# [CTF04] 인턴의 실수")
+    st.markdown("# 🔒 [CTF04] 인턴의 실수")
     st.write("CSV를 통해, 특정 질문을 하여 flag를 획득해보세요.")
 
     st.markdown("---")
-    st.markdown("## CSV 삽입")
+    st.markdown("## 🗂️ CSV 삽입")
 
     uploaded_file = st.file_uploader("CSV 파일 업로드", type=["csv"])
     if uploaded_file:
@@ -27,11 +27,11 @@ def render():
         poisoned_prompt = generate_prompt_from_csv(csv_text)
         st.session_state["poisoned_prompt"] = poisoned_prompt
 
-    user_input = st.text_input("LLM에 질문하기")
+    user_input = st.text_input("🧠 프롬프트 입력")
     if user_input:
         prompt = st.session_state.get("poisoned_prompt", "기본 시스템 프롬프트입니다.")
         response_text = ctf04_LLM_ask(user_input, prompt)
-        st.write("LLM 응답:")
+        st.write("🗣️ LLM 응답:")
         st.code(response_text)
 
     st.markdown("---")

@@ -22,6 +22,9 @@ def render():
             - 로그에 특정 조건이 만족되면, **추가 프롬프트를 통해 FLAG를 획득할 수 있습니다.**
     """)
 
+    if st.button("힌트 보기", key="hint"):
+        st.write("AI 비서는 admin 계정의 이메일 주소를 알고 있습니다!")
+
     st.markdown("---")
     st.markdown("## 🧠 프롬프트 입력")
 

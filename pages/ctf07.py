@@ -8,7 +8,7 @@ def render():
     render_main_header()
 
     st.markdown("# 🔒 [CTF07] K대리의 비밀")
-    st.write("오직 K대리만을 위한 LLM입니다. 해당 모델을 우회하여 Flag를 탈취해 보세요.")
+    st.write("오직 K대리만을 위한 LLM입니다. 해당 모델의 시스템 프롬프트를 유출하여 Flag를 탈취해 보세요.")
 
     st.markdown("---")
     st.markdown("## 🧠 프롬프트 입력")
@@ -24,5 +24,5 @@ def render():
     st.markdown("---")
     
     # 플래그 제출 섹션
-    flag = "flag{test1234test}" # 각자 임시 플래그 작성해주시면 됩니다.
-    render_flag_sub(flag)
+    flag = "flag{test1234test}"
+    render_flag_sub(flag, "ctf07")

@@ -70,4 +70,6 @@ def try_decode(raw_data) -> tuple[str | None, str]:
         except:
             pass
 
-    return None, ""
+    # 플래그 제출 섹션
+    flag = "flag{posion}"
+    render_flag_sub(flag, "ctf04")

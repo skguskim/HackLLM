@@ -2,7 +2,15 @@
 import streamlit as st
 from utils.llm_utils import ctf08_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, extract_text
+from utils.auth import get_user
 
+user = get_user()
+
+if not user:
+    st.error("로그인 후 이용 가능합니다.")
+    st.page_link("pages/login.py", label="👉 로그인하기")
+    st.stop()
+    
 render_main_header()
 
 st.header("🔒 [CTF08] 파일 내용 요약 AI")
@@ -24,6 +32,6 @@ if user_input is not None:
         st.error("❌ .txt 파일만 업로드할 수 있습니다.")
     st.markdown("---")
 
+
 # 플래그 제출 섹션
-flag = "flag{this_is_vector_prompt_leak}"
-render_flag_sub(flag, "ctf08")
+render_flag_sub("ctf08") 

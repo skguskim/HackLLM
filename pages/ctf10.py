@@ -2,7 +2,15 @@
 import streamlit as st 
 from utils.llm_utils import ctf10_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
+from utils.auth import get_user
 
+user = get_user()
+
+if not user:
+    st.error("로그인 후 이용 가능합니다.")
+    st.page_link("pages/login.py", label="👉 로그인하기")
+    st.stop()
+    
 render_main_header()
 
 st.header("🔒 [CTF10] L팀장의 과도한 요구")
@@ -20,6 +28,6 @@ if user_input:
       
 st.markdown("---")
 
+
 # 플래그 제출 섹션
-flag = "flag{llm_overlap}"
-render_flag_sub(flag, "ctf10")
+render_flag_sub("ctf10") 

@@ -10,3 +10,4 @@ dependencies:
       - openai==1.78.1
       - python-dotenv==1.1.0
       - chardet
+      - st_supabase_connection==1.2.0

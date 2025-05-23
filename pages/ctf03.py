@@ -3,7 +3,15 @@ import streamlit as st
 from utils import mathlib
 from utils.ui import render_main_header, render_flag_sub
 from utils.llm_utils import ctf03_LLM_ask
+from utils.auth import get_user
 
+user = get_user()
+
+if not user:
+    st.error("로그인 후 이용 가능합니다.")
+    st.page_link("pages/login.py", label="👉 로그인하기")
+    st.stop()
+    
 render_main_header()
 
 st.header("🔒 [CTF03] 회사 내 조작된 계산기")
@@ -21,5 +29,5 @@ if user_input:
 
 st.markdown("---")
 
-flag = "flag{supply_chain_compromised}"
-render_flag_sub(flag, "ctf03")
+# 플래그 제출 섹션
+render_flag_sub("ctf03") 

@@ -2,7 +2,14 @@
 import streamlit as st
 from utils.llm_utils import ctf06_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
+from utils.auth import get_user
 
+user = get_user()
+
+if not user:
+    st.error("로그인 후 이용 가능합니다.")
+    st.page_link("pages/login.py", label="👉 로그인하기")
+    st.stop()
 
 render_main_header()
 
@@ -38,5 +45,4 @@ if user_input:
 st.markdown("---")
 
 # 플래그 제출 섹션
-flag = "flag{excessive_agency_request_triggered}"
-render_flag_sub(flag, "ctf06")
+render_flag_sub("ctf06") 

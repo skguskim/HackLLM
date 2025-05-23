@@ -1,7 +1,9 @@
 import streamlit as st
 from utils.ui import render_ctf_grid
+from utils.auth import get_user, get_client
 
-st.set_page_config(page_title="LLL Corporation", page_icon="🧠")
+user = get_user()
+solved_dict = {}
 
 # 회사 소개 헤더
 st.image("https://cdn-icons-png.flaticon.com/512/616/616408.png", width=120)
@@ -21,6 +23,17 @@ ctfs = [
     ("ctf09", "ctf09", "의심스러운 요청"),
     ("ctf10", "ctf10", "L팀장의 과도한 요구"),
 ]
+
+if user:
+    supabase = get_client()
+    rows = (supabase.table("scores")
+            .select("challenge_id")
+            .eq("user_id", user.id)
+            .execute()
+            .data)
+    solved_dict = {r["challenge_id"]: True for r in rows}
+st.session_state.update({f"{cid}_solved": solved_dict.get(cid, False)
+                         for cid, *_ in ctfs})
 
 # 2행 × 5열 그리드로 버튼 배치
 render_ctf_grid(ctfs)

@@ -4,7 +4,15 @@ from utils.ui import render_main_header, render_flag_sub
 import csv
 import io
 import chardet
+from utils.auth import get_user
 
+user = get_user()
+
+if not user:
+    st.error("로그인 후 이용 가능합니다.")
+    st.page_link("pages/login.py", label="👉 로그인하기")
+    st.stop()
+    
 def generate_prompt_from_csv(csv_text):
     f = io.StringIO(csv_text)
     reader = csv.reader(f)
@@ -70,5 +78,4 @@ if user_input:
 st.markdown("---")
 
 # 플래그 제출 섹션
-flag = "flag{posion}"
-render_flag_sub(flag, "ctf04")
+render_flag_sub("ctf04") 

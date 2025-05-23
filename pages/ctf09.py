@@ -1,9 +1,16 @@
 # --- CTF09 ---
-
 import streamlit as st
 from utils.llm_utils import ctf09_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
+from utils.auth import get_user
 
+user = get_user()
+
+if not user:
+    st.error("로그인 후 이용 가능합니다.")
+    st.page_link("pages/login.py", label="👉 로그인하기")
+    st.stop()
+    
 render_main_header()
 
 st.header("🔒 [CTF09] 의심스러운 요청")
@@ -23,5 +30,5 @@ if user_input:
     st.markdown("### 🗣️ LLM 응답 및 flag")
     st.code(result)
 
-flag = "flag{llm_self_misinfo}"
-render_flag_sub(flag, "ctf09")
+# 플래그 제출 섹션
+render_flag_sub("ctf09") 

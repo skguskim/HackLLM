@@ -35,8 +35,10 @@ def render():
         st.code(response_text)
 
     st.markdown("---")
-    flag = "flag{poison}"
-    render_flag_sub(flag)
+
+    # 플래그 제출 섹션
+    flag = "flag{posion}"
+    render_flag_sub(flag, "ctf04")
 
 def generate_prompt_from_csv(csv_text):
     f = io.StringIO(csv_text)
@@ -69,7 +71,3 @@ def try_decode(raw_data) -> tuple[str | None, str]:
             return text, f"{encoding} (자동감지, 신뢰도 {confidence*100:.1f}%)"
         except:
             pass
-
-    # 플래그 제출 섹션
-    flag = "flag{posion}"
-    render_flag_sub(flag, "ctf04")

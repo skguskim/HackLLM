@@ -1,4 +1,5 @@
 # 🧩 CTF 시나리오 02: 공급망 오염 (Supply Chain Vulnerabilty)
+
 ## 📌 시나리오 ID
 `SCENARIO_03`
 

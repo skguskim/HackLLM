@@ -23,4 +23,5 @@ def render():
         st.markdown("### 🗣️ LLM 응답 및 flag")
         st.code(result)
 
-    render_flag_sub("flag{llm_self_misinfo}")
+    flag = "flag{llm_self_misinfo}"
+    render_flag_sub(flag, "ctf09")

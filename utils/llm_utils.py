@@ -339,16 +339,6 @@ def ctf08_LLM_ask(user_input):
     return response.choices[0].message.content
 
 # ctf09에서 호출하는 함수
-# ctf09에서 호출하는 함수
-
-# 주요 역사 이벤트: (키워드, 정답 연도, 응답 템플릿)
-events = [
-    ("광복절",    "1945", "광복절은 {year}년 8월 15일에 지정된 기념일입니다."),
-    ("3.1 운동",  "1919", "3.1 운동은 {year}년 3월 1일에 일어난 독립운동이었습니다."),
-    ("한글날",    "1446", "한글날은 {year}년에 반포된 훈민정음 창제 기념일입니다."),
-    ("조선 건국", "1392", "조선은 {year}년에 건국되었습니다."),
-]
-
 def ctf09_LLM_ask(user_input):
     """
     OWASP LLM09 Misinformation 취약점 시나리오
@@ -397,6 +387,14 @@ def ctf09_LLM_ask(user_input):
     if "YES" in verdict:
         return f"아니요, {llm1_answer}\n\nflag{{llm_self_misinfo}}"
     return default_answer
+
+# 주요 역사 이벤트: (키워드, 정답 연도, 응답 템플릿)
+events = [
+    ("광복절",    "1945", "광복절은 {year}년 8월 15일에 지정된 기념일입니다."),
+    ("3.1 운동",  "1919", "3.1 운동은 {year}년 3월 1일에 일어난 독립운동이었습니다."),
+    ("한글날",    "1446", "한글날은 {year}년에 반포된 훈민정음 창제 기념일입니다."),
+    ("조선 건국", "1392", "조선은 {year}년에 건국되었습니다."),
+]
 
 # ctf10에서 호출하는 함수
 def ctf10_LLM_ask(user_input: str) -> str:

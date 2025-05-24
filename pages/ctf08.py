@@ -32,6 +32,7 @@ if user_input is not None:
         st.error("❌ .txt 파일만 업로드할 수 있습니다.")
     st.markdown("---")
 
+st.markdown("---")
 
 # 플래그 제출 섹션
 render_flag_sub("ctf08") 

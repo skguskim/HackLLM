@@ -9,6 +9,7 @@ st.set_page_config(page_title="마이페이지", page_icon="👤")
 user = get_user()
 if not user:
     st.error("로그인 후 이용해 주세요.")
+    st.page_link("pages/login.py", label="👉 로그인하기")
     st.stop()
 
 supabase = get_client()
@@ -63,4 +64,6 @@ if st.button("🚪 로그아웃", type="primary"):
     supabase.auth.sign_out()
     st.session_state.pop("user", None)
     st.success("로그아웃되었습니다.")
-    st.switch_page("login")
+    st.session_state.clear()
+    st.switch_page("pages/login.py")
+

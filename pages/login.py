@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.auth import get_client, get_user
 
-st.header("🔑 로그인")
+st.set_page_config(page_title="로그인", page_icon="🔐")
 
 supabase = get_client()
 

@@ -3,6 +3,7 @@ import streamlit as st
 import csv
 from utils.auth import get_user, get_client       
 from utils.score import sha256_hex, total_score       
+from postgrest.exceptions import APIError
 
 # 메인으로 돌아가는 버튼
 def render_main_header():
@@ -20,7 +21,6 @@ def render_ctf_grid(ctf_info):
                 title = f"✅ [{short}]" if solved else f"[{short}]"
                 if st.button(f"{title}\n{label}", key=file_key):
                     st.switch_page(f"pages/{file_key}.py")
-
 
 # FLAG 제출 버튼
 def render_flag_sub(challenge_id: str):
@@ -45,21 +45,26 @@ def render_flag_sub(challenge_id: str):
 
     # 1) flags 테이블에서 (challenge_id, flag_hash == sha256) 조회
     h = sha256_hex(user_flag.strip())
-    row = (
-        supabase.table("flags")
-        .select("points")
-        .eq("challenge_id", challenge_id)
-        .eq("flag_hash", h)
-        .single()
-        .execute()
-        .data
-    )
 
-    if not row:
-        st.error("❌ 오답입니다.")
-        return
+    try:
+        row = (
+            supabase.table("flags")
+            .select("points")
+            .eq("challenge_id", challenge_id)
+            .eq("flag_hash", h)
+            .single()
+            .execute()
+            .data
+        )
+    except APIError as e:
+        if e.code == "PGRST116":
+            st.error("❌ 오답입니다.")
+            return
+        else:
+            st.error(f"오류 발생: {e.message}")
+            return
 
-    # scores upsert
+    # 2) 정답이면 scores upsert
     supabase.table("scores").upsert(
         {"user_id": user.id, "challenge_id": challenge_id, "score": row["points"]}
     ).execute()
@@ -68,6 +73,7 @@ def render_flag_sub(challenge_id: str):
     st.session_state[f"{challenge_id}_solved"] = True
     st.success(f"✅ 정답! {row['points']}점 획득")
     st.write(f"🏅 현재 총점: **{total_score(user.id)}**")
+
 
 
 # 업로드된 .txt파일에서 텍스트 추출 함수

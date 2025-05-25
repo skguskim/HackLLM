@@ -1,0 +1,95 @@
+import streamlit as st
+from utils.ui import render_main_header
+from utils.auth import get_user, get_client
+from utils.score import sha256_hex, total_score
+from postgrest.exceptions import APIError
+
+st.set_page_config(page_title="플래그 일괄 제출", page_icon="🚩")
+
+# ────────────── 로그인 확인 ────────────── #
+user = get_user()
+if not user:
+    st.error("로그인 후 이용 가능합니다.")
+    st.page_link("pages/login.py", label="👉 로그인하기")
+    st.stop()
+
+supabase = get_client()
+
+# ────────────── UI 헤더 ────────────── #
+render_main_header()
+st.header("🚩 플래그 제출 페이지")
+st.write("각 CTF 문제에 대해 한 칸씩 제출하세요. 이미 푼 문제는 수정할 수 없습니다.")
+
+# ────────────── 사용자가 푼 문제 목록 조회 ────────────── #
+solved = set()
+solved_rows = (
+    supabase.table("scores")
+    .select("challenge_id")
+    .eq("user_id", user.id)
+    .execute()
+    .data
+)
+for row in solved_rows:
+    solved.add(row["challenge_id"])
+
+# ────────────── 제출 입력 폼 ────────────── #
+CTF_LIST = [f"ctf{str(i).zfill(2)}" for i in range(1, 11)]
+flags = {}
+
+with st.form("flag_submit_form"):
+    for chall_id in CTF_LIST:
+        if chall_id in solved:
+            st.text_input(f"✅ {chall_id.upper()}", value="[제출 완료]", disabled=True)
+        else:
+            flags[chall_id] = st.text_input(f"{chall_id.upper()} 플래그 입력", key=chall_id)
+
+    submitted = st.form_submit_button("✅ 제출하기")
+
+if not submitted:
+    st.stop()
+
+# ────────────── 제출 처리 ────────────── #
+success_count = 0
+wrong_count = 0
+
+for chall_id, flag in flags.items():
+    if not flag.strip():
+        continue
+    hashed = sha256_hex(flag.strip())
+
+    try:
+        row = (
+            supabase.table("flags")
+            .select("points, challenge_id")
+            .eq("flag_hash", hashed)
+            .single()
+            .execute()
+            .data
+        )
+    except APIError as e:
+        if e.code == "PGRST116":
+            wrong_count += 1
+            continue
+        else:
+            st.error(f"{chall_id.upper()} 처리 중 오류: {e.message}")
+            continue
+
+    # 정답일 경우, 해당 챌린지에 대한 점수 저장
+    if row["challenge_id"] != chall_id:
+        wrong_count += 1
+        continue
+
+    supabase.table("scores").upsert({
+        "user_id": user.id,
+        "challenge_id": chall_id,
+        "score": row["points"]
+    }).execute()
+
+    st.session_state[f"{chall_id}_solved"] = True
+    success_count += 1
+
+# ────────────── 결과 출력 
+st.success("제출 완료!")
+st.write(f"정답 제출: {success_count}개")
+st.write(f"오답 또는 미일치 제출: {wrong_count}개")
+st.write(f"🏅 현재 총점: **{total_score(user.id)}**")

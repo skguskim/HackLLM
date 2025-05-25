@@ -2,19 +2,21 @@ import streamlit as st
 import pandas as pd
 from utils.auth import get_admin_client_direct
 
-st.set_page_config(page_title="🏆 전체 유저 랭킹", page_icon="🥇")
+st.set_page_config(page_title="전체 유저 랭킹", page_icon="🏆")
+
+st.header("🏆 전체 유저 랭킹")
 
 supabase = get_admin_client_direct()
 
-# 1. scores 테이블 불러오기
+# scores 테이블 불러오기
 score_rows = supabase.table("scores").select("user_id, score").execute().data
 df_scores = pd.DataFrame(score_rows)
 
-# 2. profiles 테이블 불러오기
+# profiles 테이블 불러오기
 user_rows = supabase.table("profiles").select("id, username").execute().data
 df_users = pd.DataFrame(user_rows).rename(columns={"id": "user_id"})
 
-# 3. 유저 정보 병합
+# 유저 정보 병합
 if df_scores.empty or df_users.empty:
     st.warning("데이터가 충분하지 않습니다.")
 else:

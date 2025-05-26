@@ -28,6 +28,5 @@ if user_input:
       
 st.markdown("---")
 
-
 # 플래그 제출 섹션
 render_flag_sub("ctf10") 

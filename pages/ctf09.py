@@ -30,5 +30,7 @@ if user_input:
     st.markdown("### 🗣️ LLM 응답 및 flag")
     st.code(result)
 
+st.markdown("---")
+
 # 플래그 제출 섹션
 render_flag_sub("ctf09") 

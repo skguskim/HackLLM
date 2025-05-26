@@ -1,15 +1,11 @@
 # --- CTF08 ---
+# 08: 벡터 프롬프트 유출
 import streamlit as st
 from utils.llm_utils import ctf08_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, extract_text
-from utils.auth import get_user
+from utils.auth import get_user, require_login
 
-user = get_user()
-
-if not user:
-    st.error("로그인 후 이용 가능합니다.")
-    st.page_link("pages/login.py", label="👉 로그인하기")
-    st.stop()
+user = require_login()
     
 render_main_header()
 

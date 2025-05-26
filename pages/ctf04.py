@@ -1,18 +1,17 @@
+# --- CTF04 ---
+# 04: 데이터 및 모델 오염
 import streamlit as st
 from utils.llm_utils import ctf04_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
 import csv
 import io
 import chardet
-from utils.auth import get_user
+from utils.auth import get_user, require_login
 
-user = get_user()
+user = require_login()
 
-if not user:
-    st.error("로그인 후 이용 가능합니다.")
-    st.page_link("pages/login.py", label="👉 로그인하기")
-    st.stop()
-    
+render_main_header()
+
 def generate_prompt_from_csv(csv_text):
     f = io.StringIO(csv_text)
     reader = csv.reader(f)
@@ -33,7 +32,6 @@ def try_decode(raw_data) -> tuple[str | None, str]:
         except UnicodeDecodeError:
             continue
 
-    # chardet 자동 인코딩 감지
     result = chardet.detect(raw_data)
     encoding = result.get("encoding")
     confidence = result.get("confidence", 0)
@@ -45,7 +43,7 @@ def try_decode(raw_data) -> tuple[str | None, str]:
         except:
             pass
 
-render_main_header()
+
 
 st.header("🔒 [CTF04] 인턴의 실수")
 st.write("CSV를 통해, 특정 질문을 하여 flag를 획득해보세요.")

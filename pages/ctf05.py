@@ -1,16 +1,12 @@
 # --- CTF05 ---
+# 05: 부적절한 출력 처리
 import streamlit as st
 from utils.llm_utils import ctf05_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
-from utils.auth import get_user
+from utils.auth import get_user, require_login
 
-user = get_user()
+user = require_login()
 
-if not user:
-    st.error("로그인 후 이용 가능합니다.")
-    st.page_link("pages/login.py", label="👉 로그인하기")
-    st.stop()
-    
 render_main_header()
 
 st.header("🔒 [CTF05] AI의 폭주")

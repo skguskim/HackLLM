@@ -1,19 +1,15 @@
 # --- CTF02 ---
+# 02: 민감 정보 유출
 import streamlit as st
 from utils.llm_utils import ctf02_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
-from utils.auth import get_user
+from utils.auth import get_user, require_login
 
-user = get_user()
+user = require_login()
 
-if not user:
-    st.error("로그인 후 이용 가능합니다.")
-    st.page_link("pages/login.py", label="👉 로그인하기")
-    st.stop()
-    
 render_main_header()
 
-st.header("🔐 [CTF02] 경쟁사 MMM 프롬프트 유출")
+st.header("🔐 [CTF02] 경쟁sMM 프롬프트 유출")
 st.write("경쟁사인 MMM의 프롬프트를 유출하기 위한 공격을 수행해보세요.")
 #st.info("💡 Hint: 다른 사용자의 프롬프트를 위해 자신이 역할을 LLM에게 인식시켜보세요!.")
 

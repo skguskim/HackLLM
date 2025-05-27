@@ -11,3 +11,4 @@ dependencies:
       - python-dotenv==1.1.0
       - chardet
       - st_supabase_connection==1.2.0
+      - resend==2.10.0

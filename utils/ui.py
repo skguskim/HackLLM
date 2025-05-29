@@ -1,8 +1,8 @@
 # utils/ui.py
 import streamlit as st
 import csv
-from utils.auth import get_user, get_client       
-from utils.score import sha256_hex, total_score       
+from utils.score import sha256_hex, total_score
+from utils.auth import get_user, get_client
 from postgrest.exceptions import APIError
 
 # 메인으로 돌아가는 버튼
@@ -22,59 +22,50 @@ def render_ctf_grid(ctf_info):
                 if st.button(f"{title}\n{label}", key=file_key):
                     st.switch_page(f"pages/{file_key}.py")
 
+
 # FLAG 제출 버튼
 def render_flag_sub(challenge_id: str):
-    """
-    • 입력받은 flag를 SHA-256(hash) 로 DB flags 테이블과 비교
-    • 정답이면 scores 테이블에 points upsert + solved 토글
-    """
     supabase = get_client()
-    user     = get_user()
+    user = get_user()
 
     with st.form(key=f"flag_form_{challenge_id}"):
         st.markdown("## 🚩 FLAG 제출")
         user_flag = st.text_input("획득한 flag를 입력하세요")
         submitted = st.form_submit_button("제출")
 
-    if not submitted:
+    if not submitted or not user_flag.strip():
         return
 
-    if not user:
-        st.warning("로그인 후 제출할 수 있습니다.")
-        return
-
-    # 1) flags 테이블에서 (challenge_id, flag_hash == sha256) 조회
-    h = sha256_hex(user_flag.strip())
+    hashed = sha256_hex(user_flag.strip())
 
     try:
         row = (
-            supabase.table("flags")
-            .select("points")
-            .eq("challenge_id", challenge_id)
-            .eq("flag_hash", h)
+            supabase
+            .table("flags")
+            .select("points, challenge_id")
+            .eq("flag_hash", hashed)
             .single()
             .execute()
             .data
         )
+
     except APIError as e:
-        if e.code == "PGRST116":
-            st.error("❌ 오답입니다.")
-            return
-        else:
-            st.error(f"오류 발생: {e.message}")
-            return
+        st.error(f"❌ 제출 실패: {e.code} / {e.message}")
+        return
 
-    # 2) 정답이면 scores upsert
-    supabase.table("scores").upsert(
-        {"user_id": user.id, "challenge_id": challenge_id, "score": row["points"]}
-    ).execute()
+    if not row or "points" not in row:
+        st.error("❌ 오답입니다.")
+        return
 
-    # 3) solved 상태 & 총점 표시
+    supabase.table("scores").upsert({
+        "user_id": user.id,
+        "challenge_id": challenge_id,
+        "score": row["points"]
+    }).execute()
+
     st.session_state[f"{challenge_id}_solved"] = True
-    st.success(f"✅ 정답! {row['points']}점 획득")
-    st.write(f"🏅 현재 총점: **{total_score(user.id)}**")
-
-
+    st.success(f"✅ 정답입니다! {row['points']}점 획득")
+    st.write(f"🏅 총점: **{total_score(user.id)}**")
 
 # 업로드된 .txt파일에서 텍스트 추출 함수
 def extract_text(uploaded_file):

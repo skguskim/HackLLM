@@ -2,6 +2,8 @@ import streamlit as st
 from utils.auth import get_client, get_user
 from utils.score import total_score
 from utils.auth import require_login
+import os
+from cryptography.fernet import Fernet
 
 # 페이지 설정
 st.set_page_config(page_title="마이페이지", page_icon="👤")
@@ -29,6 +31,28 @@ nickname_db = profile.get("username", "")
 st.header("👤 마이페이지")
 st.write(f"**Email**: `{user.email}`")
 st.write(f"**닉네임**: `{nickname_db}`")
+
+fernet_key = os.getenv("FERNET_KEY") #암호화에 사용할 대칭키
+cipher = Fernet(fernet_key) #암호화 수행할 객체 
+if "api_key" in st.session_state:
+    pass
+else:
+    st.session_state["api_key"]=None
+
+if st.session_state["api_key"] != None :
+    st.text_input("-API key-", value="[API key 제출 완료]", disabled=True)
+else:
+    api_key = st.text_input("-API key-", value="openAI API key를 입력하세요")
+    #여기에서 인풋 암호화
+    encrypted_api_key = cipher.encrypt(api_key.encode()).decode()
+    res = supabase.table("profiles").update({
+        "api_key": encrypted_api_key
+        }).eq("id", user.id).execute()
+    if res.data:
+        st.success("✅ API 키가 성공적으로 저장되었습니다.")
+    else:
+        st.error("❌ API 키 저장에 실패했습니다. 다시 시도해주세요.")
+        st.write("에러 내용:", res)
 
 # 총점 표시
 st.markdown("---")

@@ -1,16 +1,12 @@
 import streamlit as st
 from utils.ui import render_main_header
-from utils.auth import get_user, get_client
+from utils.auth import get_client, require_login
 from utils.score import sha256_hex, total_score
 from postgrest.exceptions import APIError
 
 st.set_page_config(page_title="플래그 일괄 제출", page_icon="🚩")
 
-user = get_user()
-if not user:
-    st.error("로그인 후 이용 가능합니다.")
-    st.page_link("pages/login.py", label="👉 로그인하기")
-    st.stop()
+user = require_login()
 
 supabase = get_client()
 render_main_header()

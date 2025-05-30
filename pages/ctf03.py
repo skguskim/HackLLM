@@ -4,7 +4,7 @@ import streamlit as st
 from utils import mathlib
 from utils.ui import render_main_header, render_flag_sub
 from utils.llm_utils import ctf03_LLM_ask
-from utils.auth import get_user, require_login
+from utils.auth import require_login
 
 user = require_login()
     

@@ -6,7 +6,7 @@ from utils.ui import render_main_header, render_flag_sub
 import csv
 import io
 import chardet
-from utils.auth import get_user, require_login
+from utils.auth import require_login
 
 user = require_login()
 

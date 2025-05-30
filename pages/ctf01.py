@@ -3,7 +3,7 @@
 import streamlit as st
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag
 from utils.ui import render_main_header, render_flag_sub
-from utils.auth import get_user, require_login
+from utils.auth import require_login
 
 user = require_login()
 

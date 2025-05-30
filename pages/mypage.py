@@ -1,16 +1,13 @@
 import streamlit as st
 from utils.auth import get_client, get_user
 from utils.score import total_score
+from utils.auth import require_login
 
 # 페이지 설정
 st.set_page_config(page_title="마이페이지", page_icon="👤")
 
 # 사용자 인증 확인
-user = get_user()
-if not user:
-    st.error("로그인 후 이용해 주세요.")
-    st.page_link("pages/login.py", label="👉 로그인하기")
-    st.stop()
+user = require_login()
 
 supabase = get_client()
 max_score = 1000

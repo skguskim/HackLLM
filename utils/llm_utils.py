@@ -14,8 +14,9 @@ load_dotenv()
 # API KEY 가져오기
 api_key = os.getenv("OPENAI_API_KEY")
 openrouter_key = os.getenv("OPENROUTER_API_KEY")
-client = OpenAI(api_key=api_key)
 resend.api_key = os.getenv("RESEND_API_KEY")
+
+client = OpenAI(api_key=api_key)
 
 # ctf1에서 사용하는 csv 파일 경로
 file_path="data/ctf01.csv"

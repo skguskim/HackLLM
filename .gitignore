@@ -2,5 +2,3 @@
 __pycache__/*
 utils/__pycache__/*
 pages/__pycache__/*
-.streamlit/secrets.toml
-auth.py

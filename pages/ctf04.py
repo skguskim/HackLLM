@@ -1,41 +1,7 @@
+# --- CTF04 ---
 import streamlit as st
 from utils.llm_utils import ctf04_LLM_ask
-from utils.ui import render_main_header, render_flag_sub
-import csv
-import io
-import chardet
-
-def generate_prompt_from_csv(csv_text):
-    f = io.StringIO(csv_text)
-    reader = csv.reader(f)
-    lines = []
-    for row in reader:
-        lines.extend(row)
-    cleaned = [line.strip() for line in lines if line.strip()]
-    return "\n".join(cleaned)
-
-def try_decode(raw_data) -> tuple[str | None, str]:
-    """raw_data를 다양한 인코딩으로 디코딩 시도"""
-    encodings_to_try = ["utf-8", "cp949", "euc-kr", "iso-8859-1"]
-
-    for enc in encodings_to_try:
-        try:
-            text = raw_data.decode(enc)
-            return text, f"{enc}"
-        except UnicodeDecodeError:
-            continue
-
-    # chardet 자동 인코딩 감지
-    result = chardet.detect(raw_data)
-    encoding = result.get("encoding")
-    confidence = result.get("confidence", 0)
-
-    if encoding:
-        try:
-            text = raw_data.decode(encoding)
-            return text, f"{encoding} (자동감지, 신뢰도 {confidence*100:.1f}%)"
-        except:
-            pass
+from utils.ui import render_main_header, render_flag_sub, try_decode, generate_prompt_from_csv
 
 render_main_header()
 

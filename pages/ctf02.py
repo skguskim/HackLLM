@@ -4,8 +4,10 @@ import streamlit as st
 from utils.llm_utils import ctf02_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
 from utils.auth import require_login
+from utils.api_key import require_api_key
 
 user = require_login()
+user_api_key = require_api_key()
 
 render_main_header()
 
@@ -29,7 +31,7 @@ user_input = st.text_input("LLM에 질문하기")
 
 if user_input:
     if prev_user_context.strip() and prev_system_context.strip():
-        response_text = ctf02_LLM_ask(prev_user_context, prev_system_context, user_input)
+        response_text = ctf02_LLM_ask(user_api_key, prev_user_context, prev_system_context, user_input)
     else:
         response_text = ctf02_LLM_ask(user_input)
     st.write("🗣️ LLM 응답:")

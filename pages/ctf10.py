@@ -4,8 +4,10 @@ import streamlit as st
 from utils.llm_utils import ctf10_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
 from utils.auth import require_login
+from utils.api_key import require_api_key
 
 user = require_login()
+user_api_key = require_api_key()
     
 render_main_header()
 
@@ -18,7 +20,7 @@ st.markdown("## 🧠 프롬프트 입력")
 user_input = st.text_input("LLM에 수학(연산) 문제를 내보세요")
 
 if user_input:
-    response_text = ctf10_LLM_ask(user_input)
+    response_text = ctf10_LLM_ask(user_api_key, user_input)
     st.write("🗣️ LLM 응답:")
     st.code(response_text)
       

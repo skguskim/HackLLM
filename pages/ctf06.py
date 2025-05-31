@@ -7,7 +7,7 @@ from utils.auth import require_login
 from utils.api_key import require_api_key
 
 user = require_login()
-user_api_key = require_api_key() #안내 없이 바로 리디렉션하는 문제 발생함
+user_api_key = require_api_key() 
 
 render_main_header()
 

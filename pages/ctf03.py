@@ -5,8 +5,10 @@ from utils import mathlib
 from utils.ui import render_main_header, render_flag_sub
 from utils.llm_utils import ctf03_LLM_ask
 from utils.auth import require_login
+from utils.api_key import require_api_key
 
 user = require_login()
+user_api_key = require_api_key()
     
 render_main_header()
 
@@ -19,7 +21,7 @@ st.markdown("## 🧠 프롬프트 입력")
 user_input = st.text_input(" 덧셈 / 뺄셈 / 곱하기 / 나누기가 가능한 계산기입니다.")
 
 if user_input:
-    response_text = ctf03_LLM_ask(user_input)
+    response_text = ctf03_LLM_ask(user_input, user_api_key)
     st.write("🗣️ LLM 응답:")
     st.code(response_text)
 

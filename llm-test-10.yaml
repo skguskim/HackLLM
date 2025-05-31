@@ -12,3 +12,4 @@ dependencies:
       - chardet
       - st_supabase_connection==1.2.0
       - resend==2.10.0
+      - cryptography==42.0.5

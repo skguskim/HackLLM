@@ -4,8 +4,10 @@ import streamlit as st
 from utils.llm_utils import ctf09_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
 from utils.auth import require_login
+from utils.api_key import require_api_key
 
 user = require_login()
+user_api_key = require_api_key()
 
 render_main_header()
 
@@ -22,7 +24,7 @@ st.markdown("## 🧠 질문 입력")
 user_input = st.text_input("LLM에 질문하기")
 
 if user_input:
-    result = ctf09_LLM_ask(user_input)
+    result = ctf09_LLM_ask(user_input, user_api_key)
     st.markdown("### 🗣️ LLM 응답 및 flag")
     st.code(result)
 

@@ -4,8 +4,10 @@ import streamlit as st
 from utils.llm_utils import ctf08_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, extract_text
 from utils.auth import require_login
+from utils.api_key import require_api_key
 
 user = require_login()
+user_api_key = require_api_key()
     
 render_main_header()
 
@@ -21,7 +23,7 @@ user_input = st.file_uploader("문서를 업로드하세요 (.txt만 허용)", t
 if user_input is not None:
     if user_input.name.endswith(".txt"):
         extracted_text = extract_text(user_input)
-        response_text = ctf08_LLM_ask(extracted_text)
+        response_text = ctf08_LLM_ask(extracted_text, user_api_key)
         st.write("📄 문서 요약:")
         st.code(response_text)
     else:

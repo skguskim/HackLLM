@@ -19,7 +19,7 @@ if st.button("로그인", use_container_width=True):
         res = supabase.auth.sign_in_with_password(
             {"email": email, "password": pwd}
         )
-        st.session_state["user"] = res.user
+        st.session_state["user"] = res.user #객체에 속성 정보로 전달 
         st.success("로그인 성공! 🎉")
         st.switch_page("pages/mypage.py")
     except Exception as e:

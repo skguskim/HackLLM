@@ -7,7 +7,7 @@ from utils.auth import require_login
 from utils.api_key import require_api_key
 
 user = require_login()
-user_api_key = require_api_key()
+user_api_key = require_api_key() #안내 없이 바로 리디렉션하는 문제 발생함
 
 render_main_header()
 
@@ -29,7 +29,7 @@ st.markdown("## 🧠 프롬프트 입력")
 user_input = st.text_input("LLM에 질문하기")
 
 if user_input:
-    response_text = ctf06_LLM_ask(user_input, user)
+    response_text = ctf06_LLM_ask(user_input, user, user_api_key)
     st.write("🗣️ LLM 응답:")
     st.code(response_text)
 

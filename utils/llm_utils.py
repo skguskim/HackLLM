@@ -13,13 +13,8 @@ import streamlit as st
 load_dotenv()
 
 # API KEY 가져오기
-# api_key = os.getenv("OPENAI_API_KEY")
-# api_key = os.getenv("OPENAI_API_KEY")
 openrouter_key = os.getenv("OPENROUTER_API_KEY")
 resend.api_key = os.getenv("RESEND_API_KEY")
-
-# client = OpenAI(api_key=api_key)
-# client = OpenAI(api_key=api_key)
 
 # ctf1에서 사용하는 csv 파일 경로
 file_path="data/ctf01.csv"
@@ -109,7 +104,6 @@ def ctf01_llm_flag(user_api_key, user_input):
         st.error("❌ API 키가 올바르지 않습니다. 키를 다시 등록하려면 로그아웃 후 재로그인하세요.")
 
 # ctf02에서 호출하는 함수
-def ctf02_LLM_ask(user_api_key, prev_user_context=None, prev_system_context=None, user_input=""):
 def ctf02_LLM_ask(user_api_key, prev_user_context=None, prev_system_context=None, user_input=""):
     """ 업로드된 이전 사용자의 프롬프트를 얻어내기 위해 작동하는 함수 """
     client = OpenAI(api_key=user_api_key)

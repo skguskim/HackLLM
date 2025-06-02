@@ -32,7 +32,6 @@ st.header("👤 마이페이지")
 st.write(f"**Email**: `{user.email}`")
 st.write(f"**닉네임**: `{nickname_db}`")
 
-#수정 없을 경우 딱 한 번만 api 키 받아서 암호화 -> 디비에 저장
 fernet_key = os.getenv("FERNET_KEY") 
 cipher = Fernet(fernet_key) 
 
@@ -41,10 +40,10 @@ if st.session_state.get("api_key"):
 
 else:
     api_key = st.text_input("**API key**", placeholder="openAI API key를 입력하세요")
-    #여기에서 인풋 암호화
     if st.button("API 키 제출"):
         if api_key:
             try:
+                #api 키 암호화
                 encrypted_api_key = cipher.encrypt(api_key.encode()).decode()
 
                 res = supabase.table("profiles").update({

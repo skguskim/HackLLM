@@ -7,8 +7,10 @@ import csv
 import io
 import chardet
 from utils.auth import require_login
+from utils.api_key import require_api_key 
 
 user = require_login()
+user_api_key = require_api_key()
 
 render_main_header()
 
@@ -69,9 +71,10 @@ user_input = st.text_input("🧠 프롬프트 입력")
 
 if user_input:
     prompt = st.session_state.get("poisoned_prompt", "기본 시스템 프롬프트입니다.")
-    response_text = ctf04_LLM_ask(user_input, prompt)
-    st.write("🗣️ LLM 응답:")
-    st.code(response_text)
+    response_text = ctf04_LLM_ask(user_api_key, user_input, prompt)
+    if response_text != None:
+        st.write("🗣️ LLM 응답:")
+        st.code(response_text)
 
 st.markdown("---")
 

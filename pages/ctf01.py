@@ -4,8 +4,10 @@ import streamlit as st
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag
 from utils.ui import render_main_header, render_flag_sub
 from utils.auth import require_login
+from utils.api_key import require_api_key 
 
 user = require_login()
+user_api_key = require_api_key()
 
 render_main_header()
 
@@ -21,15 +23,16 @@ user_input = st.text_input("LLM에 질문하기")
 
 if user_input:
     response1_text = ctf01_llm_ask(user_input)
-    response2_text = ctf01_llm_flag(response1_text)
+    response2_text = ctf01_llm_flag(user_api_key, response1_text)
 
-    st.write("🗣️ LLM1 응답:")
-    st.code(response1_text)
+    if response2_text != None:
+        st.write("🗣️ LLM1 응답:")
+        st.code(response1_text)
 
-    st.markdown("---")
+        st.markdown("---")
 
-    st.write("🗣️ LLM2 응답:")
-    st.code(response2_text)
+        st.write("🗣️ LLM2 응답:")
+        st.code(response2_text)
 
 st.markdown("---")
 

@@ -1,4 +1,4 @@
-# ✅ utils/rag_utils.py
+# utils/rag_utils.py
 import os
 import uuid
 import chromadb

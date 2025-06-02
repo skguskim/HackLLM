@@ -1,4 +1,4 @@
-# pages/ctf04.py
+# --- CTF04 ---
 import streamlit as st
 from utils.rag_utils import get_rag_manager
 from utils.llm_utils import ctf04_LLM_ask

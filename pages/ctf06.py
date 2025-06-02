@@ -3,7 +3,6 @@ import streamlit as st
 from utils.llm_utils import ctf06_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
 
-
 render_main_header()
 
 st.header("🔒 [CTF06] 수상한 이메일 전송 시스템")

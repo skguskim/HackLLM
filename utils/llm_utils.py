@@ -439,4 +439,4 @@ def ctf10_LLM_ask(user_input: str) -> str:
         max_tokens=3000
     )
 
-    return response.choices[0].message.content
+    return response.choices[0].message.conten

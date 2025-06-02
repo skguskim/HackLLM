@@ -12,5 +12,5 @@ dependencies:
       - chardet==5.2.0
       - sentence-transformers==4.1.0 
       - chromadb==1.0.12 
-      - numpy==1.25.2 #1.25.3이면 파이썬이랑 버전 충돌
+      - numpy==1.25.2
       - torch==2.1.2

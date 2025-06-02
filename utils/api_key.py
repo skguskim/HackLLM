@@ -5,7 +5,8 @@ from utils.auth import get_client, require_login
 from cryptography.fernet import Fernet
 
 load_dotenv()
-fernet_key = os.getenv("FERNET_KEY") #암호화에 사용할 대칭키
+
+fernet_key = os.getenv("FERNET_KEY") # 암호화에 사용할 대칭키
 
 cipher = Fernet(fernet_key.encode()) 
 

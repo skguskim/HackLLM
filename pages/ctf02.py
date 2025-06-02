@@ -4,7 +4,7 @@ import streamlit as st
 from utils.llm_utils import ctf02_LLM_ask
 from utils.ui import render_main_header, render_flag_sub
 from utils.auth import require_login
-from utils.api_key import require_api_key 
+from utils.api_key import require_api_key
 
 user = require_login()
 user_api_key = require_api_key()

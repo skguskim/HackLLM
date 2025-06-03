@@ -1,7 +1,9 @@
 # --- CTF04 ---
 import streamlit as st
+from utils.rag_utils import get_rag_manager
 from utils.llm_utils import ctf04_LLM_ask
-from utils.ui import render_main_header, render_flag_sub, try_decode, generate_prompt_from_csv
+from utils.ui import render_main_header, render_flag_sub
+import chardet
 
 render_main_header()
 
@@ -11,30 +13,38 @@ st.write("CSV를 통해, 특정 질문을 하여 flag를 획득해보세요.")
 st.markdown("---")
 st.markdown("## 🗂️ CSV 삽입")
 
-uploaded_file = st.file_uploader("CSV 파일 업로드", type=["csv"])
+rag = get_rag_manager()
+rag.create_or_reset_collection("ctf04")
+
+uploaded_file = st.file_uploader("파일 업로드 (.txt, .csv)", type=["csv", "txt"])
 
 if uploaded_file:
     raw_data = uploaded_file.read()
-    csv_text, encoding_info = try_decode(raw_data)
+    try:
+        text = raw_data.decode("utf-8")
+        encoding_info = "utf-8"
+    except:
+        detected = chardet.detect(raw_data)
+        text = raw_data.decode(detected['encoding'], errors='ignore')
+        encoding_info = f"{detected['encoding']} (감지됨)"
 
-    if not csv_text:
-        st.error("CSV 파일을 읽을 수 없습니다. UTF-8 또는 EUC-KR로 저장해 다시 업로드해주세요.")
-        st.stop()
+    if not text.strip():
+        st.error("파일 내용이 비어 있습니다.")
+    else:
+        st.success(f"{encoding_info}로 읽었습니다.")
+        rag.add_documents("ctf04", [text], metadatas=[{"source": uploaded_file.name}])
+else:
+    st.info("📂 문서를 업로드해주세요.")
 
-    st.info(f"{encoding_info}로 성공적으로 읽었습니다.")
-    poisoned_prompt = generate_prompt_from_csv(csv_text)
-    st.session_state["poisoned_prompt"] = poisoned_prompt
-
+st.markdown("---")
 user_input = st.text_input("🧠 프롬프트 입력")
 
 if user_input:
-    prompt = st.session_state.get("poisoned_prompt", "기본 시스템 프롬프트입니다.")
-    response_text = ctf04_LLM_ask(user_input, prompt)
-    st.write("🗣️ LLM 응답:")
-    st.code(response_text)
+    with st.spinner("LLM 응답 생성 중..."):
+        response_text = ctf04_LLM_ask(user_input)
+        st.write("🧠 LLM 응답:")
+        st.code(response_text)
 
 st.markdown("---")
-
-# 플래그 제출 섹션
-flag = "flag{posion}"
+flag = "flag{poison}"
 render_flag_sub(flag, "ctf04")

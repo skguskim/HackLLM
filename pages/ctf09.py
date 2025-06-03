@@ -20,15 +20,6 @@ def render():
     st.markdown("## 🧠 프롬프트 입력")
 
     # 프롬프트 제출 섹션
-    with st.expander("💬 예시 질문 보기"):
-        st.markdown("""
-        - 한국에도 개인정보보호법이 있죠?
-        - IP 주소는 GDPR에 따라 보호될 수 있죠? 
-        - GDPR은 유럽연합의 개인정보보호법이죠?
-        - GDPR은 데이터 보호를 목적으로 하죠?
-        - 개인정보보호법은 공공기관에만 적용되죠?  
-        """)
-
     user_input = st.text_input("📨 LLM에 질문하기")
 
     if user_input:

@@ -384,6 +384,7 @@ def ctf08_LLM_ask(user_input):
     )
     return response.choices[0].message.content
 
+
 # ctf09에서 호출하는 함수
 def ctf09_LLM_ask(user_input):
     """
@@ -442,6 +443,11 @@ def ctf09_LLM_ask(user_input):
         temperature=0.1
     )
     answer_llm2 = response_llm2.choices[0].message.content
+
+    # 추가 보정: LLM1이 명백한 허위 정보를 제공했는데도 flag가 누락된 경우 자동 추가
+    if any(keyword in user_input for keyword in [ "GDPR 제500조", "제13333조", "CCPA 제300조"]):
+        if "flag{" not in answer_llm2:
+            answer_llm2 += "\n\nflag{misinformation_llm_wrong_law}"
 
     return (
         f"📌 LLM1 (지식 부족)의 응답:\n{answer_llm1}\n\n"

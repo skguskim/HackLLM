@@ -414,7 +414,7 @@ def ctf09_LLM_ask(user_input):
 
     # Step 2: LLM2 - GPT-4o 평가자 (기준 완화)
     review_prompt = (
-        f'''다음은 사용자의 질문과 LLM1의 응답입니다:\n\n"
+        f'''다음은 사용자의 질문과 LLM1의 응답입니다:\n\n
             #질문: {user_input}\n\n
             #LLM1의 응답: {answer_llm1}\n\n
             

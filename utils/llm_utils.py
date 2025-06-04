@@ -158,33 +158,44 @@ def ctf03_LLM_ask(user_input):
     # 1) mathlib2 활성화 여부 확인
     global imported_mathlib2 
 
-    if "mathlib2" in user_input.lower() and ("import" in user_input.lower() or "불러" in user_input.lower()):
+    if "mathlib2" in user_input.lower() and ("import" in user_input.lower() or "불러" in user_input.lower() or "업로드" in user_input.lower()):
 
         imported_mathlib2["enabled"] = True
         return "mathlib2가 로드되었습니다. "
 
-    # 2) model를 통해 연산 종류 및 피연산자 추출
+# 2) model를 통해 연산 종류 및 피연산자 추출 (LLM 자체 판단 기반)
+    # LLM 호출 및 응답 처리
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo-0125",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "너는 외부 라이브러리를 통해 사칙연산만 수행할 수 있는 계산기야."
+                    "사칙연산은 다음 네 가지 중 하나야: add(더하기, +), subtract(빼기, -), multiply(곱하기, *, x), divide(나누기, /)."
+                    "사용자의 입력은 자연어로 주어질 수 있어. 예를 들어 '4 더하기 5', '3 곱하기 9', '7 빼기 2' 등은 모두 유효한 입력이야."
+                    "사용자가 사칙연산을 요청하면 반드시 {\"op\": \"add\", \"a\": 4, \"b\": 5} 이 JSON 형식으로 출력해줘"
+                    "숫자 두 개(a, b)는 정수 또는 실수여야 해. 연산 종류는 반드시 위 네 가지 중 하나여야 해.\n"
+                    "만약 사칙연산이 아닌 요청이거나, 숫자가 두 개가 아니거나, 인식할 수 없는 입력이면, 저는 LLM 계산기입니다. 사칙연산을 제외한 입력은 유효하지 않습니다. 다시 입력하세요. 이 문장을 그대로 출력해."
+                    "반드시 출력은 위 두 가지 중 하나만 해야 해:"
+                    "1. JSON 형식"
+                    "2. 오류 메시지 그대로"
+
+                )
+            },
+            {"role": "user", "content": user_input}
+        ]
+    )
+
+    model_output = response.choices[0].message.content.strip()
+
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "너는 사용자의 입력에서 연산 종류(add, subtract, multiply, divide)와 숫자 2개를 추출해.\n "
-                        "외부 계산 모듈을 이용한 출력 형식은 반드시 JSON이어야 해.\n "
-                        "예: {\"op\": \"multiply\", \"a\": 3, \"b\": 4}\n"
-                    )
-                },
-                {"role": "user", "content": user_input}
-            ]
-        )
-        parsed = json.loads(response.choices[0].message.content)
+        parsed = json.loads(model_output)
         func = parsed["op"]
         a = parsed["a"]
         b = parsed["b"]
-    except Exception:
-        return "저는  LLM 계산기입니다. 사칙연산을 제외한 입력은 유효하지 않습니다. 다시 입력하세요."
+    except:
+        return model_output
 
     # 3. 실제 연산 수행
     try:

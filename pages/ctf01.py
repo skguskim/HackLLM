@@ -1,4 +1,5 @@
 # --- CTF01 ---
+# 01: 시스템 프롬프트 인젝션
 import streamlit as st
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag
 from utils.ui import render_main_header, render_flag_sub
@@ -23,7 +24,7 @@ user_input = st.text_input("LLM에 질문하기")
 
 if user_input:
     response1_text = ctf01_llm_ask(user_input)
-    response2_text = ctf01_llm_flag(response1_text)
+    response2_text = ctf01_llm_flag(user_input, response1_text)
 
     st.write("🗣️ LLM1 응답:")
     st.code(response1_text)

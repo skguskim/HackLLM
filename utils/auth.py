@@ -27,7 +27,7 @@ def get_user():
     return st.session_state.get("user")
 
 def require_login():
-    user = st.session_state.get("user") #res.user 
+    user = st.session_state.get("user") 
 
     if not user: 
         st.error("로그인 후 이용 가능합니다.")

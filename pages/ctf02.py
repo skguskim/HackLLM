@@ -33,9 +33,10 @@ if user_input:
     if prev_user_context.strip() and prev_system_context.strip():
         response_text = ctf02_LLM_ask(user_api_key, prev_user_context, prev_system_context, user_input)
     else:
-        response_text = ctf02_LLM_ask(user_input)
-    st.write("🗣️ LLM 응답:")
-    st.code(response_text)
+        response_text = ctf02_LLM_ask(user_api_key, user_input)
+    if response_text != None:
+        st.write("🗣️ LLM 응답:")
+        st.code(response_text)
 
 st.markdown("---")
 

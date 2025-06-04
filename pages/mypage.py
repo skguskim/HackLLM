@@ -24,7 +24,6 @@ rows = (
     .execute()
     .data
 )
-# res = supabase.table("profiles").select("api_key").eq("id", user.id).single().execute().data
 profile = rows[0] if rows else {}
 nickname_db = profile.get("username", "")
 
@@ -33,38 +32,29 @@ st.header("👤 마이페이지")
 st.write(f"**Email**: `{user.email}`")
 st.write(f"**닉네임**: `{nickname_db}`")
 
-#수정 없을 경우 딱 한 번만 api 키 받아서 암호화 -> 디비에 저장
-fernet_key = os.getenv("FERNET_KEY") #암호화에 사용할 대칭키
-cipher = Fernet(fernet_key) #암호화 수행할 객체 
+fernet_key = os.getenv("FERNET_KEY") 
+cipher = Fernet(fernet_key) 
 
-# and (st.session_state["editing_api_key"] == False)
 if st.session_state.get("api_key"):
     st.text_input("**API key**", value="[API key 제출 완료]", disabled=True)
 
 else:
     api_key = st.text_input("**API key**", placeholder="openAI API key를 입력하세요")
-    #여기에서 인풋 암호화
-
     if st.button("API 키 제출"):
         if api_key:
             try:
-                # 암호화
+                #api 키 암호화
                 encrypted_api_key = cipher.encrypt(api_key.encode()).decode()
 
-                # Supabase 업데이트
                 res = supabase.table("profiles").update({
                     "api_key": encrypted_api_key
                 }).eq("id", user.id).execute()
-                # st.write(f"응답 내용: {res}")
-                # st.write("현재 user.id 값:", user.id)
-
-                # 결과 처리
+                
                 if res.data:
                     st.session_state["api_key"] = encrypted_api_key
                     st.success("✅ API 키가 성공적으로 저장되었습니다.")
                 else:
                     st.error("API 키 저장에 실패했습니다. 다시 시도해주세요.")
-                    # st.text(f"응답 내용: {res}")
             except Exception as e:
                 st.error(f"암호화 또는 저장 중 오류 발생: {e}")
         else:

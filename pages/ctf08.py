@@ -5,6 +5,7 @@ from utils.llm_utils import ctf08_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, extract_text
 from utils.auth import require_login
 from utils.api_key import require_api_key 
+st.session_state["edit_mode"]=False
 
 user = require_login()
 user_api_key = require_api_key()

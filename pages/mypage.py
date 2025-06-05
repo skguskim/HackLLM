@@ -35,16 +35,29 @@ st.write(f"**닉네임**: `{nickname_db}`")
 fernet_key = os.getenv("FERNET_KEY") 
 cipher = Fernet(fernet_key) 
 
-if st.session_state.get("api_key"):
-    st.text_input("**API key**", value="[API key 제출 완료]", disabled=True)
+# 로그인 시 edit_mode는 기본으로 false, api_key가 없을 경우 마이페이지로 라우팅되는데 여기서 세션에 api_key 키가 없을 때 true로 바꿔줌줌
+if not st.session_state.get("api_key"):
+    st.session_state["edit_mode"] = True
 
-else:
-    api_key = st.text_input("**API key**", placeholder="openAI API key를 입력하세요")
+api_key_input = st.text_input(
+    "**API key**",
+    placeholder="[API key 제출 완료]" if st.session_state.get("api_key") else "openAI API key를 입력하세요",
+    disabled=not st.session_state["edit_mode"] # 수정 모드가 False일 때
+)
+
+# 세션에 api_key라는 키가 있을 경우에는 무조건 db에 값이 있는 거라서 수정버튼이 필요함
+if st.session_state.get("api_key") and (st.session_state["edit_mode"] == False):
+    if st.button("API 키 수정"):
+        st.session_state["edit_mode"]=True
+        st.rerun()
+
+if st.session_state["edit_mode"] == True:
+# not st.session_state.get("api_key") or (st.session_state["edit_mode"] == True):
     if st.button("API 키 제출"):
-        if api_key:
+        if api_key_input:
             try:
                 #api 키 암호화
-                encrypted_api_key = cipher.encrypt(api_key.encode()).decode()
+                encrypted_api_key = cipher.encrypt(api_key_input.encode()).decode()
 
                 res = supabase.table("profiles").update({
                     "api_key": encrypted_api_key
@@ -59,6 +72,7 @@ else:
                 st.error(f"암호화 또는 저장 중 오류 발생: {e}")
         else:
             st.warning("API 키가 입력되지 않았습니다")
+
 
 # 총점 표시
 st.markdown("---")

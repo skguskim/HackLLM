@@ -10,11 +10,12 @@ fernet_key = os.getenv("FERNET_KEY") # 암호화에 사용할 대칭키
 
 cipher = Fernet(fernet_key.encode()) 
 
+# 이부분 코드 리팩토링 필요
 user = require_login() 
 supabase = get_client() 
 
 def require_api_key():
-    user = require_login() 
+    user = require_login() # st 세션상태 user만 가져옴 
 
     if not st.session_state.get("api_key"):
         st.error("API 키를 제출한 뒤 이용해주세요.")

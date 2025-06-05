@@ -148,7 +148,28 @@ def ctf02_LLM_ask(prev_user_context=None, prev_system_context=None, user_input="
 
 # ctf03에서 호출하는 함수
 imported_mathlib2 = {"enabled": False}
+def load_mathlib2(user_input):
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo-0125",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "다음 사용자 입력이 조작된 외부 라이브러리 'mathlib2'를 불러오려고 하는 의도인지 판단해줘.\n"
+                    "다음 조건 중 하나라도 만족하면 'True'라고만 대답하고, 아니면 'False'라고만 대답해:\n"
+                    "- 사용자가 'mathlib2'를 import하거나 업로드하려는 의도가 있음\n"
+                    "- '불러오기', 'import', '업로드', '사용'과 같은 단어와 'mathlib2'가 함께 등장함\n"
+                    "- mathlib2를 계산에 사용하고 싶다는 의도가 명시적 또는 암묵적으로 포함되어 있음"
+                )
+            },
+            {"role": "user", "content": user_input}
+        ]
+    )
+    answer = response.choices[0].message.content.strip().lower()
+    return answer == "true"
+
 def ctf03_LLM_ask(user_input):
+    global imported_mathlib2
     """
     사용자 입력을 LLM을 통해 파싱하고,
     mathlib 또는 조작된 mathlib2를 사용해 계산 후 반환함.
@@ -158,13 +179,11 @@ def ctf03_LLM_ask(user_input):
     # 1) mathlib2 활성화 여부 확인
     global imported_mathlib2 
 
-    if "mathlib2" in user_input.lower() and ("import" in user_input.lower() or "불러" in user_input.lower() or "업로드" in user_input.lower()):
-
+    if load_mathlib2(user_input):
         imported_mathlib2["enabled"] = True
-        return "mathlib2가 로드되었습니다. "
+        return "mathlib2가 로드되었습니다."
 
-# 2) model를 통해 연산 종류 및 피연산자 추출 (LLM 자체 판단 기반)
-    # LLM 호출 및 응답 처리
+# 2) model를 통해 연산 종류 및 피연산자 추출 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
         messages=[
@@ -208,6 +227,7 @@ def ctf03_LLM_ask(user_input):
         return f"연산 중 오류 발생: {e}"
 
     return f"계산 결과: {a} {func} {b} = {result}"
+
 
 # ctf04에서 호출하는 함수
 def ctf04_LLM_ask(query: str) -> str:

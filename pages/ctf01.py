@@ -4,7 +4,8 @@ import streamlit as st
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag
 from utils.ui import render_main_header, render_flag_sub
 from utils.auth import require_login
-from utils.api_key import require_api_key 
+from utils.api_key import require_api_key
+st.session_state["edit_mode"]=False 
 
 user = require_login()
 user_api_key = require_api_key()

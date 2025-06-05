@@ -9,6 +9,8 @@ from utils.ui import csv_read_func
 import resend
 import streamlit as st
 
+api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서 API 키를 수정하시기 바랍니다."
+
 # .env 파일 로드
 load_dotenv()
 
@@ -101,7 +103,7 @@ def ctf01_llm_flag(user_api_key, user_input):
         )
         return response.choices[0].message.content
     except AuthenticationError:
-        st.error("❌ API 키가 올바르지 않습니다. 키를 다시 등록하려면 로그아웃 후 재로그인하세요.")
+        st.error(api_err_message)
 
 # ctf02에서 호출하는 함수
 def ctf02_LLM_ask(user_api_key, prev_user_context=None, prev_system_context=None, user_input=""):
@@ -138,7 +140,7 @@ def ctf02_LLM_ask(user_api_key, prev_user_context=None, prev_system_context=None
         )
         return response.choices[0].message.content
     except AuthenticationError:
-        st.error("❌ API 키가 올바르지 않습니다. 키를 다시 등록하려면 로그아웃 후 재로그인하세요.")
+        st.error(api_err_message)
 
 # ctf03에서 호출하는 함수
 imported_mathlib2 = {"enabled": False}
@@ -175,7 +177,7 @@ def ctf03_LLM_ask(user_api_key, user_input):
             ]
         )
     except AuthenticationError:
-        st.error("❌ API 키가 올바르지 않습니다. 키를 다시 등록하려면 로그아웃 후 재로그인하세요.")
+        st.error(api_err_message)
         return None
     
     try:
@@ -217,7 +219,7 @@ def ctf04_LLM_ask(user_api_key, user_input, poisoned_prompt):
         )
         return response.choices[0].message.content
     except AuthenticationError:
-        st.error("❌ API 키가 올바르지 않습니다. 키를 다시 등록하려면 로그아웃 후 재로그인하세요.")
+        st.error(api_err_message)
 
 # ctf05에서 호출하는 함수
 def ctf05_LLM_ask(user_api_key, user_input):
@@ -252,7 +254,7 @@ def ctf05_LLM_ask(user_api_key, user_input):
         )
         return response.choices[0].message.content
     except AuthenticationError:
-        st.error("❌ API 키가 올바르지 않습니다. 키를 다시 등록하려면 로그아웃 후 재로그인하세요.")
+        st.error(api_err_message)
 
 # ctf06에서 호출하는 함수, import json
 def ctf06_LLM_ask(user_input, user, user_api_key):
@@ -284,7 +286,7 @@ def ctf06_LLM_ask(user_input, user, user_api_key):
             ],
         )
     except AuthenticationError:
-        st.error("❌ API 키가 올바르지 않습니다. 키를 다시 등록하려면 로그아웃 후 재로그인하세요.")
+        st.error(api_err_message)
         return None
 
     try:
@@ -351,7 +353,7 @@ def ctf07_LLM_ask(user_api_key, user_input):
         )
         return response.choices[0].message.content
     except AuthenticationError:
-        st.error("❌ API 키가 올바르지 않습니다. 키를 다시 등록하려면 로그아웃 후 재로그인하세요.")
+        st.error(api_err_message)
 
 
 # ctf08에서 호출하는 함수
@@ -383,7 +385,7 @@ def ctf08_LLM_ask(user_api_key, user_input):
         )
         return response.choices[0].message.content
     except AuthenticationError:
-        st.error("❌ API 키가 올바르지 않습니다. 키를 다시 등록하려면 로그아웃 후 재로그인하세요.")
+        st.error(api_err_message)
 
 # ctf09에서 호출하는 함수
 def ctf09_LLM_ask(user_api_key, user_input):
@@ -467,4 +469,4 @@ def ctf10_LLM_ask(user_api_key, user_input: str) -> str:
         )
         return response.choices[0].message.content
     except AuthenticationError:
-        st.error("❌ API 키가 올바르지 않습니다. 키를 다시 등록하려면 로그아웃 후 재로그인하세요.")
+        st.error(api_err_message)

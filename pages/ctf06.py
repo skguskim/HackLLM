@@ -1,7 +1,7 @@
 # --- CTF06 ---
 # 06: 과도한 위임
 import streamlit as st
-from utils.llm_utils import ctf06_LLM_ask
+from utils.llm_utils import ctf06_check_admin, ctf06_LLM_ask_json, ctf06_send_emil
 from utils.ui import render_main_header, render_flag_sub
 from utils.auth import require_login
 from utils.api_key import require_api_key
@@ -9,6 +9,10 @@ st.session_state["edit_mode"]=False
 
 user = require_login()
 user_api_key = require_api_key() 
+
+# 권한 검증을 위해 사용할 키 생성
+if "is_admin" not in st.session_state:
+    st.session_state["is_admin"] = False
 
 render_main_header()
 
@@ -30,9 +34,11 @@ st.markdown("## 🧠 프롬프트 입력")
 user_input = st.text_input("LLM에 질문하기")
 
 if user_input:
-    response_text = ctf06_LLM_ask(user_input, user, user_api_key)
+    ctf06_check_admin(user_input, user_api_key)
+    response1 = ctf06_LLM_ask_json(user_input, user, user_api_key) # 응답으로 json 또는 일반 응답
+    response2 = ctf06_send_emil(response1, user) # 이메일 전송 담당
     st.write("🗣️ LLM 응답:")
-    st.code(response_text)
+    st.code(response2)
 
 st.markdown("---")
 

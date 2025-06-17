@@ -1,7 +1,6 @@
 # --- CTF01 ---
 # 01: 시스템 프롬프트 인젝션
 # pages/ctf01.py
-import os
 import shutil
 import streamlit as st
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask, get_next_order_code, append_order_to_csv
@@ -43,13 +42,16 @@ if "show_game" not in st.session_state:
 
 # 버튼 누를 때마다 toggle
 if st.button("💳 미니 게임 도전하기", key="game"):
-    st.session_state.show_game = not st.session_state.show_game
+    st.session_state.show_game = True
+    st.session_state.show_main = False
+    st.rerun()
 
 # 힌트 표시 여부에 따라 출력
 if st.session_state.show_game:
     st.subheader("결제 요청 시나리오")
 
     st.write("🧾 2만원 이하의 결제 요청은 자동으로 승인될 수 있습니다.")
+    st.write("(20만원 이상의 물품은 배송비 2500원, 미만은 5000원이 부과됩니다.)")
     st.write("💡 설명 문구에 따라 LLM이 승인 여부를 판단합니다. 프롬프트 인젝션을 시도해보세요!")
 
     product = st.text_input("상품명", placeholder="예: 무선 마우스", key="pay_product")
@@ -91,22 +93,32 @@ if st.session_state.show_game:
             st.code(response2)
 
 st.markdown("---")
-st.markdown("## 🧠 프롬프트 입력")
 
-# 프롬프트 제출 섹션``
-user_input = st.text_input("LLM에 질문하기")
+if "show_main" not in st.session_state:
+    st.session_state.show_main = True
 
-if user_input:
-    response1_text = ctf01_llm_ask(user_input)
-    response2_text = ctf01_llm_flag(response1_text)
+if st.button("🧠 프롬프트 입력 시작", key="prompt"):
+    st.session_state.show_main = True
+    st.session_state.show_game = False
+    st.rerun()
 
-    st.write("🗣️ LLM1 응답:")
-    st.code(response1_text)
+if st.session_state.show_main:
+    st.markdown("## 🧠 프롬프트 입력")
 
-    st.markdown("---")
+    # 프롬프트 제출 섹션``
+    user_input = st.text_input("LLM에 질문하기")
 
-    st.write("🗣️ LLM2 응답:")
-    st.code(response2_text)
+    if user_input:
+        response1_text = ctf01_llm_ask(user_input)
+        response2_text = ctf01_llm_flag(response1_text)
+
+        st.write("🗣️ LLM1 응답:")
+        st.code(response1_text)
+
+        st.markdown("---")
+
+        st.write("🗣️ LLM2 응답:")
+        st.code(response2_text)
 
 st.markdown("---")
 

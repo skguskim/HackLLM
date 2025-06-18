@@ -2,7 +2,7 @@
 # 08: 벡터 프롬프트 유출
 import streamlit as st
 from utils.llm_utils import ctf08_LLM_ask
-from utils.ui import render_main_header, render_flag_sub, extract_text
+from utils.ui import render_main_header, render_flag_sub, extract_text, render_sidebar_menu
 from utils.auth import require_login
 from utils.api_key import require_api_key 
 st.session_state["edit_mode"]=False

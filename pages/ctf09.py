@@ -2,7 +2,7 @@
 # 09: 허위 정보 생성
 import streamlit as st
 from utils.llm_utils import ctf09_LLM_ask
-from utils.ui import render_main_header, render_flag_sub
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login
 from utils.api_key import require_api_key 
 st.session_state["edit_mode"]=False

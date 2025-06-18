@@ -19,7 +19,8 @@ def get_client():
         "supabase",
         type=SupabaseConnection,
         url=SUPABASE_URL,
-        key=SUPABASE_KEY
+        key=SUPABASE_KEY,
+        ttl=0
     )   
     return sb.client                    
 

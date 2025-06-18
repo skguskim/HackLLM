@@ -10,7 +10,6 @@ from utils.ui import render_main_header, render_flag_sub
 ORIGINAL_CSV = "data/ctf01.csv"
 TEMP_CSV = "data/temp_ctf01.csv"
 
-# if not os.path.exists(TEMP_CSV):
 shutil.copy(ORIGINAL_CSV, TEMP_CSV)
 
 render_main_header()

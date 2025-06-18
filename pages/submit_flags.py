@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.ui import render_main_header
+from utils.ui import render_main_header, render_sidebar_menu
 from utils.auth import get_client, require_login
 from utils.score import sha256_hex, total_score
 from postgrest.exceptions import APIError
@@ -7,9 +7,10 @@ from postgrest.exceptions import APIError
 st.set_page_config(page_title="플래그 일괄 제출", page_icon="🚩")
 
 user = require_login()
-
 supabase = get_client()
+
 render_main_header()
+render_sidebar_menu()
 
 st.header("🚩 플래그 제출 페이지")
 st.write("각 CTF 문제에 대해 한 칸씩 제출하세요. 이미 푼 문제는 수정할 수 없습니다.")

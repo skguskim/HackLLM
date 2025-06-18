@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.ui import render_ctf_grid
+from utils.ui import render_ctf_grid, render_sidebar_menu
 from utils.auth import get_user, get_client
 
 user = get_user()
@@ -32,8 +32,12 @@ if user:
             .execute()
             .data)
     solved_dict = {r["challenge_id"]: True for r in rows}
+
 st.session_state.update({f"{cid}_solved": solved_dict.get(cid, False)
                          for cid, *_ in ctfs})
 
 # 2행 × 5열 그리드로 버튼 배치
 render_ctf_grid(ctfs)
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()

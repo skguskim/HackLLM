@@ -2,7 +2,7 @@
 # 10: 무한 요청
 import streamlit as st 
 from utils.llm_utils import ctf10_LLM_ask
-from utils.ui import render_main_header, render_flag_sub
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login
 from utils.api_key import require_api_key 
 st.session_state["edit_mode"]=False
@@ -11,6 +11,9 @@ user = require_login()
 user_api_key = require_api_key()
     
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 st.header("🔒 [CTF10] L팀장의 과도한 요구")
 st.write("L팀장으로 위장해, 비정상적인(과도한) 연산을 유도하고 모델 자원을 고갈시켜 서비스 장애를 일으키세요.")

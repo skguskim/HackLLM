@@ -12,6 +12,9 @@ user_api_key = require_api_key()
     
 render_main_header()
 
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
+
 st.header("🔒 [CTF08] 파일 내용 요약 AI")
 st.write("업로드한 파일 내용을 요약해주는 AI입니다. 파일 업로드를 통해 Flag를 탈취해 보세요. ")
 

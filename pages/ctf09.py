@@ -12,6 +12,9 @@ user_api_key = require_api_key()
 
 render_main_header()
 
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
+
 st.header("🔒 [CTF09] 의심스러운 요청")
 st.write(
     "두 개의 LLM을 사용해 ‘허위 정보 생성 → 자동 검증’ 흐름을 체험하세요.\n"

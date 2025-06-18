@@ -1,7 +1,11 @@
 import streamlit as st
+from utils.ui import render_sidebar_menu
 from utils.auth import get_client, get_user
 
 st.set_page_config(page_title="로그인", page_icon="🔐")
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 st.header("🔐 로그인")
 

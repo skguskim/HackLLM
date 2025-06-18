@@ -1,12 +1,15 @@
 import streamlit as st
-from utils.auth import get_client, get_user
+from utils.auth import get_client, require_login
 from utils.score import total_score
-from utils.auth import require_login
+from utils.ui import render_sidebar_menu
 import os
 from cryptography.fernet import Fernet
 
 # 페이지 설정
 st.set_page_config(page_title="마이페이지", page_icon="👤")
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 # 사용자 인증 확인
 user = require_login()

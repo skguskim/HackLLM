@@ -28,7 +28,7 @@ if user:
     supabase = get_client()
     rows = (supabase.table("scores")
             .select("challenge_id")
-            .eq("user_id", user.id)
+            .eq("user_id", user["id"])
             .execute()
             .data)
     solved_dict = {r["challenge_id"]: True for r in rows}

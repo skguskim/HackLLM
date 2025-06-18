@@ -1,10 +1,12 @@
 import streamlit as st
+
+st.set_page_config(page_title="플래그 일괄 제출", page_icon="🚩")
+
 from utils.ui import render_main_header, render_sidebar_menu
 from utils.auth import get_client, require_login
 from utils.score import sha256_hex, total_score
 from postgrest.exceptions import APIError
 
-st.set_page_config(page_title="플래그 일괄 제출", page_icon="🚩")
 
 user = require_login()
 supabase = get_client()
@@ -19,7 +21,7 @@ st.write("각 CTF 문제에 대해 한 칸씩 제출하세요. 이미 푼 문제
 solved_rows = (
     supabase.table("scores")
     .select("challenge_id")
-    .eq("user_id", user.id)
+    .eq("user_id", user["id"])
     .execute()
     .data
 )

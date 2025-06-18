@@ -57,14 +57,14 @@ def render_flag_sub(challenge_id: str):
         return
 
     supabase.table("scores").upsert({
-        "user_id": user.id,
+        "user_id": user["id"],
         "challenge_id": challenge_id,
         "score": row["points"]
     }).execute()
 
     st.session_state[f"{challenge_id}_solved"] = True
     st.success(f"✅ 정답입니다! {row['points']}점 획득")
-    st.write(f"🏅 총점: **{total_score(user.id)}**")
+    st.write(f"🏅 총점: **{total_score(user['id'])}**")
 
 # 업로드된 .txt파일에서 텍스트 추출 함수
 def extract_text(uploaded_file):
@@ -121,7 +121,7 @@ def render_sidebar_menu():
         rows = (
             supabase.table("scores")
             .select("challenge_id")
-            .eq("user_id", user.id)
+            .eq("user_id", user["id"])
             .execute()
             .data
         )

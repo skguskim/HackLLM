@@ -22,7 +22,7 @@ def require_api_key():
         st.page_link("pages/mypage.py", label="👉 API키 제출하러 가기")
         st.stop()
     else:
-        res = supabase.table("profiles").select("api_key").eq("id", user.id).single().execute()
+        res = supabase.table("profiles").select("api_key").eq("id", user["id"]).single().execute()
         encrypted_api_key = res.data["api_key"]
         decrypted_api_key = cipher.decrypt(encrypted_api_key.encode()).decode()
     return decrypted_api_key #ctf01~10에서 require_api_key()로 받은 값을 LLM 호출 함수로 전달

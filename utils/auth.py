@@ -3,11 +3,16 @@ from st_supabase_connection import SupabaseConnection
 from supabase import create_client
 import os
 from dotenv import load_dotenv
+from streamlit_cookies_controller import CookieController, RemoveEmptyElementContainer
 
 load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+COOKIE_NAME = "llm_user_id"
+
+RemoveEmptyElementContainer()
 
 def get_client():
     sb = st.connection(
@@ -16,15 +21,27 @@ def get_client():
         url=SUPABASE_URL,
         key=SUPABASE_KEY
     )   
-    return sb.client                     
+    return sb.client                    
 
 def get_admin_client_direct():
-    url=SUPABASE_URL
-    key=SUPABASE_KEY
+    url = SUPABASE_URL
+    key = SUPABASE_KEY
     return create_client(url, key)
 
 def get_user():
-    return st.session_state.get("user")
+    user = st.session_state.get("user")
+    if user:
+        return user
+
+    cookie = CookieController()
+    user_id = cookie.get(COOKIE_NAME)
+    
+    if user_id:
+        st.session_state["user"] = {
+            "id": user_id
+        }
+        return st.session_state["user"]
+    return None
 
 def require_login():
     user = st.session_state.get("user") 

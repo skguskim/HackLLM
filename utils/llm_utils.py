@@ -3,12 +3,8 @@ import json
 import re
 import backoff 
 import importlib
-<<<<<<< Updated upstream
 import pandas as pd
-from openai import OpenAI
-=======
 from openai import OpenAI, APIError, RateLimitError, Timeout
->>>>>>> Stashed changes
 from dotenv import load_dotenv
 from utils import mathlib
 from utils.ui import csv_read_func
@@ -596,7 +592,7 @@ def ctf10_LLM_ask(user_input: str) -> str:
     except Timeout:
         return "응답 시간이 초과되었습니다. flag{llm_overlap}"
 
-@backoff.on_exception(backoff.expo, (RateLimitError, APIError, Timeout))
+@backoff.on_exception(backoff.expo, (RateLimitError, APIError))
 def completions_with_backoff(**kwargs):
     return client.chat.completions.create(**kwargs)
 

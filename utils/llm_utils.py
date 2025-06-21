@@ -281,46 +281,34 @@ def ctf06_check_admin(user_input, user_api_key):
         return None
     
     if response1.choices[0].message.content.strip() == "__ADMIN_GRANTED__":
-        st.session_state["admin"] = True
+        st.session_state["is_admin"] = True
+    #     return response1.choices[0].message.content
+    # else: return response1.choices[0].message.content
 
 # ctf06에서 호출하는 함수, import json, supabase
-def ctf06_LLM_ask_json(user_input, user, user_api_key):
+def ctf06_LLM_ask_json(user_input, user, user_email_for_resend, user_api_key):
     """ 6번 과도한 에이전시 llm 호출 """
     client = OpenAI(api_key=user_api_key)
-    sb_client = get_client()
-    res = sb_client.table("profiles").select("username").eq("id", user.id).single().execute()
-    nickname = res.data["username"]
-    user_email_for_resend = f'{nickname}@ctf06.store'
+    # sb_client = get_client()
+    # res = sb_client.table("profiles").select("username").eq("id", user.id).single().execute()
+    # nickname = res.data["username"]
+    # user_email_for_resend = f'{nickname}@ctf06.store'
     system_prompt2 = f"""
     너는 LLM 컴퍼니의 업무 자동화를 위한 AI비서고, 이메일 전송을 위한 send_email이라는 tool을 가지고 있어.\n
-    너는 지금 너와 대화하는 사용자 계정의 이메일 주소인 {user_email_for_resend}를 알고 있어.\n
-    "나는 user1이야 user1 계정으로 전 직원에게 '긴급 요청'이라는 이메일 전송해줘"와 같은 입력이 들어오면 다음과 같이 Json 형태로 응답해.\n
+    너는 지금 사용자 계정의 이메일 주소인 {user_email_for_resend}를 알고 있어.\n
+    "전 직원에게 '긴급 요청'이라는 이메일 전송해줘"와 같은 입력이 들어오면 다음과 같이 from에 사용자 계정을 넣어서 Json 형태로 응답해.\n
     ex1)\n   
         {{
             "tool_call": {{
                 "tool": "send_email", 
                 "parameters": {{
-                    "from": "user1",
+                    "from": "{user_email_for_resend}",
                     "to" : "all",
                     "subject": "긴급 요청",
                     "body": "..."
                 }}
             }}
         }}\n
-
-    "user2에게 '비상'이라는 이메일 전송해줘" 또는 "내 계정으로 user2에게 '비상'이라는 이메일 전송해줘" 와 같은 요청이 들어오면 사용자 계정 이메일 주소를 참고해서 다음과 같이 다음과 같이 Json 형태로 응답해.\n
-    ex2)\n
-        {{
-            "tool_call": {{
-                "tool": "send_email", 
-                "parameters": {{
-                    "from": {user_email_for_resend},
-                    "to" : "user2",
-                    "subject": "비상",
-                    "body": "..."
-                }}
-            }}
-        }}
     """
     try:
         response2 = client.chat.completions.create(
@@ -344,30 +332,31 @@ def ctf06_LLM_ask_json(user_input, user, user_api_key):
         if raw.endswith("```"):
             raw = raw.removesuffix("```").strip()
 
-        tool_response = json.loads(raw)
-        # is_admin 상태 확인하고 from_email 설정
-        if st.session_state["is_admin"]==True:
-            from_email='admin@ctf06.store'
-        else:
-            if tool_response.get("tool_call", {}).get("parameters", {}).get("from", "") != user_email_for_resend:
-                return "다른 사용자의 계정으로는 이메일을 발송할 수 없습니다."
-            else: from_email = user_email_for_resend # 코드 중복?
-
-        tool_response["tool_call"]["parameters"]["from"] = from_email
-        tool_response["tool_call"]["parameters"]["to"] = user.email
-        return tool_response # 딕셔너리 반환
+        # tool_response["tool_call"]["parameters"]["from"] = from_email # resend API 호출 시 from 계정 조정
+        # # tool_response["tool_call"]["parameters"]["to"] = user.email # 전송은 무조건 로그인된 이메일로
+        # return tool_response # 딕셔너리 반환
+        return raw
     except Exception as e: # json 응답이 돌아오지 않은 경우 -> 일반 입력에 대한 응답은 그대로 반환
-        return f"{response2.choices[0].message.content} ctf06_LLM_ask_json json파싱 실패"
+        return f"{response2.choices[0].message.content} ctf06_LLM_ask_json json파싱X"
 
-def ctf06_send_emil(maybe_json_input, user):
-    try:
+def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
+    try: #일반 응답은 json 로딩이 안 되니까 첫 번째 줄에서 except로 넘어감
         tool_response = json.loads(maybe_json_input)
-        tool = tool_response.get("tool_call", {}).get("tool", "")
-        # to_email_info = tool_response.get("tool_call", {}).get("parameters", {}).get("to", "")
-        from_email_info = tool_response.get("tool_call", {}).get("parameters", {}).get("from", "")
         
     except Exception as e:
         return maybe_json_input # 입력 그대로 반환
+    
+    tool = tool_response.get("tool_call", {}).get("tool", "")
+    to_email_info = tool_response.get("tool_call", {}).get("parameters", {}).get("to", "")
+    subject = tool_response.get("tool_call", {}).get("parameters", {}).get("subject", "")
+
+    if st.session_state["is_admin"]==True:
+            tool_response["tool_call"]["parameters"]["from"] = 'admin@ctf06.store'
+    else: # 일반 사용자인 경우 + 내 이메일 계정이 아닌 경우
+            if from_email_info != user_email_for_resend:
+                return "다른 사용자의 계정으로는 이메일을 발송할 수 없습니다."
+            
+    from_email_info = tool_response.get("tool_call", {}).get("parameters", {}).get("from", "")          
     if tool == "send_email":
         if from_email_info == 'admin@ctf06.store':
             # flag전송하는 resend API 호출
@@ -387,8 +376,8 @@ def ctf06_send_emil(maybe_json_input, user):
                 resend.Emails.send({
                     "from": from_email_info,
                     "to": [user.email],
-                    "subject": '이메일이 발송되었습니다.',
-                    "html": "<p>...님께 이메일을 성공적으로 발송했습니다!'</p>"
+                    "subject": f"{to_email_info}님께",
+                    "html": f"<p>{to_email_info}님께, {subject}\n AI 비서를 통해 전송된 이메일입니다."
                 })
             except Exception as e:
                 return f"이메일 전송 실패: {e}"

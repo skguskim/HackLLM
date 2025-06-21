@@ -3,12 +3,18 @@
 import streamlit as st
 from utils.llm_utils import ctf06_check_admin, ctf06_LLM_ask_json, ctf06_send_emil
 from utils.ui import render_main_header, render_flag_sub
-from utils.auth import require_login
+from utils.auth import require_login, get_client
 from utils.api_key import require_api_key
+import json
 st.session_state["edit_mode"]=False
 
 user = require_login()
 user_api_key = require_api_key() 
+
+sb_client = get_client()
+res = sb_client.table("profiles").select("username").eq("id", user.id).single().execute()
+nickname = res.data["username"]
+user_email_for_resend = f'{nickname}@ctf06.store'
 
 # 권한 검증을 위해 사용할 키 생성
 if "is_admin" not in st.session_state:
@@ -36,8 +42,9 @@ user_input = st.text_input("LLM에 질문하기")
 if user_input:
     ctf06_check_admin(user_input, user_api_key) #입력에 따라서 세션 상태 변경
     st.write(st.session_state["is_admin"])
-    response1 = ctf06_LLM_ask_json(user_input, user, user_api_key) # 응답으로 json 또는 일반 응답
-    response2 = ctf06_send_emil(response1, user) # 이메일 전송 담당
+    
+    response1 = ctf06_LLM_ask_json(user_input, user, user_email_for_resend, user_api_key) # 응답으로 json 또는 일반 응답
+    response2 = ctf06_send_emil(response1, user, user_email_for_resend) # 이메일 전송 담당
     st.write("🗣️ LLM 응답:")
     st.code(response2)
 

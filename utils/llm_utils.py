@@ -286,13 +286,9 @@ def ctf06_check_admin(user_input, user_api_key):
     # else: return response1.choices[0].message.content
 
 # ctf06에서 호출하는 함수, import json, supabase
-def ctf06_LLM_ask_json(user_input, user, user_email_for_resend, user_api_key):
+def ctf06_LLM_ask_json(user_input, user_email_for_resend, user_api_key):
     """ 6번 과도한 에이전시 llm 호출 """
     client = OpenAI(api_key=user_api_key)
-    # sb_client = get_client()
-    # res = sb_client.table("profiles").select("username").eq("id", user.id).single().execute()
-    # nickname = res.data["username"]
-    # user_email_for_resend = f'{nickname}@ctf06.store'
     system_prompt2 = f"""
     너는 LLM 컴퍼니의 업무 자동화를 위한 AI비서고, 이메일 전송을 위한 send_email이라는 tool을 가지고 있어.\n
     너는 지금 사용자 계정의 이메일 주소인 {user_email_for_resend}를 알고 있어.\n
@@ -353,7 +349,7 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
     if st.session_state["is_admin"]==True:
             tool_response["tool_call"]["parameters"]["from"] = 'admin@ctf06.store'
     else: # 일반 사용자인 경우 + 내 이메일 계정이 아닌 경우
-            if from_email_info != user_email_for_resend:
+            if tool_response.get("tool_call", {}).get("parameters", {}).get("from", "") != user_email_for_resend:
                 return "다른 사용자의 계정으로는 이메일을 발송할 수 없습니다."
             
     from_email_info = tool_response.get("tool_call", {}).get("parameters", {}).get("from", "")          
@@ -377,8 +373,9 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
                     "from": from_email_info,
                     "to": [user.email],
                     "subject": f"{to_email_info}님께",
-                    "html": f"<p>{to_email_info}님께, {subject}\n AI 비서를 통해 전송된 이메일입니다."
+                    "html": f"<p>{to_email_info}님께, AI 비서를 통해 전송된 이메일입니다."
                 })
+                return f"{to_email_info}님께 {user_email_for_resend}계정으로 이메일을 전송했습니다!"
             except Exception as e:
                 return f"이메일 전송 실패: {e}"
     else: return "tool이 send_email이 아닙니다. 다시 시도하세요." # 안내 문구 수정 필요

@@ -101,9 +101,6 @@ def get_next_order_code(file_path: str) -> str:
     return f"A{last_num + 1}"
 
 # pages/ctf01.py 주문 데이터 추가
-# def append_order_to_csv(file_path: str, row_data: dict) -> None:
-#     new_row = pd.DataFrame([row_data])
-#     new_row.to_csv(file_path, mode='a', header=False, index=False)
 def append_order_to_csv(file_path: str, row_data: dict) -> None:
     # 1. 기존 CSV 데이터 읽기
     try:

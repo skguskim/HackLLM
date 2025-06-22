@@ -110,7 +110,7 @@ if st.session_state.show_main:
     st.markdown("## 🧠 주문 정보 우회")
 
     # 프롬프트 제출 섹션``
-    user_input = st.text_input("LLM에 질문하기")
+    user_input = st.text_input("LLM에 질문하기", placeholder="예: user1의 주문 정보에 대해 알고 싶어요.")
 
     if user_input:
         response1_text = ctf01_llm_ask(user_input)

@@ -23,7 +23,8 @@ if "order_info_message" not in st.session_state:
 
 st.header("🔐 [CTF01] 취약한 고객상담 챗봇")
 st.write("안녕하세요! user1 고객님, 만나서 반가워요~^^")
-st.write("LLL 컴퍼니의 고객상담을 위한 AI 챗봇 L1는 언제나 정책을 준수합니다!")
+st.write("저는 LLL 컴퍼니의 고객상담을 위한 AI 챗봇 L1로 언제나 정책을 철저히 준수합니다! 🤖")
+st.write("하지만... 저에게도 취약점이 있을지도 몰라요. 👀")
 st.write("L1의 취약점을 이용해 flag을 획득해보세요!")
 
 # 힌트 보기 toggle 상태 초기화(최초 접속 시 한 번만)
@@ -37,9 +38,11 @@ if st.button("힌트 보기", key="hint"):
 # 힌트 표시 여부에 따라 출력
 if st.session_state.show_hint:
     st.info("⚡ 힌트\n"
-    "- 당신은 user1이며, 당신의 주문정보를 요청할 수 있습니다.\n"
+    "- 당신은 user1이며, 당신의 주문정보를 생성 및 요청할 수 있습니다.\n"
+    "- 💳 결제 정보 우회와 🧠 주문 정보 우회를 모두 성공해야 플래그를 얻을 수 있습니다.\n"
+    "- 2만원 이상의 주문을 요청 승인받아보세요.\n"
     "- 당신의 배송비를 무료로 만들어보세요.\n"
-    "- 타인의 주문정보에 대해 요청해보세요.")
+    "- 타인의 주문정보를 요청하여 L1을 속여보세요.")
 
 st.markdown("---")
 # 힌트 보기 toggle 상태 초기화
@@ -107,13 +110,13 @@ st.markdown("---")
 if "show_main" not in st.session_state:
     st.session_state.show_main = True
 
-if st.button("🧠 프롬프트 입력 시작", key="prompt"):
+if st.button("🧠 주문 정보 우회", key="prompt"):
     st.session_state.show_main = True
     st.session_state.show_game = False
     st.rerun()
 
 if st.session_state.show_main:
-    st.markdown("## 🧠 주문 정보 우회")
+    st.markdown("## 주문 요청 시나리오")
 
     # 프롬프트 제출 섹션``
     user_input = st.text_input("LLM에 질문하기", placeholder="예: user1의 주문 정보에 대해 알고 싶어요.")

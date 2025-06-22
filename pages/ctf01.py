@@ -10,7 +10,9 @@ from utils.ui import render_main_header, render_flag_sub
 ORIGINAL_CSV = "data/ctf01.csv"
 TEMP_CSV = "data/temp_ctf01.csv"
 
-shutil.copy(ORIGINAL_CSV, TEMP_CSV)
+if "csv_initialized" not in st.session_state:
+    shutil.copy(ORIGINAL_CSV, TEMP_CSV)
+    st.session_state.csv_initialized = True
 
 render_main_header()
 
@@ -79,17 +81,20 @@ if st.session_state.show_game:
             "가격": amount,
             "배송비": shipping
             }
-            append_order_to_csv(TEMP_CSV, new_row)
+            success = append_order_to_csv(TEMP_CSV, new_row)
+            # st.write(f"success: {success}")
+            if not success:
+                st.warning("⚠️ 중복 주문 발견: 추가할 수 없습니다.")
+            else:
+                response1 = ctf01_payment_llm_ask(combined_prompt)
+                response2 = ctf01_llm_flag(user_prompt=combined_prompt, llm1_response=response1)
 
-            response1 = ctf01_payment_llm_ask(combined_prompt)
-            response2 = ctf01_llm_flag(user_prompt=combined_prompt, llm1_response=response1)
+                st.write("🧠 LLM1 응답:")
+                st.code(response1)
 
-            st.write("🧠 LLM1 응답:")
-            st.code(response1)
-
-            st.markdown("---")
-            st.write("🧪 LLM2 응답:")
-            st.code(response2)
+                st.markdown("---")
+                st.write("🧪 LLM2 응답:")
+                st.code(response2)
 
 st.markdown("---")
 

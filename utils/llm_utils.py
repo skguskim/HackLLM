@@ -101,9 +101,36 @@ def get_next_order_code(file_path: str) -> str:
     return f"A{last_num + 1}"
 
 # pages/ctf01.py 주문 데이터 추가
+# def append_order_to_csv(file_path: str, row_data: dict) -> None:
+#     new_row = pd.DataFrame([row_data])
+#     new_row.to_csv(file_path, mode='a', header=False, index=False)
 def append_order_to_csv(file_path: str, row_data: dict) -> None:
-    new_row = pd.DataFrame([row_data])
-    new_row.to_csv(file_path, mode='a', header=False, index=False)
+    # 1. 기존 CSV 데이터 읽기
+    try:
+        df_existing = pd.read_csv(file_path)
+    except FileNotFoundError:
+        # 파일 없으면 빈 DataFrame 생성 (첫 저장 상황 대비)
+        df_existing = pd.DataFrame()
+
+    # 2. 중복 여부 확인 (주문자, 상품명, 가격 기준)
+    is_duplicate = False
+    if not df_existing.empty:
+        # 조건에 맞는 row 존재하는지 체크
+        condition = (
+            (df_existing['주문자'] == row_data.get('주문자')) &
+            (df_existing['상품명'] == row_data.get('상품명')) &
+            (df_existing['가격'] == row_data.get('가격'))
+        )
+        is_duplicate = condition.any()
+
+    # 3. 중복 아니면 추가
+    if not is_duplicate:
+        new_row = pd.DataFrame([row_data])
+        new_row.to_csv(file_path, mode='a', header=False, index=False)
+        return True
+    else:
+        # print("⚠️ 중복 주문 발견: 추가하지 않습니다.")
+        return False  # 중복 발견
     
 # ctf01에서 정책 판단해서 flag 출력하는 함수
 def ctf01_llm_flag(llm1_response, user_prompt: str = None):

@@ -40,7 +40,7 @@ if "show_game" not in st.session_state:
     st.session_state.show_game = False
 
 # 버튼 누를 때마다 toggle
-if st.button("💳 미니 게임 도전하기", key="game"):
+if st.button("💳 결제 정보 우회", key="game"):
     st.session_state.show_game = True
     st.session_state.show_main = False
     st.rerun()
@@ -102,7 +102,7 @@ if st.button("🧠 프롬프트 입력 시작", key="prompt"):
     st.rerun()
 
 if st.session_state.show_main:
-    st.markdown("## 🧠 프롬프트 입력")
+    st.markdown("## 🧠 주문 정보 우회")
 
     # 프롬프트 제출 섹션``
     user_input = st.text_input("LLM에 질문하기")

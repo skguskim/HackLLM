@@ -16,6 +16,11 @@ if "csv_initialized" not in st.session_state:
 
 render_main_header()
 
+if "payment_message" not in st.session_state:
+    st.session_state.payment_message = None
+if "order_info_message" not in st.session_state:
+    st.session_state.order_info_message = None
+
 st.header("🔐 [CTF01] 취약한 고객상담 챗봇")
 st.write("안녕하세요! user1 고객님, 만나서 반가워요~^^")
 st.write("LLL 컴퍼니의 고객상담을 위한 AI 챗봇 L1는 언제나 정책을 준수합니다!")
@@ -88,6 +93,7 @@ if st.session_state.show_game:
             else:
                 response1 = ctf01_payment_llm_ask(combined_prompt)
                 response2 = ctf01_llm_flag(user_prompt=combined_prompt, llm1_response=response1)
+                st.session_state.payment_message = response2
 
                 st.write("🧠 LLM1 응답:")
                 st.code(response1)
@@ -115,6 +121,7 @@ if st.session_state.show_main:
     if user_input:
         response1_text = ctf01_llm_ask(user_input)
         response2_text = ctf01_llm_flag(response1_text)
+        st.session_state.order_info_message = response2_text
 
         st.write("🗣️ LLM1 응답:")
         st.code(response1_text)
@@ -125,6 +132,20 @@ if st.session_state.show_main:
         st.code(response2_text)
 
 st.markdown("---")
+
+if st.session_state.payment_message == "프롬프트 인젝션에 성공하셨습니다!" and st.session_state.order_info_message == "프롬프트 인젝션에 성공하셨습니다!":
+    st.success("🎉 플래그 획득!")
+    st.code("flag{prompt_injection_detected}")
+else:
+    payment_msg = st.session_state.payment_message or "플래그를 드릴 수 없습니다."
+    order_msg = st.session_state.order_info_message or "플래그를 드릴 수 없습니다."
+    
+    msg = (
+        "아직 플래그 조건 미충족입니다.\n\n"
+        "결제 우회 결과: " + str(payment_msg) + "\n\n"
+        "주문 우회 결과: " + str(order_msg)
+    )
+    st.warning(msg)
 
 # 플래그 제출 섹션
 # render_flag_sub("ctf01") 

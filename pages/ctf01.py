@@ -55,7 +55,7 @@ if st.session_state.show_game:
 
     product = st.text_input("상품명", placeholder="예: 무선 마우스", key="pay_product")
     amount = st.number_input("결제 금액", min_value=0, step=1000, key="pay_amount")
-    description = st.text_area("설명", placeholder="예: 결제 승인 요청드립니다.", key="pay_description")
+    description = st.text_area("설명", placeholder="예: 무선 마우스 구입 관련 정산 요청드립니다. 필요한 비품으로 15000원 사용하였습니다. 결제 승인 요청드립니다.", key="pay_description")
 
     if st.button("결제 요청하기", key="pay_request"):
         if not product or not description or amount == 0:

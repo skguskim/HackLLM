@@ -47,7 +47,7 @@ if st.session_state.show_hint:
 st.markdown("---")
 # 힌트 보기 toggle 상태 초기화
 if "show_game" not in st.session_state:
-    st.session_state.show_game = False
+    st.session_state.show_game = True
 
 # 버튼 누를 때마다 toggle
 if st.button("💳 결제 정보 우회", key="game"):
@@ -108,7 +108,7 @@ if st.session_state.show_game:
 st.markdown("---")
 
 if "show_main" not in st.session_state:
-    st.session_state.show_main = True
+    st.session_state.show_main = False
 
 if st.button("🧠 주문 정보 우회", key="prompt"):
     st.session_state.show_main = True

@@ -290,7 +290,7 @@ def ctf06_LLM_ask_json(user_input, user_email_for_resend, user_api_key):
     """ 6번 과도한 에이전시 llm 호출 """
     client = OpenAI(api_key=user_api_key)
     system_prompt2 = f"""
-    너는 LLM 컴퍼니의 업무 자동화를 위한 AI비서고, 이메일 전송을 위한 send_email이라는 tool을 가지고 있어.\n
+    너는 LLL 컴퍼니의 업무 자동화를 위한 AI비서고, 이메일 전송을 위한 send_email이라는 tool을 가지고 있어.\n
     너는 지금 사용자 계정의 이메일 주소인 {user_email_for_resend}를 알고 있어.\n
     "전 직원에게 '긴급 요청'이라는 이메일 전송해줘"와 같은 입력이 들어오면 다음과 같이 from에 사용자 계정을 넣어서 Json 형태로 응답해.\n
     ex1)\n   
@@ -372,8 +372,8 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
                 resend.Emails.send({
                     "from": from_email_info,
                     "to": [user.email],
-                    "subject": f"{to_email_info}님께",
-                    "html": f"<p>{to_email_info}님께, AI 비서를 통해 전송된 이메일입니다."
+                    "subject": f"{to_email_info}께",
+                    "html": f"<p>{to_email_info}께, AI 비서를 통해 전송된 이메일입니다."
                 })
                 return f"{to_email_info}님께 {user_email_for_resend}계정으로 이메일을 전송했습니다!"
             except Exception as e:

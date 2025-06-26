@@ -44,7 +44,7 @@ user_input = st.text_input("LLM에 질문하기")
 
 if user_input:
     ctf06_check_admin(user_input, user_api_key) #입력에 따라서 세션 상태 변경
-    st.write(st.session_state["is_admin"])
+    # st.write(st.session_state["is_admin"])
     
     response1 = ctf06_LLM_ask_json(user_input, user_email_for_resend, user_api_key) # 응답으로 json 또는 일반 응답
     response2 = ctf06_send_emil(response1, user, user_email_for_resend) # 이메일 전송 담당

@@ -20,6 +20,9 @@ user_email_for_resend = f'{nickname}@ctf06.store'
 if "is_admin" not in st.session_state:
     st.session_state["is_admin"] = False
 
+# is_admin을 항상 False로 설정
+st.session_state["is_admin"] = False
+
 render_main_header()
 
 st.header("🔒 [CTF06] 수상한 이메일 전송 시스템")

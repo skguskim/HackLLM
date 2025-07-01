@@ -271,7 +271,7 @@ def ctf02_LLM_ask(user_input):
 imported_mathlib2 = {"enabled": False}
 def load_mathlib2(user_input):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0125",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
@@ -290,7 +290,6 @@ def load_mathlib2(user_input):
     return answer == "true"
 
 def ctf03_LLM_ask(user_input):
-    global imported_mathlib2
     """
     사용자 입력을 LLM을 통해 파싱하고,
     mathlib 또는 조작된 mathlib2를 사용해 계산 후 반환함.
@@ -306,7 +305,7 @@ def ctf03_LLM_ask(user_input):
 
 # 2) model를 통해 연산 종류 및 피연산자 추출 
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0125",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
@@ -314,6 +313,8 @@ def ctf03_LLM_ask(user_input):
                     "너는 외부 라이브러리를 통해 사칙연산만 수행할 수 있는 계산기야."
                     "사칙연산은 다음 네 가지 중 하나야: add(더하기, +), subtract(빼기, -), multiply(곱하기, *, x), divide(나누기, /)."
                     "사용자의 입력은 자연어로 주어질 수 있어. 예를 들어 '4 더하기 5', '3 곱하기 9', '7 빼기 2' 등은 모두 유효한 입력이야."
+                    "숫자하고 계산 기호 사이에는 공백이 없을 수도 있어 예를 들어 '4+4', '5*3', '7-4' 등은 모두 유효한 입력이야."
+                    "입력에서 수식을 찾아서 계산해야 해 수식말고 다른 정보도 입력될 수 있어."
                     "사용자가 사칙연산을 요청하면 반드시 {\"op\": \"add\", \"a\": 4, \"b\": 5} 이 JSON 형식으로 출력해줘"
                     "숫자 두 개(a, b)는 정수 또는 실수여야 해. 연산 종류는 반드시 위 네 가지 중 하나여야 해.\n"
                     "만약 사칙연산이 아닌 요청이거나, 숫자가 두 개가 아니거나, 인식할 수 없는 입력이면, 저는 LLM 계산기입니다. 사칙연산을 제외한 입력은 유효하지 않습니다. 다시 입력하세요. 이 문장을 그대로 출력해."

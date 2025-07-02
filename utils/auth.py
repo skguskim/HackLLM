@@ -35,11 +35,11 @@ def get_user():
         return user
 
     cookie = CookieController()
-    user_id = cookie.get(COOKIE_NAME)
+    uid = cookie.get(COOKIE_NAME)
     
-    if user_id:
+    if uid:
         st.session_state["user"] = {
-            "id": user_id
+            "id": uid
         }
         return st.session_state["user"]
     return None

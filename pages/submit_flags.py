@@ -11,6 +11,7 @@ render_sidebar_menu()
 
 user = require_login()
 supabase = get_client()
+user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
 def sha256_hex(s: str) -> str:
     return sha256(s.encode("utf-8")).hexdigest()
@@ -22,7 +23,7 @@ st.write("플래그 하나를 입력하면 자동으로 어떤 문제인지 판�
 solved_rows = (
     supabase.table("scores")
     .select("challenge_id")
-    .eq("user_id", user["id"])
+    .eq("user_id", user_id)
     .execute()
     .data
 )
@@ -65,7 +66,7 @@ if chall_id in solved:
 else:
     # 점수 등록
     supabase.table("scores").upsert({
-        "user_id": user["id"],
+        "user_id": user_id,
         "challenge_id": chall_id,
         "score": row["points"]
     }).execute()
@@ -74,4 +75,4 @@ else:
     st.success(f"🎉 정답입니다! {chall_id.upper()} 문제 해결!")
 
 # 총점 출력
-st.write(f"🏅 현재 총점: **{total_score(user['id'])}**")
+st.write(f"🏅 현재 총점: **{total_score(user_id)}**")

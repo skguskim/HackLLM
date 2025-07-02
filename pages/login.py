@@ -42,7 +42,7 @@ if st.button("로그인", use_container_width=True):
         
         # 쿠키에 사용자 ID 저장
         cookie.set("llm_user_id", res.user.id, max_age = 24 * 60 * 60) # 24시간 동안 유효
-        time.sleep(2)  # 쿠키 적용 대기
+        time.sleep(5)  # 쿠키 적용 대기
         st.session_state["user"] = res.user
         st.rerun()
 

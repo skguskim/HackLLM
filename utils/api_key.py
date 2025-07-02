@@ -13,6 +13,7 @@ cipher = Fernet(fernet_key.encode())
 # 이부분 코드 리팩토링 필요
 user = require_login() 
 supabase = get_client() 
+user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
 def require_api_key():
     user = require_login()
@@ -20,7 +21,7 @@ def require_api_key():
 
     # DB에서 직접 가져와서 session_state에 캐싱
     if "api_key" not in st.session_state:
-        res = supabase.table("profiles").select("api_key").eq("id", user["id"]).single().execute()
+        res = supabase.table("profiles").select("api_key").eq("id", user_id).single().execute()
         encrypted_api_key = res.data.get("api_key")
 
         if not encrypted_api_key:

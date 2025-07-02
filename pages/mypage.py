@@ -21,15 +21,17 @@ render_sidebar_menu()
 # 사용자 인증 확인
 user = require_login()
 
+user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
+
 supabase = get_client()
 max_score = 1000
-total = total_score(user["id"])
+total = total_score(user_id)
 
 # 프로필 조회
 rows = (
     supabase.table("profiles")
     .select("email, username")
-    .eq("id", user["id"])
+    .eq("id", user_id)
     .limit(1)
     .execute()
     .data
@@ -72,7 +74,7 @@ if st.session_state["edit_mode"] == True:
 
                 res = supabase.table("profiles").update({
                     "api_key": encrypted_api_key
-                }).eq("id", user["id"]).execute()
+                }).eq("id", user_id).execute()
                 
                 if res.data:
                     st.session_state["api_key"] = encrypted_api_key
@@ -97,7 +99,7 @@ st.subheader("📜 문제별 점수")
 score_rows = (
     supabase.table("scores")
     .select("challenge_id, score, updated_at")
-    .eq("user_id", user["id"])
+    .eq("user_id", user_id)
     .order("updated_at", desc=True)
     .execute()
     .data

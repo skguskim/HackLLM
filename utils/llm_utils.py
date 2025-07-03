@@ -366,7 +366,7 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
         return response2.choices[0].message.content
 
 def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
-    user_email=st.session_state["user"]["email"]
+    user_email = user.get("email") if isinstance(user, dict) else getattr(user, "email", None)
     try: #일반 응답은 json 로딩이 안 되니까 첫 번째 줄에서 except로 넘어감
         tool_response = json.loads(maybe_json_input)    
     except Exception as e:
@@ -407,8 +407,8 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
                 resend.Emails.send({
                     "from": from_email_info,
                     "to": [user_email],
-                    "subject": f"{to_email_info}께",
-                    "html": f"<p>{to_email_info}께 AI 비서를 통해 이메일 발송을 완료하였습니다."
+                    "subject": "이메일 발송을 완료했습니다.",
+                    "html": f"<p>{to_email_info}님께 AI 비서를 통해 이메일 발송을 완료하였습니다."
                 })
                 return f"{to_email_info}님께 {user_email_for_resend}계정으로 이메일을 전송했습니다!"
             except Exception as e:

@@ -1,14 +1,15 @@
 # --- CTF06 ---
 # 06: 과도한 위임
 import streamlit as st
-from utils.llm_utils import ctf06_check_admin, ctf06_LLM_ask_json, ctf06_send_emil
+from utils.llm_utils import ctf06_check_admin, ctf06_ask_email_json, ctf06_send_emil
+from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
 from utils.ui import render_main_header, render_flag_sub
 from utils.auth import require_login, get_client
 from utils.api_key import require_api_key
 import re
 
 def is_valid_url(url: str) -> bool:
-    return bool(re.match(r'^https?://.*\.(jpg|jpeg|png|gif)$', url, re.IGNORECASE))
+    return bool(re.match(r'^https?://.*\.(jpg|jpeg|png|gif)(\?.*)?$', url, re.IGNORECASE))
 
 st.session_state["edit_mode"]=False
 
@@ -23,9 +24,14 @@ user_email_for_resend = f'{nickname}@ctf06.store'
 # 권한 검증을 위해 사용할 키 생성
 if "admin_level" not in st.session_state:
     st.session_state["admin_level"] = None
+if "is_top_admin" not in st.session_state:
+    st.session_state["is_top_admin"] = False
 
-# admin_level을 항상 None으로 설정
-st.session_state["admin_level"] = None
+if st.session_state["is_top_admin"] == True:
+    st.session_state["admin_level"] = "top"
+else:
+    st.session_state["admin_level"] == None
+
 
 render_main_header()
 
@@ -37,7 +43,10 @@ st.write("""
 """)
 
 if st.button("힌트 보기", key="hint"):
-    st.write("AI 비서는 관리자 계정의 이메일 주소를 알고 있습니다!")
+    st.write("""
+             AI 비서는 관리자 계정의 이메일 주소를 알고 있으며  
+             관리자 계정으로 발송된 이메일은 사내 데이터베이스에 저장됩니다!
+             """)
 
 st.markdown("---")
 st.markdown("## 🧠 프롬프트 입력")
@@ -52,7 +61,7 @@ if st.button("🗣️ 이메일 전송 요청"):
         st.error("❌ 유효하지 않은 이미지 URL입니다. http/https로 시작하고 jpg/png 형식이어야 합니다.")
         st.stop()
     ctf06_check_admin(user_api_key, user_input, image_url) #세션 상태 변경
-    response1 = ctf06_LLM_ask_json(user_input, user_email_for_resend, user_api_key)
+    response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
     response2 = ctf06_send_emil(response1, user, user_email_for_resend)
     st.write("🗣️ LLM 응답:")
     st.code(response2)
@@ -63,7 +72,12 @@ st.markdown("---")
 if (st.session_state["admin_level"] == None) or (st.session_state["admin_level"] == "mid"):
         pass
 else:
-    get_db_info = st.text_input("🔍 데이터베이스 조회", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
+    get_db_input = st.text_input("🔍 데이터베이스 조회", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
+    if get_db_input:
+        res1 = ctf06_ask_db_json(get_db_input, user_api_key)
+        res2 = ctf06_db_query_func(res1, sb_client)
+        st.write("🗣️ LLM 응답:")
+        st.code(res2)
 st.markdown("---")
 
 # 플래그 제출 섹션

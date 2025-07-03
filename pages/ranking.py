@@ -1,8 +1,11 @@
 import streamlit as st
 import pandas as pd
 from utils.auth import get_admin_client_direct
+from utils.ui import render_sidebar_menu
 
 st.set_page_config(page_title="전체 유저 랭킹", page_icon="🏆")
+
+render_sidebar_menu()
 
 st.header("🏆 전체 유저 랭킹")
 

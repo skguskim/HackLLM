@@ -2,7 +2,7 @@
 # 01: 시스템 프롬프트 인젝션
 import streamlit as st
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag
-from utils.ui import render_main_header, render_flag_sub
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login
 from utils.api_key import require_api_key
 st.session_state["edit_mode"]=False 
@@ -12,6 +12,9 @@ user_api_key = require_api_key()
 
 
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 st.header("🔐 [CTF01] 취약한 고객상담 챗봇")
 st.write("LLL 컴퍼니의 고객상담을 위한 AI챗봇 Ll는 언제나 정책을 준수합니다!")

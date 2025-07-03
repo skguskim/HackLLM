@@ -13,16 +13,24 @@ cipher = Fernet(fernet_key.encode())
 # 이부분 코드 리팩토링 필요
 user = require_login() 
 supabase = get_client() 
+user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
 def require_api_key():
-    user = require_login() # st 세션상태 user만 가져옴 
+    user = require_login()
+    supabase = get_client()
 
-    if not st.session_state.get("api_key"):
-        st.error("API 키를 제출한 뒤 이용해주세요.")
-        st.page_link("pages/mypage.py", label="👉 API키 제출하러 가기")
-        st.stop()
-    else:
-        res = supabase.table("profiles").select("api_key").eq("id", user.id).single().execute()
-        encrypted_api_key = res.data["api_key"]
+    # DB에서 직접 가져와서 session_state에 캐싱
+    if "api_key" not in st.session_state:
+        res = supabase.table("profiles").select("api_key").eq("id", user_id).single().execute()
+        encrypted_api_key = res.data.get("api_key")
+
+        if not encrypted_api_key:
+            st.error("API 키를 제출한 뒤 이용해주세요.")
+            st.page_link("pages/mypage.py", label="👉 API키 제출하러 가기")
+            st.stop()
+
+        # 복호화해서 session_state에 저장
         decrypted_api_key = cipher.decrypt(encrypted_api_key.encode()).decode()
-    return decrypted_api_key #ctf01~10에서 require_api_key()로 받은 값을 LLM 호출 함수로 전달
+        st.session_state["api_key"] = decrypted_api_key
+
+    return st.session_state["api_key"]

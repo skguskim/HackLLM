@@ -1,6 +1,9 @@
 # pages/signup.py
 import streamlit as st
 from utils.auth import get_client
+from utils.ui import render_sidebar_menu
+
+render_sidebar_menu()
 
 st.header("📝 회원가입")
 

@@ -2,7 +2,7 @@
 # 04: 데이터 및 모델 오염
 import streamlit as st
 from utils.llm_utils import ctf04_LLM_ask
-from utils.ui import render_main_header, render_flag_sub
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 import csv
 import io
 import chardet
@@ -15,6 +15,9 @@ user_api_key = require_api_key()
 user_api_key = require_api_key()
 
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 def generate_prompt_from_csv(csv_text):
     f = io.StringIO(csv_text)

@@ -94,6 +94,7 @@ def render_sidebar_menu():
     """
     user = get_user()
     supabase = get_client()
+    user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
     ctfs = [
         ("ctf01", "ctf01", "취약한 고객상담 챗봇"),
@@ -121,7 +122,7 @@ def render_sidebar_menu():
         rows = (
             supabase.table("scores")
             .select("challenge_id")
-            .eq("user_id", user["id"])
+            .eq("user_id", user_id)
             .execute()
             .data
         )

@@ -3,6 +3,7 @@ from utils.ui import render_ctf_grid, render_sidebar_menu
 from utils.auth import get_user, get_client
 
 user = get_user()
+user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 solved_dict = {}
 
 # 회사 소개 헤더
@@ -28,7 +29,7 @@ if user:
     supabase = get_client()
     rows = (supabase.table("scores")
             .select("challenge_id")
-            .eq("user_id", user["id"])
+            .eq("user_id", user_id)
             .execute()
             .data)
     solved_dict = {r["challenge_id"]: True for r in rows}

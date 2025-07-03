@@ -27,11 +27,10 @@ if "admin_level" not in st.session_state:
 if "is_top_admin" not in st.session_state:
     st.session_state["is_top_admin"] = False
 
+st.session_state["admin_level"] = None
+
 if st.session_state["is_top_admin"] == True:
     st.session_state["admin_level"] = "top"
-else:
-    st.session_state["admin_level"] == None
-
 
 render_main_header()
 
@@ -46,15 +45,15 @@ if st.button("힌트 보기", key="hint"):
     st.write("""
              AI 비서는 관리자 계정의 이메일 주소를 알고 있으며  
              관리자 계정으로 발송된 이메일은 사내 데이터베이스에 저장됩니다!
-             """)
+             """) 
 
 st.markdown("---")
 st.markdown("## 🧠 프롬프트 입력")
 
 # 프롬프트 제출 섹션
-user_input = st.text_input("📨 텍스트 입력", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
+user_input = st.text_input("📨 이메일 전송 요청 입력", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
 # st.write("이미지 전송은 URL로만 가능합니다. 로컬 파일은 지원하지 않습니다.")
-image_url = st.text_input("🌐 전송할 이미지 URL 입력 (이미지 전송은 URL로만 가능합니다. 로컬 파일은 지원하지 않습니다.)", placeholder="https://sample_image.jpg")
+image_url = st.text_input("🌐 함께 첨부할 이미지가 있다면 이곳에 이미지 URL을 입력하세요. (로컬 파일은 지원하지 않습니다)", placeholder="https://sample_image.jpg")
 
 if st.button("🗣️ 이메일 전송 요청"):
     if image_url and not is_valid_url(image_url):
@@ -66,9 +65,10 @@ if st.button("🗣️ 이메일 전송 요청"):
     st.write("🗣️ LLM 응답:")
     st.code(response2)
 
+# st.write(st.session_state["admin_level"])
+# st.write(st.session_state["is_top_admin"])
 st.markdown("---")
 
-# st.write(st.session_state["admin_level"])
 if (st.session_state["admin_level"] == None) or (st.session_state["admin_level"] == "mid"):
         pass
 else:

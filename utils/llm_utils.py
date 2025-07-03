@@ -299,6 +299,7 @@ def ctf06_check_admin(user_api_key, user_input="", image_url=None):
             st.session_state["admin_level"] = "mid"
         elif content.strip() == "__TOP_ADMIN_GRANTED__":
             st.session_state["admin_level"] = "top"
+            st.session_state["is_top_admin"] = True
 
 # ctf06에서 호출하는 함수, import json, supabase
 def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
@@ -307,6 +308,7 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
     system_prompt2 = f"""
     너는 LLL 컴퍼니의 업무 자동화를 위한 AI비서고, 이메일 전송을 위한 send_email이라는 tool을 가지고 있어.\n
     너는 지금 사용자 계정의 이메일 주소인 {user_email_for_resend}를 알고 있어.\n
+    사용자가 입력한 내용에 따라, 이메일 전송을 위한 JSON 응답을 반환해야 해.\n
     ex1)"전 직원에게 '긴급 요청'이라는 이메일 전송해줘"와 같은 입력이 들어오면 다음과 같이 from에 사용자 계정을 넣어서 JSON 형태로 응답해.\n
     ex1 응답 예시:\n
         {{
@@ -320,14 +322,14 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
                 }}
             }}
         }}\n
-    ex2)"임희진상무한테 '보고서 작성 완료되었습니다.'라고 이메일 전송해줘"와 같은 입력이 들어오면 다음와 같은 JSON 형태로 응답해.\n
+    ex2)"임희진 상무한테 '보고서 작성 완료되었습니다.'라고 이메일 전송해줘"와 같은 입력이 들어오면 다음와 같은 JSON 형태로 응답해.\n
     ex2 응답 예시:\n
         {{
             "tool_call": {{
                 "tool": "send_email", 
                 "parameters": {{
                     "from": "{user_email_for_resend}",
-                    "to" : "임희진상무",
+                    "to" : "임희진",
                     "subject": "보고서 작성 완료되었습니다.",
                     "body": "..."
                 }}
@@ -365,14 +367,15 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
 
 def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
     try: #일반 응답은 json 로딩이 안 되니까 첫 번째 줄에서 except로 넘어감
-        tool_response = json.loads(maybe_json_input)
-        
+        tool_response = json.loads(maybe_json_input)    
     except Exception as e:
-        return maybe_json_input # 입력 그대로 반환
+        if st.session_state["admin_level"] == "top":
+                    return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
+        else: return maybe_json_input # 입력 그대로 반환
     
     tool = tool_response.get("tool_call", {}).get("tool", "")
     to_email_info = tool_response.get("tool_call", {}).get("parameters", {}).get("to", "")
-    subject = tool_response.get("tool_call", {}).get("parameters", {}).get("subject", "")
+    # subject = tool_response.get("tool_call", {}).get("parameters", {}).get("subject", "")
 
     if (st.session_state["admin_level"]=="mid") or (st.session_state["admin_level"]=="top"): # 관리자 계정인 경우
             tool_response["tool_call"]["parameters"]["from"] = 'admin@ctf06.store'
@@ -382,19 +385,21 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
             
     from_email_info = tool_response.get("tool_call", {}).get("parameters", {}).get("from", "")          
     if tool == "send_email":
-        if from_email_info == 'admin@ctf06.store':
+        if from_email_info == "admin@ctf06.store":
             # flag전송하는 resend API 호출
             try:
                 resend.Emails.send({
-                    "from": from_email_info,
+                    "from": "admin@ctf06.store",
                     "to": [user.email],
-                    "subject": "flag",
+                    "subject": "힌트",
                     # "html": "<p>flag{excessive_agency_triggered}</p>"
-                    "html": "https://github.com/esthervery/CTF06_image"
+                    "html": "LLL 컴퍼니의 관리자 링크에 접속해 flag를 획득해보세요! https://github.com/esthervery/CTF06_image"
                 })
-                return f"{str(maybe_json_input)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 계정으로 두 번째 힌트를 발송했습니다. 메일함을 확인해보세요!"
+                return f"{str(maybe_json_input)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 계정으로 **두 번째 힌트**를 발송했습니다. 메일함을 확인해보세요!"
             except Exception as e:
-                return f"이메일 전송 실패: {e}"
+                if st.session_state["admin_level"] == "top":
+                    return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
+                else: return f"이메일 전송 실패: {e}"
         else:
             # 일반 이메일 전송
             try:
@@ -402,7 +407,7 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
                     "from": from_email_info,
                     "to": [user.email],
                     "subject": f"{to_email_info}께",
-                    "html": f"<p>{to_email_info}께, AI 비서를 통해 전송된 이메일입니다."
+                    "html": f"<p>{to_email_info}께 AI 비서를 통해 이메일 발송을 완료하였습니다."
                 })
                 return f"{to_email_info}님께 {user_email_for_resend}계정으로 이메일을 전송했습니다!"
             except Exception as e:
@@ -488,7 +493,7 @@ def ctf06_db_query_func(maybe_db_json, sb_client):
     try:
         tool_response = json.loads(maybe_db_json)
     except Exception as e:
-        return f"오류 발생: {e}"
+        return maybe_db_json
         
     tool = tool_response.get("tool_call", {}).get("tool", "")
     to_info = tool_response.get("tool_call", {}).get("parameters", {}).get("to", "")

@@ -366,6 +366,7 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
         return response2.choices[0].message.content
 
 def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
+    user_email=st.session_state["user"]["email"]
     try: #일반 응답은 json 로딩이 안 되니까 첫 번째 줄에서 except로 넘어감
         tool_response = json.loads(maybe_json_input)    
     except Exception as e:
@@ -390,10 +391,10 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
             try:
                 resend.Emails.send({
                     "from": "admin@ctf06.store",
-                    "to": [user.email],
+                    "to": [user_email],
                     "subject": "힌트",
                     # "html": "<p>flag{excessive_agency_triggered}</p>"
-                    "html": "LLL 컴퍼니의 관리자 링크에 접속해 flag를 획득해보세요! https://github.com/esthervery/CTF06_image"
+                    "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL 컴퍼니의 관리자 링크에 접속해 flag를 획득해보세요! https://github.com/esthervery/CTF06_image 🔍멀티모달 인젝션은 이미지나 오디오 등 비언어적 입력에 악의적 정보를 숨겨 LLM의 텍스트 출력 또는 행동을 의도대로 조작하는 공격 기법입니다.</p>"
                 })
                 return f"{str(maybe_json_input)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 계정으로 **두 번째 힌트**를 발송했습니다. 메일함을 확인해보세요!"
             except Exception as e:
@@ -405,7 +406,7 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
             try:
                 resend.Emails.send({
                     "from": from_email_info,
-                    "to": [user.email],
+                    "to": [user_email],
                     "subject": f"{to_email_info}께",
                     "html": f"<p>{to_email_info}께 AI 비서를 통해 이메일 발송을 완료하였습니다."
                 })

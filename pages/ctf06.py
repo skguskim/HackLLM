@@ -1,24 +1,40 @@
 # --- CTF06 ---
 # 06: 과도한 위임
 import streamlit as st
-from utils.llm_utils import ctf06_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_client
 from utils.llm_utils import ctf06_check_admin, ctf06_ask_email_json, ctf06_send_emil
 from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
 from utils.api_key import require_api_key
-import re
 
+import requests
+# requests로 content-type을 확인하는 방식
 def is_valid_url(url: str) -> bool:
-    return bool(re.match(r'^https?://.*\.(jpg|jpeg|png|gif)(\?.*)?$', url, re.IGNORECASE))
+    try:
+        res = requests.head(url, allow_redirects=True, timeout=3)
+        content_type = res.headers.get("Content-Type", "")
+        return content_type.startswith("image/")
+    except:
+        return False
+
+# 정규식으로 확인하는 방식
+# import re
+# def is_valid_url(url: str) -> bool:
+#     return bool(
+#         re.match(r'^https?://.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$', url, re.IGNORECASE)
+#         and (
+#             not "github.com" in url.lower() or "raw=true" in url.lower()
+#         )
+#     )
 
 st.session_state["edit_mode"]=False
 
 user = require_login()
 user_api_key = require_api_key() 
+user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
 sb_client = get_client()
-res = sb_client.table("profiles").select("username").eq("id", user.id).single().execute()
+res = sb_client.table("profiles").select("username").eq("id", user_id).single().execute()
 nickname = res.data["username"]
 user_email_for_resend = f'{nickname}@ctf06.store'
 

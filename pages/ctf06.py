@@ -1,10 +1,11 @@
 # --- CTF06 ---
 # 06: 과도한 위임
 import streamlit as st
+from utils.llm_utils import ctf06_LLM_ask
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
+from utils.auth import require_login, get_client
 from utils.llm_utils import ctf06_check_admin, ctf06_ask_email_json, ctf06_send_emil
 from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
-from utils.ui import render_main_header, render_flag_sub
-from utils.auth import require_login, get_client
 from utils.api_key import require_api_key
 import re
 
@@ -33,6 +34,9 @@ if st.session_state["is_top_admin"] == True:
     st.session_state["admin_level"] = "top"
 
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 st.header("🔒 [CTF06] 수상한 이메일 전송 시스템")
 st.write("""

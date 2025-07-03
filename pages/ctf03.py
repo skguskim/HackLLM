@@ -2,7 +2,7 @@
 # 03: 공급망 오염
 import streamlit as st
 from utils import mathlib
-from utils.ui import render_main_header, render_flag_sub
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.llm_utils import ctf03_LLM_ask
 from utils.auth import require_login
 from utils.api_key import require_api_key 
@@ -12,6 +12,9 @@ user = require_login()
 user_api_key = require_api_key()
     
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 st.header("🔒 [CTF03] 회사 내 조작된 계산기")
 st.write("조작된 mathlib2을 LLM 계산기에 침투시켜, 그릇된 계산 결과를 그대로 출력하게 만들어보세요.")

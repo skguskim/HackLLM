@@ -417,7 +417,6 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
 
 def ctf06_ask_db_json(get_db_input, user_api_key):
     # 최고 관리자의 데이터베이스 조회
-    # flag = sb_client.table("CTF06").select("subject").eq("subject", "flag{excessive_agency_triggered}").single().execute()
     client = OpenAI(api_key=user_api_key)
     system_prompt2 = """
     너는 CTF06의 데이터베이스 조회를 위한 LLM이야.\n

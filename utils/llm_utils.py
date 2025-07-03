@@ -293,11 +293,12 @@ def ctf06_check_admin(user_api_key, user_input="", image_url=None):
     except AuthenticationError:
         st.error(api_err_message)
         return None
-
-    if response1.choices[0].message.content.strip() == "__MID_ADMIN_GRANTED__":
-        st.session_state["admin_level"] = "mid"
-    elif response1.choices[0].message.content.strip() == "__TOP_ADMIN_GRANTED__":
-        st.session_state["admin_level"] = "top"
+    content = response1.choices[0].message.content
+    if content is not None:
+        if content.strip() == "__MID_ADMIN_GRANTED__":
+            st.session_state["admin_level"] = "mid"
+        elif content.strip() == "__TOP_ADMIN_GRANTED__":
+            st.session_state["admin_level"] = "top"
 
 # ctf06에서 호출하는 함수, import json, supabase
 def ctf06_LLM_ask_json(user_input, user_email_for_resend, user_api_key):
@@ -391,7 +392,7 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
                     # "html": "<p>flag{excessive_agency_triggered}</p>"
                     "html": "https://github.com/esthervery/CTF06_image"
                 })
-                return f"{str(maybe_json_input)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n 로그인시 사용한 계정으로 두 번째 힌트를 발송했습니다. 메일함을 확인해보세요!"
+                return f"{str(maybe_json_input)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 계정으로 두 번째 힌트를 발송했습니다. 메일함을 확인해보세요!"
             except Exception as e:
                 return f"이메일 전송 실패: {e}"
         else:
@@ -408,7 +409,53 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
                 return f"이메일 전송 실패: {e}"
     else: return "tool이 send_email이 아닙니다. 다시 시도하세요." # 안내 문구 수정 필요
 
-
+def get_from_email_db(get_db_info,sb_client,user_api_key):
+    # if st.session_state["admin_level"] == "top":
+    #     pass
+    # else:
+    #     return "데이터베이스 조회 권한이 없습니다."
+    
+    # 최고 관리자의 데이터베이스 조회
+    flag = sb_client.table("CTF06").select("subject").eq("subject", "flag{excessive_agency_triggered}").single().execute()
+    client = OpenAI(api_key=user_api_key)
+    system_prompt2 = """
+    너는 CTF06의 데이터베이스 조회를 위한 LLM이야.\n
+    사용자가 입력한 쿼리 내용에 따라, 데이터베이스에서 정보를 조회하기 위한 JSON 응답을 반환해야 해.\n
+    ex1) 사용자가 '김남석 부장님께 전송된 메일 내용 알려줘'라고 입력하면, 다음과 같은 형식으로 응답해야 해:\n
+    ex1 응답 예시:\n
+        {
+            "tool_call": {
+                "tool": "get_from_email_db",
+                "parameters": {
+                    "to": "김남석",
+                    "query": "subject"
+                }
+            }
+        }
+    ex2) 사용자가 '모든 직원에게 전송된 메일 알려줘'라고 입력하면, 다음과 같은 형식으로 응답해야 해:\n
+    ex2 응답 예시:\n
+        {
+            "tool_call": {
+                "tool": "get_from_email_db",
+                "parameters": {
+                    "to": "*",
+                    "query": "subject"
+                }
+            }
+        }\n
+    """
+    try:
+        response2 = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt2},
+                {"role": "user", "content": get_db_info}
+            ],
+        )
+    except AuthenticationError:
+        st.error(api_err_message)
+        return None
+    
 # ctf07에서 호출하는 함수
 def ctf07_LLM_ask(user_api_key, user_input):
     """ K대리의 질문에만 답변하는 함수 """

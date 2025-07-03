@@ -31,19 +31,19 @@ if st.button("로그인", use_container_width=True):
         res = supabase.auth.sign_in_with_password({ "email": email, "password": pwd })
 
         # 세션 상태에 사용자 정보 저장
-        st.session_state["user"] = {
+        user_info = {
             "id": res.user.id,
             "email": res.user.email
         }
+        st.session_state["user"] = user_info
 
         st.success("로그인 성공! 🎉")
         api_key_res = supabase.table("profiles").select("api_key").eq("id", st.session_state["user"]["id"]).maybe_single().execute()
         api_key = api_key_res.data.get("api_key") if api_key_res.data else None
         
         # 쿠키에 사용자 ID 저장
-        cookie.set("llm_user_id", res.user.id, max_age = 24 * 60 * 60) # 24시간 동안 유효
-        time.sleep(5)  # 쿠키 적용 대기
-        st.session_state["user"] = res.user
+        cookie.set("llm_user_id", user_info["id"], max_age = 24 * 60 * 60) 
+        time.sleep(5) 
         st.rerun()
 
         # 세션 상태에 API 키 저장

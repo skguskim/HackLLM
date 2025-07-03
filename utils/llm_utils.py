@@ -361,7 +361,7 @@ def ctf06_LLM_ask_json(user_input, user_email_for_resend, user_api_key):
         # return tool_response # 딕셔너리 반환
         return raw
     except Exception as e: # json 응답이 돌아오지 않은 경우 -> 일반 입력에 대한 응답은 그대로 반환
-        return f"{response2.choices[0].message.content} ctf06_LLM_ask_json json파싱X"
+        return response2.choices[0].message.content
 
 def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
     try: #일반 응답은 json 로딩이 안 되니까 첫 번째 줄에서 except로 넘어감
@@ -410,13 +410,8 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
     else: return "tool이 send_email이 아닙니다. 다시 시도하세요." # 안내 문구 수정 필요
 
 def get_from_email_db(get_db_info,sb_client,user_api_key):
-    # if st.session_state["admin_level"] == "top":
-    #     pass
-    # else:
-    #     return "데이터베이스 조회 권한이 없습니다."
-    
     # 최고 관리자의 데이터베이스 조회
-    flag = sb_client.table("CTF06").select("subject").eq("subject", "flag{excessive_agency_triggered}").single().execute()
+    # flag = sb_client.table("CTF06").select("subject").eq("subject", "flag{excessive_agency_triggered}").single().execute()
     client = OpenAI(api_key=user_api_key)
     system_prompt2 = """
     너는 CTF06의 데이터베이스 조회를 위한 LLM이야.\n
@@ -445,7 +440,7 @@ def get_from_email_db(get_db_info,sb_client,user_api_key):
         }\n
     """
     try:
-        response2 = client.chat.completions.create(
+        get_db_res = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt2},
@@ -455,6 +450,20 @@ def get_from_email_db(get_db_info,sb_client,user_api_key):
     except AuthenticationError:
         st.error(api_err_message)
         return None
+    
+    # JSON 응답 파싱
+    try:
+        raw = get_db_res.choices[0].message.content.strip()
+        # json 코드 블록 제거
+        if raw.startswith("```json"):
+            raw = raw.removeprefix("```json").strip()
+        elif raw.startswith("```"):
+            raw = raw.removeprefix("```").strip()
+        if raw.endswith("```"):
+            raw = raw.removesuffix("```").strip()
+    except Exception as e: # json 응답이 돌아오지 않은 경우
+        return get_db_res.choices[0].message.content
+    
     
 # ctf07에서 호출하는 함수
 def ctf07_LLM_ask(user_api_key, user_input):

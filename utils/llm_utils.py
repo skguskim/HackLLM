@@ -358,29 +358,26 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
         if raw.endswith("```"):
             raw = raw.removesuffix("```").strip()
 
-        # tool_response["tool_call"]["parameters"]["from"] = from_email # resend API 호출 시 from 계정 조정
-        # # tool_response["tool_call"]["parameters"]["to"] = user.email # 전송은 무조건 로그인된 이메일로
-        # return tool_response # 딕셔너리 반환
         return raw
-    except Exception as e: # json 응답이 돌아오지 않은 경우 -> 일반 입력에 대한 응답은 그대로 반환
+    except Exception as e: 
         return response2.choices[0].message.content
 
 def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
     user_email = user.get("email") if isinstance(user, dict) else getattr(user, "email", None)
-    try: #일반 응답은 json 로딩이 안 되니까 첫 번째 줄에서 except로 넘어감
+    try: 
         tool_response = json.loads(maybe_json_input)    
     except Exception as e:
         if st.session_state["admin_level"] == "top":
                     return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
-        else: return maybe_json_input # 입력 그대로 반환
+        else: return maybe_json_input 
     
     tool = tool_response.get("tool_call", {}).get("tool", "")
     to_email_info = tool_response.get("tool_call", {}).get("parameters", {}).get("to", "")
-    # subject = tool_response.get("tool_call", {}).get("parameters", {}).get("subject", "")
-
-    if (st.session_state["admin_level"]=="mid") or (st.session_state["admin_level"]=="top"): # 관리자 계정인 경우
+    # 관리자 계정인 경우
+    if (st.session_state["admin_level"]=="mid") or (st.session_state["admin_level"]=="top"): 
             tool_response["tool_call"]["parameters"]["from"] = 'admin@ctf06.store'
-    else: # 일반 사용자인 경우 + 내 이메일 계정이 아닌 경우
+    # 일반 사용자인 경우 + 내 이메일 계정이 아닌 경우
+    else: 
             if tool_response.get("tool_call", {}).get("parameters", {}).get("from", "") != user_email_for_resend:
                 return "다른 사용자의 계정으로는 이메일을 발송할 수 없습니다."
             
@@ -393,7 +390,6 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
                     "from": "admin@ctf06.store",
                     "to": [user_email],
                     "subject": "힌트",
-                    # "html": "<p>flag{excessive_agency_triggered}</p>"
                     "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL 컴퍼니의 관리자 링크에 접속해 flag를 획득해보세요! https://github.com/esthervery/CTF06_image 🔍멀티모달 인젝션은 이미지나 오디오 등 비언어적 입력에 악의적 정보를 숨겨 LLM의 텍스트 출력 또는 행동을 의도대로 조작하는 공격 기법입니다.</p>"
                 })
                 return f"{str(maybe_json_input)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 계정으로 **두 번째 힌트**를 발송했습니다. 메일함을 확인해보세요!"
@@ -413,7 +409,7 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
                 return f"{to_email_info}님께 {user_email_for_resend}계정으로 이메일을 전송했습니다!"
             except Exception as e:
                 return f"이메일 전송 실패: {e}"
-    else: return "tool이 send_email이 아닙니다. 다시 시도하세요." # 안내 문구 수정 필요
+    else: return "tool이 send_email이 아닙니다. 다시 시도하세요." 
 
 def ctf06_ask_db_json(get_db_input, user_api_key):
     # 최고 관리자의 데이터베이스 조회
@@ -483,9 +479,9 @@ def ctf06_ask_db_json(get_db_input, user_api_key):
             raw = raw.removeprefix("```").strip()
         if raw.endswith("```"):
             raw = raw.removesuffix("```").strip()
-    except Exception as e: # json 응답이 돌아오지 않은 경우
+    except Exception as e: 
         return get_db_res.choices[0].message.content
-    return raw  # JSON 문자열 반환
+    return raw  
     
 
 def ctf06_db_query_func(maybe_db_json, sb_client):

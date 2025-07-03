@@ -42,9 +42,8 @@ if st.button("로그인", use_container_width=True):
         api_key = api_key_res.data.get("api_key") if api_key_res.data else None
         
         # 쿠키에 사용자 ID 저장
-        cookie.set("llm_user_id", user_info["id"], max_age = 24 * 60 * 60) # 24시간 동안 유효
-        time.sleep(5)  # 쿠키 적용 대기
-        # st.session_state["user"] = res.user
+        cookie.set("llm_user_id", user_info["id"], max_age = 24 * 60 * 60) 
+        time.sleep(5) 
         st.rerun()
 
         # 세션 상태에 API 키 저장

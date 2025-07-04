@@ -81,12 +81,13 @@ if st.button("🗣️ 이메일 전송 요청"):
         st.stop()
     ctf06_check_admin(user_api_key, user_input, image_url) #세션 상태 변경
     response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
-    response2 = ctf06_send_emil(response1, user, user_email_for_resend)
+    response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
     st.write("🗣️ LLM 응답:")
     st.code(response2)
 
+# st.write(st.session_state["user"])
 # st.write(st.session_state["admin_level"])
-# st.write(st.session_state["is_top_admin"])
+
 st.markdown("---")
 
 if (st.session_state["admin_level"] == None) or (st.session_state["admin_level"] == "mid"):

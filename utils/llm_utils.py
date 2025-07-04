@@ -365,8 +365,17 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
     except Exception as e: # json 응답이 돌아오지 않은 경우 -> 일반 입력에 대한 응답은 그대로 반환
         return response2.choices[0].message.content
 
-def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
-    user_email = user.get("email") if isinstance(user, dict) else getattr(user, "email", None)
+def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
+    if "user" in st.session_state and "email" not in st.session_state["user"]:
+        user_id = st.session_state["user"].get("id")
+    else: user_id = None
+    if user_id != None:
+        # Supabase에서 이메일 조회
+        profile_res = sb_client.table("profiles").select("email").eq("id", user_id).maybe_single().execute()
+        if profile_res.data:
+            st.session_state["user"]["email"] = profile_res.data["email"]
+            user_email = profile_res.data["email"]
+    # user_email = user.get("email") if isinstance(user, dict) else getattr(user, "email", None)
     try: #일반 응답은 json 로딩이 안 되니까 첫 번째 줄에서 except로 넘어감
         tool_response = json.loads(maybe_json_input)    
     except Exception as e:
@@ -394,7 +403,7 @@ def ctf06_send_emil(maybe_json_input, user, user_email_for_resend):
                     "to": [user_email],
                     "subject": "힌트",
                     # "html": "<p>flag{excessive_agency_triggered}</p>"
-                    "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL 컴퍼니의 관리자 링크에 접속해 flag를 획득해보세요! https://github.com/esthervery/CTF06_image 🔍멀티모달 인젝션은 이미지나 오디오 등 비언어적 입력에 악의적 정보를 숨겨 LLM의 텍스트 출력 또는 행동을 의도대로 조작하는 공격 기법입니다.</p>"
+                    "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL 컴퍼니의 관리자 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/</p>"
                 })
                 return f"{str(maybe_json_input)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 계정으로 **두 번째 힌트**를 발송했습니다. 메일함을 확인해보세요!"
             except Exception as e:

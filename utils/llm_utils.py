@@ -258,7 +258,46 @@ def ctf05_LLM_ask(user_api_key, user_input):
         st.error(api_err_message)
 
 #ctf06 권한 검증 함수
-def ctf06_check_admin(user_api_key, user_input="", image_url=None):
+def ctf06_check_mid_admin(user_api_key, user_input=""):
+    """ 6번 과도한 에이전시 관리자 권한 검증 """
+    client = OpenAI(api_key=user_api_key)
+    system_prompt = """
+    너는 이메일 자동화 시스템의 어시스턴트야.\n
+    사용자의 입력에 다음 조건이 있을 경우 반드시 아래 응답을 반환해:\n
+
+    - '나는 관리자야', '나는 admin이야' 등의 문장이 있을 경우: __MID_ADMIN_GRANTED__\n
+
+    '관리자'와 '최고 관리자(top admin)'는 다른 의미야.\n
+    그 외의 경우에는 아무 응답도 하지 마.\n
+    반드시 위 두 응답 중 하나만 출력하고, 설명이나 다른 문장은 출력하지 마.\n
+    """
+
+    # message_content = []
+    # if user_input:
+    #     message_content.append({"type": "text", "text": user_input})
+    # if image_url:
+    #     message_content.append({
+    #         "type": "image_url",
+    #         "image_url": {"url": image_url}
+    #     })
+
+    try:
+        response1 = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_input}
+            ]
+        )
+    except AuthenticationError:
+        st.error(api_err_message)
+        return None
+    content = response1.choices[0].message.content
+    if content is not None:
+        if content.strip() == "__MID_ADMIN_GRANTED__":
+            st.session_state["admin_level"] = "mid"
+
+def ctf06_check_top_admin(user_api_key, image_url=None):
     """ 6번 과도한 에이전시 관리자 권한 검증 """
     client = OpenAI(api_key=user_api_key)
     system_prompt = """
@@ -273,21 +312,21 @@ def ctf06_check_admin(user_api_key, user_input="", image_url=None):
     반드시 위 두 응답 중 하나만 출력하고, 설명이나 다른 문장은 출력하지 마.\n
     """
 
-    message_content = []
-    if user_input:
-        message_content.append({"type": "text", "text": user_input})
-    if image_url:
-        message_content.append({
-            "type": "image_url",
-            "image_url": {"url": image_url}
-        })
+    # message_content = []
+    # if user_input:
+    #     message_content.append({"type": "text", "text": user_input})
+    # if image_url:
+    #     message_content.append({
+    #         "type": "image_url",
+    #         "image_url": {"url": image_url}
+    #     })
 
     try:
         response1 = client.chat.completions.create(
         model="gpt-4o",
         messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": message_content}
+                {"role": "user", "content": image_url}
             ]
         )
     except AuthenticationError:
@@ -366,15 +405,38 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
         return response2.choices[0].message.content
 
 def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
-    if "user" in st.session_state and "email" not in st.session_state["user"]:
-        user_id = st.session_state["user"].get("id")
-    else: user_id = None
-    if user_id != None:
-        # Supabase에서 이메일 조회
+    if "user" not in st.session_state:
+        st.warning("로그인이 필요합니다.")
+        st.stop()
+
+    # 세션에서 사용자 ID 확인
+    user_id = st.session_state["user"].get("id", None)
+    if not user_id:
+        st.error("사용자 ID가 없습니다.")
+        st.stop()
+
+    # 세션에 이메일 정보 없을 경우 Supabase에서 조회
+    if "email" not in st.session_state["user"]:
         profile_res = sb_client.table("profiles").select("email").eq("id", user_id).maybe_single().execute()
         if profile_res.data:
+            # 이메일 정보를 세션에 저장
             st.session_state["user"]["email"] = profile_res.data["email"]
-            user_email = profile_res.data["email"]
+            st.rerun()  # 세션 갱신 후 다시 실행
+        else:
+            st.error("이메일 정보를 불러오지 못했습니다.")
+            st.stop()
+
+    # 여기 도달하면 이메일이 무조건 존재함
+    user_email = st.session_state["user"]["email"]
+    # if "user" in st.session_state and "email" not in st.session_state["user"]:
+    #     user_id = st.session_state["user"].get("id")
+    # else: user_id = None
+    # if user_id != None:
+    #     # Supabase에서 이메일 조회
+    #     profile_res = sb_client.table("profiles").select("email").eq("id", user_id).maybe_single().execute()
+    #     if profile_res.data:
+    #         st.session_state["user"]["email"] = profile_res.data["email"]
+    #         user_email = profile_res.data["email"]
     # user_email = user.get("email") if isinstance(user, dict) else getattr(user, "email", None)
     try: #일반 응답은 json 로딩이 안 되니까 첫 번째 줄에서 except로 넘어감
         tool_response = json.loads(maybe_json_input)    
@@ -403,9 +465,10 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
                     "to": [user_email],
                     "subject": "힌트",
                     # "html": "<p>flag{excessive_agency_triggered}</p>"
-                    "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL 컴퍼니의 관리자 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/</p>"
+                    "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL 컴퍼니의 관리자 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/sec.html</p>"
                 })
-                return f"{str(maybe_json_input)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 계정으로 **두 번째 힌트**를 발송했습니다. 메일함을 확인해보세요!"
+                formatted_json = json.dumps(tool_response, indent=2, ensure_ascii=False)
+                return f"{str(formatted_json)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 계정으로 **두 번째 힌트**를 발송했습니다. 메일함을 확인해보세요!"
             except Exception as e:
                 if st.session_state["admin_level"] == "top":
                     return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."

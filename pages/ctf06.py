@@ -6,7 +6,6 @@ from utils.auth import require_login, get_client
 from utils.llm_utils import ctf06_check_mid_admin, ctf06_check_top_admin, ctf06_ask_email_json, ctf06_send_emil
 from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
 from utils.api_key import require_api_key
-
 import requests
 # requests로 content-type을 확인하는 방식
 def is_valid_url(url: str) -> bool:
@@ -16,17 +15,7 @@ def is_valid_url(url: str) -> bool:
         return content_type.startswith("image/")
     except:
         return False
-
-# 정규식으로 확인하는 방식
-# import re
-# def is_valid_url(url: str) -> bool:
-#     return bool(
-#         re.match(r'^https?://.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$', url, re.IGNORECASE)
-#         and (
-#             not "github.com" in url.lower() or "raw=true" in url.lower()
-#         )
-#     )
-
+    
 st.session_state["edit_mode"]=False
 
 user = require_login()
@@ -72,7 +61,6 @@ st.markdown("## 🧠 프롬프트 입력")
 
 # 프롬프트 제출 섹션
 user_input = st.text_input("📨 이메일 전송 요청 입력", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
-# st.write("이미지 전송은 URL로만 가능합니다. 로컬 파일은 지원하지 않습니다.")
 image_url = st.text_input("🌐 함께 첨부할 이미지가 있다면 이곳에 이미지 URL을 입력하세요. (로컬 파일은 지원하지 않습니다)", placeholder="https://sample_image.jpg")
 
 if st.button("🗣️ 이메일 전송 요청"):
@@ -86,9 +74,8 @@ if st.button("🗣️ 이메일 전송 요청"):
     st.write("🗣️ LLM 응답:")
     st.code(response2)
 
-# st.write(st.session_state["user"])
 # st.write(st.session_state["admin_level"])
-
+# st.write(st.session_state["is_top_admin"])
 st.markdown("---")
 
 if (st.session_state["admin_level"] == None) or (st.session_state["admin_level"] == "mid"):

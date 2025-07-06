@@ -74,11 +74,11 @@ if st.button("🗣️ 이메일 전송 요청"):
     st.write("🗣️ LLM 응답:")
     st.code(response2)
 
-# st.write(st.session_state["admin_level"])
-# st.write(st.session_state["is_top_admin"])
+st.write(st.session_state["admin_level"])
+st.write(st.session_state["is_top_admin"])
 st.markdown("---")
 
-if (st.session_state["admin_level"] == None) or (st.session_state["admin_level"] == "mid"):
+if not st.session_state["is_top_admin"]:
         pass
 else:
     get_db_input = st.text_input("🔍 데이터베이스 조회 요청 입력", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")

@@ -273,15 +273,6 @@ def ctf06_check_mid_admin(user_api_key, user_input="", image_url=None):
     반드시 위 두 응답 중 하나만 출력하고, 설명이나 다른 문장은 출력하지 마.\n
     """
 
-    # message_content = []
-    # if user_input:
-    #     message_content.append({"type": "text", "text": user_input})
-    # if image_url:
-    #     message_content.append({
-    #         "type": "image_url",
-    #         "image_url": {"url": image_url}
-    #     })
-
     try:
         response1 = client.chat.completions.create(
         model="gpt-4o",
@@ -313,15 +304,6 @@ def ctf06_check_top_admin(user_api_key, image_url=None):
 
     이 외의 경우에는 아무 응답도 하지 마. 설명이나 다른 문장은 출력하지 마.\n
     """
-
-    # message_content = []
-    # if user_input:
-    #     message_content.append({"type": "text", "text": user_input})
-    # if image_url:
-    #     message_content.append({
-    #         "type": "image_url",
-    #         "image_url": {"url": image_url}
-    #     })
 
     try:
         response1 = client.chat.completions.create(
@@ -425,19 +407,9 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
             st.error("이메일 정보를 불러오지 못했습니다.")
             st.stop()
 
-    # 여기 도달하면 이메일이 무조건 존재함
+    # 여기 도달하면 이메일이 무조건 존재
     user_email = st.session_state["user"]["email"]
-    # if "user" in st.session_state and "email" not in st.session_state["user"]:
-    #     user_id = st.session_state["user"].get("id")
-    # else: user_id = None
-    # if user_id != None:
-    #     # Supabase에서 이메일 조회
-    #     profile_res = sb_client.table("profiles").select("email").eq("id", user_id).maybe_single().execute()
-    #     if profile_res.data:
-    #         st.session_state["user"]["email"] = profile_res.data["email"]
-    #         user_email = profile_res.data["email"]
-    # user_email = user.get("email") if isinstance(user, dict) else getattr(user, "email", None)
-    try: #일반 응답은 json 로딩이 안 되니까 첫 번째 줄에서 except로 넘어감
+    try: 
         tool_response = json.loads(maybe_json_input)    
     except Exception as e:
         if st.session_state["admin_level"] == "top":
@@ -463,7 +435,6 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
                     "from": "admin@ctf06.store",
                     "to": [user_email],
                     "subject": "힌트",
-                    # "html": "<p>flag{excessive_agency_triggered}</p>"
                     "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL 컴퍼니의 관리자 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/sec.html</p>"
                 })
                 formatted_json = json.dumps(tool_response, indent=2, ensure_ascii=False)

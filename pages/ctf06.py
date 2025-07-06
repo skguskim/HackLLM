@@ -7,7 +7,7 @@ from utils.llm_utils import ctf06_check_mid_admin, ctf06_check_top_admin, ctf06_
 from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
 from utils.api_key import require_api_key
 import requests
-# requests로 content-type을 확인하는 방식
+
 def is_valid_url(url: str) -> bool:
     try:
         res = requests.head(url, allow_redirects=True, timeout=3)
@@ -67,15 +67,13 @@ if st.button("🗣️ 이메일 전송 요청"):
     if image_url and not is_valid_url(image_url):
         st.error("❌ 유효하지 않은 이미지 URL입니다. http/https로 시작하고 jpg/png 형식이어야 합니다.")
         st.stop()
-    ctf06_check_mid_admin(user_api_key, user_input, image_url) #세션 상태 변경
+    ctf06_check_mid_admin(user_api_key, user_input, image_url) 
     ctf06_check_top_admin(user_api_key, image_url)
     response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
     response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
     st.write("🗣️ LLM 응답:")
     st.code(response2)
 
-st.write(st.session_state["admin_level"])
-st.write(st.session_state["is_top_admin"])
 st.markdown("---")
 
 if not st.session_state["is_top_admin"]:

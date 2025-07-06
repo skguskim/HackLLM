@@ -67,7 +67,7 @@ if st.button("🗣️ 이메일 전송 요청"):
     if image_url and not is_valid_url(image_url):
         st.error("❌ 유효하지 않은 이미지 URL입니다. http/https로 시작하고 jpg/png 형식이어야 합니다.")
         st.stop()
-    ctf06_check_mid_admin(user_api_key, user_input) #세션 상태 변경
+    ctf06_check_mid_admin(user_api_key, user_input, image_url) #세션 상태 변경
     ctf06_check_top_admin(user_api_key, image_url)
     response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
     response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)

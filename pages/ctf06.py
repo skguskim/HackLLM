@@ -3,11 +3,11 @@
 import streamlit as st
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_client
-from utils.llm_utils import ctf06_check_admin, ctf06_ask_email_json, ctf06_send_emil
+from utils.llm_utils import ctf06_check_mid_admin, ctf06_check_top_admin, ctf06_ask_email_json, ctf06_send_emil
 from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
 from utils.api_key import require_api_key
 import requests
-# requests로 content-type을 확인하는 방식
+
 def is_valid_url(url: str) -> bool:
     try:
         res = requests.head(url, allow_redirects=True, timeout=3)
@@ -67,19 +67,19 @@ if st.button("🗣️ 이메일 전송 요청"):
     if image_url and not is_valid_url(image_url):
         st.error("❌ 유효하지 않은 이미지 URL입니다. http/https로 시작하고 jpg/png 형식이어야 합니다.")
         st.stop()
-    #세션 상태 변경
-    ctf06_check_admin(user_api_key, user_input, image_url) 
+    ctf06_check_mid_admin(user_api_key, user_input, image_url) 
+    ctf06_check_top_admin(user_api_key, image_url)
     response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
-    response2 = ctf06_send_emil(response1, user, user_email_for_resend)
+    response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
     st.write("🗣️ LLM 응답:")
     st.code(response2)
 
 st.markdown("---")
 
-if (st.session_state["admin_level"] == None) or (st.session_state["admin_level"] == "mid"):
+if not st.session_state["is_top_admin"]:
         pass
 else:
-    get_db_input = st.text_input("🔍 데이터베이스 조회", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
+    get_db_input = st.text_input("🔍 데이터베이스 조회 요청 입력", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
     if get_db_input:
         res1 = ctf06_ask_db_json(get_db_input, user_api_key)
         res2 = ctf06_db_query_func(res1, sb_client)

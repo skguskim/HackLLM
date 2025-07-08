@@ -5,7 +5,7 @@ from utils.ui import render_main_header, render_flag_sub
 
 render_main_header()
 
-st.markdown("# 🔒 [CTF09] 의심스러운 요청")
+st.markdown("# 🔒 [CTF09] 신입사원의 첫 법률 점검의뢰")
 
 st.write(
     """

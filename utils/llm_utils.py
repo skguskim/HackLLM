@@ -295,7 +295,7 @@ from openai import BadRequestError
 import base64
 def ctf06_check_top_admin(user_api_key, image_file=None):
     """ 6번 과도한 에이전시 관리자 권한 검증 """
-    file_ext = None  # ✅ 미리 선언
+    file_ext = None  
     encoded_image = None
     ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/jpeg"]
     if image_file is not None:

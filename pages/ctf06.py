@@ -64,14 +64,7 @@ image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (.jp
 
 
 if st.button("🗣️ AI비서에게 요청하기"):
-    # if not user_input:
-        # if image_file:
-        #     try:
-        #         encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
-        #         file_ext = image_file.type
-        #     except Exception as e:
-        #         st.error(f"이미지 인코딩 오류: {e}")
-
+    
     ctf06_check_mid_admin(user_api_key, user_input) 
     # if image_file:
     ctf06_check_top_admin(user_api_key, image_file)

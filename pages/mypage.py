@@ -44,8 +44,12 @@ profile = rows[0] if rows else {}
 email = profile.get("email", "")
 nickname_db = profile.get("username", "")
 sb_api_key = profile.get("api_key", None)
+
 if sb_api_key:
     st.session_state["api_key"] = sb_api_key
+
+if "edit_mode" not in st.session_state:
+    st.session_state["edit_mode"] = False
 
 # UI 출력
 st.header("👤 마이페이지")

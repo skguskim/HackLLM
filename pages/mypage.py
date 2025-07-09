@@ -10,6 +10,10 @@ import os
 from cryptography.fernet import Fernet
 from streamlit_cookies_controller import CookieController, RemoveEmptyElementContainer
 import time
+from supabase import create_client
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SB_SERVICE_ROLE_KEY = os.getenv("SB_SERVICE_ROLE_KEY")
+supabase_ad = create_client(SUPABASE_URL, SB_SERVICE_ROLE_KEY)
 
 RemoveEmptyElementContainer()
 cookie = CookieController()
@@ -30,7 +34,7 @@ total = total_score(user_id)
 # 프로필 조회
 rows = (
     supabase.table("profiles")
-    .select("email, username")
+    .select("email, username, api_key")
     .eq("id", user_id)
     .limit(1)
     .execute()
@@ -39,6 +43,13 @@ rows = (
 profile = rows[0] if rows else {}
 email = profile.get("email", "")
 nickname_db = profile.get("username", "")
+sb_api_key = profile.get("api_key", None)
+
+# if sb_api_key:
+#     st.session_state["api_key"] = sb_api_key
+
+if "edit_mode" not in st.session_state:
+    st.session_state["edit_mode"] = False
 
 # UI 출력
 st.header("👤 마이페이지")
@@ -72,12 +83,12 @@ if st.session_state["edit_mode"] == True:
                 #api 키 암호화
                 encrypted_api_key = cipher.encrypt(api_key_input.encode()).decode()
 
-                res = supabase.table("profiles").update({
+                res = supabase_ad.table("profiles").update({
                     "api_key": encrypted_api_key
                 }).eq("id", user_id).execute()
                 
                 if res.data:
-                    st.session_state["api_key"] = encrypted_api_key
+                    # st.session_state["api_key"] = encrypted_api_key
                     st.success("✅ API 키가 성공적으로 저장되었습니다.")
                 else:
                     st.error("API 키 저장에 실패했습니다. 다시 시도해주세요.")

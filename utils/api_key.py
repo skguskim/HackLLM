@@ -16,7 +16,6 @@ supabase = get_client()
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
 def require_api_key():
-    user = require_login()
     supabase = get_client()
 
     # DB에서 직접 가져와서 session_state에 캐싱

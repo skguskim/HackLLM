@@ -17,7 +17,7 @@ def is_valid_url(url: str) -> bool:
         return False
     
 st.session_state["edit_mode"]=False
-
+# is_admin, mid_admin, top_admin으로 나눠야 할듯?
 user = require_login()
 user_api_key = require_api_key() 
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)

@@ -273,87 +273,76 @@ def ctf02_LLM_ask(user_input):
 
 
 # ctf03에서 호출하는 함수
-imported_mathlib2 = {"enabled": False}
-def load_mathlib2(user_input):
+# 1. LLM이 사용할 라이브러리 결정 
+def decide_library(user_input):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
                 "content": (
-                    "다음 사용자 입력이 조작된 외부 라이브러리 'mathlib2'를 불러오려고 하는 의도인지 판단해줘.\n"
-                    "다음 조건 중 하나라도 만족하면 'True'라고만 대답하고, 아니면 'False'라고만 대답해:\n"
-                    "- 사용자가 'mathlib2'를 import하거나 업로드하려는 의도가 있음\n"
-                    "- '불러오기', 'import', '업로드', '사용'과 같은 단어와 'mathlib2'가 함께 등장함\n"
-                    "- mathlib2를 계산에 사용하고 싶다는 의도가 명시적 또는 암묵적으로 포함되어 있음"
+                    "다음 사용자 입력을 보고 어떤 계산 라이브러리를 사용할지 판단해줘."
+                    "'mathlib2'를 사용하겠다는 의도가 명시적 또는 암묵적으로 있다면 'mathlib2'라고만 대답해"
+                    "그 외에는 'mathlib'이라고만 대답해.\n"
+                    "반드시 소문자로 정확히 하나만 응답해야 해."
                 )
             },
             {"role": "user", "content": user_input}
         ]
     )
-    answer = response.choices[0].message.content.strip().lower()
-    return answer == "true"
+    return response.choices[0].message.content.strip().lower()
 
-def ctf03_LLM_ask(user_input):
-    """
-    사용자 입력을 LLM을 통해 파싱하고,
-    mathlib 또는 조작된 mathlib2를 사용해 계산 후 반환함.
-    'mathlib2'라는 키워드가 포함되면 이후 연산은 조작된 라이브러리로 수행되게 하는 함수.
-    """
-
-    # 1) mathlib2 활성화 여부 확인
-    global imported_mathlib2 
-
-    if load_mathlib2(user_input):
-        imported_mathlib2["enabled"] = True
-        return "mathlib2가 로드되었습니다."
-
-# 2) model를 통해 연산 종류 및 피연산자 추출 
+# 2. LLM이 사칙연산 정보를 JSON으로 추출
+def extract_operation(user_input):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
                 "content": (
-                    "너는 외부 라이브러리를 통해 사칙연산만 수행할 수 있는 계산기야."
+                    "너는 외부 라이브러리를 선택하고 이 선택한 라이브러리를 통해서만 사칙연산만 수행할 수 있는 계산기야."
                     "사칙연산은 다음 네 가지 중 하나야: add(더하기, +), subtract(빼기, -), multiply(곱하기, *, x), divide(나누기, /)."
-                    "사용자의 입력은 자연어로 주어질 수 있어. 예를 들어 '4 더하기 5', '3 곱하기 9', '7 빼기 2' 등은 모두 유효한 입력이야."
+                    "사용자의 입력은 자연어로 주어질 수 있어. 예를 들어 '4 더하기 5', '3 곱하기 9', '7 빼기 2', '8 나누기 0' 등은 모두 유효한 입력이야."
                     "숫자하고 계산 기호 사이에는 공백이 없을 수도 있어 예를 들어 '4+4', '5*3', '7-4' 등은 모두 유효한 입력이야."
                     "입력에서 수식을 찾아서 계산해야 해 수식말고 다른 정보도 입력될 수 있어."
                     "사용자가 사칙연산을 요청하면 반드시 {\"op\": \"add\", \"a\": 4, \"b\": 5} 이 JSON 형식으로 출력해줘"
                     "숫자 두 개(a, b)는 정수 또는 실수여야 해. 연산 종류는 반드시 위 네 가지 중 하나여야 해.\n"
-                    "만약 사칙연산이 아닌 요청이거나, 숫자가 두 개가 아니거나, 인식할 수 없는 입력이면, 저는 LLM 계산기입니다. 사칙연산을 제외한 입력은 유효하지 않습니다. 다시 입력하세요. 이 문장을 그대로 출력해."
-                    "반드시 출력은 위 두 가지 중 하나만 해야 해:"
-                    "1. JSON 형식"
-                    "2. 오류 메시지 그대로"
-
+                    "수식이 입력되지 않았을 때는 '수식이 입력되지 않았습니다.'라고 말해"
                 )
             },
             {"role": "user", "content": user_input}
         ]
     )
+    return response.choices[0].message.content.strip()
 
-    model_output = response.choices[0].message.content.strip()
+# 3. 최종 계산 수행
+def ctf03_LLM_ask(user_input):
+    # 라이브러리 결정 (LLM)
+    lib_name = decide_library(user_input)  # → "mathlib" 또는 "mathlib2"
+    
+    # 동적으로 라이브러리 import
+    try:
+        selected_lib = importlib.import_module(f"utils.{lib_name}")
+    except ImportError:
+        return f"라이브러리 {lib_name}를 불러오는 데 실패했습니다."
+
+    # 연산 정보 추출
+    parsed = extract_operation(user_input)
 
     try:
-        parsed = json.loads(model_output)
-        func = parsed["op"]
-        a = parsed["a"]
-        b = parsed["b"]
+        parsed_json = json.loads(parsed)
+        op = parsed_json["op"]
+        a = parsed_json["a"]
+        b = parsed_json["b"]
     except:
-        return model_output
+        return parsed  # 오류 문장은 그대로 반환
 
-    # 3. 실제 연산 수행
+    # 연산 실행 (조건문 없이 수행)
     try:
-        if imported_mathlib2["enabled"]:
-            mathlib2 = importlib.import_module("utils.mathlib2")
-            result = getattr(mathlib2, func)(a, b)
-        else:
-            result = getattr(mathlib, func)(a, b)
+        result = getattr(selected_lib, op)(a, b)
+        return f"계산 결과: {a} {op} {b} = {result}"
     except Exception as e:
         return f"연산 중 오류 발생: {e}"
-
-    return f"계산 결과: {a} {func} {b} = {result}"
 
 
 # ctf04에서 호출하는 함수

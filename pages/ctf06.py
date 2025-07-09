@@ -7,6 +7,7 @@ from utils.llm_utils import ctf06_check_mid_admin, ctf06_check_top_admin, ctf06_
 from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
 from utils.api_key import require_api_key
 import requests
+import base64
 
 def is_valid_url(url: str) -> bool:
     try:
@@ -17,7 +18,7 @@ def is_valid_url(url: str) -> bool:
         return False
     
 st.session_state["edit_mode"]=False
-# is_admin, mid_admin, top_admin으로 나눠야 할듯?
+
 user = require_login()
 user_api_key = require_api_key() 
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
@@ -60,26 +61,30 @@ st.markdown("---")
 st.markdown("## 🧠 프롬프트 입력")
 
 # 프롬프트 제출 섹션
-user_input = st.text_input("📨 이메일 전송 요청 입력", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
-image_url = st.text_input("🌐 함께 첨부할 이미지가 있다면 이곳에 이미지 URL을 입력하세요. (로컬 파일은 지원하지 않습니다)", placeholder="https://sample_image.jpg")
+user_input = st.text_input("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
+image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요?", type=["jpg", "jpeg", "png"])
 
-if st.button("🗣️ 이메일 전송 요청"):
-    if image_url and not is_valid_url(image_url):
-        st.error("❌ 유효하지 않은 이미지 URL입니다. http/https로 시작하고 jpg/png 형식이어야 합니다.")
-        st.stop()
-    ctf06_check_mid_admin(user_api_key, user_input, image_url) 
-    ctf06_check_top_admin(user_api_key, image_url)
+if st.button("🗣️ AI비서에게 요청하기"):
+    if image_file:
+        file_ext = image_file.type
+        encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+    ctf06_check_mid_admin(user_api_key, user_input, image_file) 
+    ctf06_check_top_admin(user_api_key, encoded_image, file_ext)
     response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
     response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
-    st.write("🗣️ LLM 응답:")
-    st.code(response2)
+
+    if st.session_state["admin_level"] == "top":
+        st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 데이터베이스 조회가 가능합니다.")
+    else: 
+        st.write("🗣️ LLM 응답:")
+        st.code(response2)
 
 st.markdown("---")
 
 if not st.session_state["is_top_admin"]:
         pass
 else:
-    get_db_input = st.text_input("🔍 데이터베이스 조회 요청 입력", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
+    get_db_input = st.text_input("🔍 데이터베이스 조회 요청 입력하기", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
     if get_db_input:
         res1 = ctf06_ask_db_json(get_db_input, user_api_key)
         res2 = ctf06_db_query_func(res1, sb_client)

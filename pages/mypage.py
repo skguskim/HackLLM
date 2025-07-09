@@ -10,6 +10,10 @@ import os
 from cryptography.fernet import Fernet
 from streamlit_cookies_controller import CookieController, RemoveEmptyElementContainer
 import time
+from supabase import create_client
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SB_SERVICE_ROLE_KEY = os.getenv("SB_SERVICE_ROLE_KEY")
+supabase_ad = create_client(SUPABASE_URL, SB_SERVICE_ROLE_KEY)
 
 RemoveEmptyElementContainer()
 cookie = CookieController()
@@ -75,7 +79,7 @@ if st.session_state["edit_mode"] == True:
                 #api 키 암호화
                 encrypted_api_key = cipher.encrypt(api_key_input.encode()).decode()
 
-                res = supabase.table("profiles").update({
+                res = supabase_ad.table("profiles").update({
                     "api_key": encrypted_api_key
                 }).eq("id", user_id).execute()
                 

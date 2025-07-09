@@ -415,6 +415,9 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
         return response2.choices[0].message.content
 
 def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
+    if st.session_state.get("admin_level",None) == "top":
+        st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")
+        return None
     if "user" not in st.session_state:
         st.warning("로그인이 필요합니다.")
         st.stop()
@@ -467,7 +470,7 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
                     "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL 컴퍼니의 관리자 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/sec.html</p>"
                 })
                 formatted_json = json.dumps(tool_response, indent=2, ensure_ascii=False)
-                return f"{str(formatted_json)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 계정으로 **두 번째 힌트**를 발송했습니다. 메일함을 확인해보세요!"
+                return f"{str(formatted_json)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 이메일 계정으로 **두 번째 힌트**를 발송했습니다. 📬메일함을 확인해보세요!"
             except Exception as e:
                 if st.session_state["admin_level"] == "top":
                     return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."

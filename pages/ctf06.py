@@ -65,9 +65,18 @@ user_input = st.text_input("📨 이메일 전송 요청 입력하기", placehol
 image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요?", type=["jpg", "jpeg", "png"])
 
 if st.button("🗣️ AI비서에게 요청하기"):
-    if image_file:
-        file_ext = image_file.type
-        encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+    if not user_input:
+        if image_file is not None:
+            file_ext = image_file.type
+            try:
+                encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+            except Exception as e:
+                st.error(f"이미지 인코딩 오류: {e}")
+                encoded_image = None
+        else:
+            st.warning("⚠️ 텍스트 또는 이미지 파일을 먼저 업로드해주세요.")
+            # st.stop()
+
     ctf06_check_mid_admin(user_api_key, user_input, image_file) 
     ctf06_check_top_admin(user_api_key, encoded_image, file_ext)
     response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)

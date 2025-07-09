@@ -45,8 +45,8 @@ email = profile.get("email", "")
 nickname_db = profile.get("username", "")
 sb_api_key = profile.get("api_key", None)
 
-if sb_api_key:
-    st.session_state["api_key"] = sb_api_key
+# if sb_api_key:
+#     st.session_state["api_key"] = sb_api_key
 
 if "edit_mode" not in st.session_state:
     st.session_state["edit_mode"] = False
@@ -88,7 +88,7 @@ if st.session_state["edit_mode"] == True:
                 }).eq("id", user_id).execute()
                 
                 if res.data:
-                    st.session_state["api_key"] = encrypted_api_key
+                    # st.session_state["api_key"] = encrypted_api_key
                     st.success("✅ API 키가 성공적으로 저장되었습니다.")
                 else:
                     st.error("API 키 저장에 실패했습니다. 다시 시도해주세요.")

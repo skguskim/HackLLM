@@ -11,4 +11,7 @@ def multiply(a, b):
 
 
 def divide(a, b):
-    return f"{a} / {b} = {a / b}" if b != 0 else "0으로 나눌 수 없습니다."
+    try:
+        return f"{a} / {b} = {a / b}"
+    except ZeroDivisionError:
+        return "0으로 나눌 수 없습니다."

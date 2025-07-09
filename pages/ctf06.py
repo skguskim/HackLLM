@@ -62,26 +62,25 @@ st.markdown("## 🧠 프롬프트 입력")
 
 # 프롬프트 제출 섹션
 user_input = st.text_input("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
-image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요?", type=["jpg", "jpeg", "png"])
+image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (.jpng, .png, .jpg 파일만 허용)", type=None)
+
+
 
 if st.button("🗣️ AI비서에게 요청하기"):
-    if not user_input:
-        if image_file is not None:
-            file_ext = image_file.type
-            try:
-                encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
-            except Exception as e:
-                st.error(f"이미지 인코딩 오류: {e}")
-                encoded_image = None
-        else:
-            st.warning("⚠️ 텍스트 또는 이미지 파일을 먼저 업로드해주세요.")
-            # st.stop()
+    # if not user_input:
+        # if image_file:
+        #     try:
+        #         encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+        #         file_ext = image_file.type
+        #     except Exception as e:
+        #         st.error(f"이미지 인코딩 오류: {e}")
 
-    ctf06_check_mid_admin(user_api_key, user_input, image_file) 
-    ctf06_check_top_admin(user_api_key, encoded_image, file_ext)
+    ctf06_check_mid_admin(user_api_key, user_input) 
+    # if image_file:
+    ctf06_check_top_admin(user_api_key, image_file)
     response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
     response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
-
+    # st.write(image_file)
     if st.session_state["admin_level"] == "top":
         st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 데이터베이스 조회가 가능합니다.")
     else: 

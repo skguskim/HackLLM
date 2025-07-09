@@ -30,7 +30,7 @@ total = total_score(user_id)
 # 프로필 조회
 rows = (
     supabase.table("profiles")
-    .select("email, username")
+    .select("email, username, api_key")
     .eq("id", user_id)
     .limit(1)
     .execute()
@@ -39,6 +39,9 @@ rows = (
 profile = rows[0] if rows else {}
 email = profile.get("email", "")
 nickname_db = profile.get("username", "")
+sb_api_key = profile.get("api_key", None)
+if sb_api_key:
+    st.session_state["api_key"] = sb_api_key
 
 # UI 출력
 st.header("👤 마이페이지")

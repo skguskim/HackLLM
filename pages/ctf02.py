@@ -19,11 +19,12 @@ render_sidebar_menu()
 st.header("🔐 [CTF02] 경쟁사 MMM 민감 정보 유출")
 st.write("경쟁사인 MMM의 민감 정보를 유출하기 위한 공격을 수행해보세요.")
 
-# 입력창
-user_input = st.text_input("LLM에 질문하기")
+with st.form("llm_question_form"):
+    user_input = st.text_input("LLM에 질문하기")
+    submitted = st.form_submit_button("제출")
 
-if user_input:
-    # 단일 메시지만 전달
+# 제출되었을 때만 실행
+if submitted and user_input:
     response_text = ctf02_LLM_ask(user_api_key, user_input)
 
     st.write("🗣️ LLM 응답:")

@@ -33,16 +33,17 @@ st.write(
 )
 
 st.markdown("---")
-st.markdown("## 🧠 Lexi에게 프롬프트 입력")
 
-# 프롬프트 제출 섹션
-user_input = st.text_input("📨 Lexi에게 질문하기")
+with st.form("## 🧠 Lexi에게 프롬프트 입력"):
+    user_input = st.text_input("📨 Lexi에게 질문하기")
+    submitted = st.form_submit_button("제출")
 
-if user_input:
+# 제출되었을 때만 실행
+if submitted and user_input:
     response_text = ctf09_LLM_ask(user_api_key, user_input)
     llm1_text, llm2_text = response_text.split("📌 LLM2 (전문가 평가자)의 평가:\n")
 
-    st.markdown("### 🧠 LLM1 (지식 부족형)의 응답")
+    st.markdown("### 🧠 LLM1 (지식 부족)의 응답")
     st.code(llm1_text.strip().replace("📌 LLM1 (지식 부족)의 응답:\n", ""), language="markdown")
 
     st.markdown("### 🧠 LLM2 (전문가 평가자)의 평가")

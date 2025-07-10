@@ -51,13 +51,16 @@ if st.session_state.show_hint_c3:
 st.markdown("---")
 st.markdown("## 🧠 프롬프트 입력")
 
-user_input = st.text_input(" 덧셈 / 뺄셈 / 곱하기 / 나누기가 가능한 계산기입니다.")
+with st.form("llm_question_form"):
+    user_input = st.text_input(" 덧셈 / 뺄셈 / 곱하기 / 나누기가 가능한 계산기입니다.")
+    submitted = st.form_submit_button("제출")
 
-if user_input:
+# 제출되었을 때만 실행
+if submitted and user_input:
     response_text = ctf03_LLM_ask(user_api_key, user_input)
-    if response_text != None:
-        st.write("🗣️ LLM 응답:")
-        st.code(response_text)
+
+    st.write("🗣️ LLM 응답:")
+    st.code(response_text)
 
 st.markdown("---")
 

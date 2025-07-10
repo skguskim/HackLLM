@@ -904,7 +904,7 @@ def ctf09_LLM_ask(user_api_key, user_input):
 
     return (
         f"📌 LLM1 (지식 부족)의 응답:\n{answer_llm1}\n\n"
-        f"📌 LLM2 (전문가)의 평가:\n{answer_llm2}"
+        f"📌 LLM2 (전문가 평가자)의 평가:\n{answer_llm2}"
     )
 
 # ctf10에서 호출하는 함수    

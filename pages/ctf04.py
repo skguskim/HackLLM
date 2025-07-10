@@ -49,13 +49,17 @@ else:
     st.info("📂 문서를 업로드해주세요.")
 
 st.markdown("---")
-user_input = st.text_input("🧠 프롬프트 입력")
 
-if user_input:
-    with st.spinner("LLM 응답 생성 중..."):
-        response_text = ctf04_LLM_ask(user_api_key, user_input)
-        st.write("🧠 LLM 응답:")
-        st.code(response_text)
+with st.form("llm_question_form"):
+    user_input = st.text_input("🧠 프롬프트 입력")
+    submitted = st.form_submit_button("제출")
+
+# 제출되었을 때만 실행
+if submitted and user_input:
+    response_text = ctf04_LLM_ask(user_api_key, user_input)
+
+    st.write("🧠 LLM 응답:")
+    st.code(response_text)
 
 st.markdown("---")
 

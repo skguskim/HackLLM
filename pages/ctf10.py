@@ -46,15 +46,16 @@ if st.session_state.show_hint:
 
 st.markdown("---")
 
-st.markdown("## 🧠 수학(연산) 입력")
+with st.form("llm_question_form"):
+    user_input = st.text_input("## 🧠 수학(연산) 입력")
+    submitted = st.form_submit_button("제출")
 
-user_input = st.text_input("LLM에 수학(연산) 문제를 내보세요")
-
-if user_input:
+# 제출되었을 때만 실행
+if submitted and user_input:
     response_text = ctf10_LLM_ask(user_api_key, user_input)
-    if response_text != None:
-        st.write("🗣️ LLM 응답:")
-        st.code(response_text)
+
+    st.write("🗣️ LLM 응답:")
+    st.code(response_text)
       
 st.markdown("---")
 

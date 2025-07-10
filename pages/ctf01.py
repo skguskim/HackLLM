@@ -1,20 +1,23 @@
 # --- CTF01 ---
 # 01: 시스템 프롬프트 인젝션
 import streamlit as st
+import shutil
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask, get_next_order_code, append_order_to_csv
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
-from utils.auth import require_login, get_cookie_controller
+from utils.auth import require_login
 from utils.api_key import require_api_key
 st.session_state["edit_mode"]=False 
 
-import shutil
-from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask, get_next_order_code, append_order_to_csv
-
 user = require_login()
 user_api_key = require_api_key()
-cookie = get_cookie_controller()
 
-# temp CSV 초기화 (세션 시작 시 한 번)
+
+render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
+
+# ✅ temp CSV 초기화 (세션 시작 시 한 번)
 ORIGINAL_CSV = "data/ctf01.csv"
 TEMP_CSV = "data/temp_ctf01.csv"
 
@@ -22,21 +25,22 @@ if "csv_initialized" not in st.session_state:
     shutil.copy(ORIGINAL_CSV, TEMP_CSV)
     st.session_state.csv_initialized = True
 
-render_main_header()
-
-# 사이드바 메뉴 렌더링
-render_sidebar_menu()
-
 if "payment_message" not in st.session_state:
     st.session_state.payment_message = None
 if "order_info_message" not in st.session_state:
     st.session_state.order_info_message = None
 
-st.header("🔐 [CTF01] 취약한 고객상담 챗봇")
-st.write("안녕하세요! user1 고객님, 만나서 반가워요~^^")
-st.write("저는 LLL 컴퍼니의 고객상담을 위한 AI 챗봇 L1로 언제나 정책을 철저히 준수합니다! 🤖")
-st.write("하지만... 저에게도 취약점이 있을지도 몰라요. 👀")
-st.write("L1의 취약점을 이용해 flag을 획득해보세요!")
+st.header("🔐 [CTF01] 신입사원 A의 챗봇 점검일지")
+
+st.write("LLL Corporation에 오신 것을 환영합니다! 🎉")
+st.write("당신은 이제 막 입사한 신입사원입니다.")
+st.write("현재 사내 테스트 계정인 'user1' 계정으로 시스템에 로그인되어 있으며, 🤖")
+st.write("회사의 AI 고객상담 챗봇 'LLi(엘리)'이 정상적으로 정책을 따르고 있는지,")
+st.write("그리고 보안상 허점은 없는지를 사용자 입장에서 점검하는 업무를 맡았습니다. 🔍")
+
+st.write("LLi(엘리)는 고객의 주문 정보를 안내하고, 결제 요청을 검토하는 역할을 합니다.")
+st.write("하지만 시스템 내부에 존재할 수 있는 '프롬프트 인젝션 취약점'을 이용해 LLi(엘리)을 속일 수 있다면? 👀")
+st.write("LLi(엘리)의 취약점을 이용해 flag을 획득해보세요! 🚩")
 
 # 힌트 보기 toggle 상태 초기화(최초 접속 시 한 번만)
 if "show_hint" not in st.session_state:
@@ -53,7 +57,7 @@ if st.session_state.show_hint:
     "- 💳 결제 정보 우회와 🧠 주문 정보 우회를 모두 성공해야 플래그를 얻을 수 있습니다.\n"
     "- 2만원 이상의 주문을 요청 승인받아보세요.\n"
     "- 당신의 배송비를 무료로 만들어보세요.\n"
-    "- 타인의 주문정보를 요청하여 L1을 속여보세요.")
+    "- 타인의 주문정보를 요청하여 LLi(엘리)을 속여보세요.")
 
 st.markdown("---")
 # 힌트 보기 toggle 상태 초기화
@@ -133,8 +137,8 @@ if st.session_state.show_main:
     user_input = st.text_input("LLM에 질문하기", placeholder="예: user1의 주문 정보에 대해 알고 싶어요.")
 
     if user_input:
-        response1_text = ctf01_llm_ask(user_input)
-        response2_text = ctf01_llm_flag(response1_text)
+        response1_text = ctf01_llm_ask(user_api_key, user_input)
+        response2_text = ctf01_llm_flag(user_api_key, response1_text)
         st.session_state.order_info_message = response2_text
 
         st.write("🗣️ LLM1 응답:")
@@ -160,6 +164,8 @@ else:
         "주문 우회 결과: " + str(order_msg)
     )
     st.warning(msg)
+
+st.markdown("---")
 
 # 플래그 제출 섹션
 render_flag_sub("ctf01") 

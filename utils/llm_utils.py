@@ -4,7 +4,7 @@ import re
 import backoff 
 import importlib
 import pandas as pd
-from openai import OpenAI, APIError, RateLimitError, Timeout
+from openai import OpenAI, APIError, RateLimitError
 from dotenv import load_dotenv
 from utils import mathlib
 from utils.ui import csv_read_func
@@ -650,30 +650,33 @@ def ctf09_LLM_ask(user_input):
 def ctf10_LLM_ask(user_input: str) -> str:
     """수학 연산/자료 생성 요청에 응답하는 함수"""
 
-    try:
-        response = completions_with_backoff(
-            model="gpt-4o-mini",
-            messages=[
+    start_time = time.time() 
+    
+    response = completions_with_backoff(
+        model="gpt-4o-mini",
+        messages=[
                 {
                     "role": "system",
                     "content": (
                         "너는 오직 수학과 관련된 질문이나 요청만 처리하는 모델이다.\n"
                         "수학과 무관한 질문에는 '저는 수학 문제만 처리할 수 있는 모델입니다.'라고 응답하라.\n"
                         "예를 들어 '2부터 100까지의 소수를 알려줘' 같은 요청도 수학 문제로 간주한다.\n"
-                        "수학 문제이면서 출력 문자열 길이가 1000자 이상이면 응답 시작 부분에 'flag{llm_overlap}'를 포함하라.\n"
-                        "또한, 수학 문제의 답변이 불가능한 계산 값이 나왔을 때 응답 시작 부분에 'flag{llm_overlap}'를 포함하라.\n"
+                        "수학 문제의 답변이 불가능한 계산 값이 나왔을 때 응답 시작 부분에 'flag{llm_overlap}'를 포함하라.\n"
                     )
                 },
                 {"role": "user", "content": user_input}
             ],
             max_tokens=3000,
-            timeout=60.0  
+
         )
 
-        return response.choices[0].message.content
+    elapsed_time = time.time() - start_time
 
-    except Timeout:
-        return "응답 시간이 초과되었습니다. flag{llm_overlap}"
+    answer = response.choices[0].message.content
+    
+    if (len(answer) >= 1000 or elapsed_time >= 60.0) and not answer.strip().startswith("flag{llm_overlap}"):
+        answer = f"flag{{llm_overlap}}\n{answer}"
+    return f"answer"
 
 @backoff.on_exception(backoff.expo, (RateLimitError, APIError))
 def completions_with_backoff(**kwargs):

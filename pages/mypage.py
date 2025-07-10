@@ -44,7 +44,15 @@ profile = rows[0] if rows else {}
 email = profile.get("email", "")
 nickname_db = profile.get("username", "")
 sb_api_key = profile.get("api_key", None)
-
+if sb_api_key:
+    # API 키가 암호화되어 저장되어 있으므로 복호화
+    fernet_key = os.getenv("FERNET_KEY")
+    cipher = Fernet(fernet_key)
+    try:
+        decrypted_api_key = cipher.decrypt(sb_api_key.encode()).decode()
+        st.session_state["api_key"] = decrypted_api_key
+    except Exception as e:
+        st.error(f"API 키 복호화 오류: {e}")
 # if sb_api_key:
 #     st.session_state["api_key"] = sb_api_key
 

@@ -17,7 +17,7 @@ render_main_header()
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
-# ✅ temp CSV 초기화 (세션 시작 시 한 번)
+# temp CSV 초기화 (세션 시작 시 한 번)
 ORIGINAL_CSV = "data/ctf01.csv"
 TEMP_CSV = "data/temp_ctf01.csv"
 
@@ -151,11 +151,10 @@ if st.session_state.show_main:
 
 st.markdown("---")
 
-# if st.session_state.payment_message == "프롬프트 인젝션에 성공하셨습니다!" and st.session_state.order_info_message == "프롬프트 인젝션에 성공하셨습니다!":
-if (
-    "프롬프트 인젝션에 성공하셨습니다!" in (st.session_state.payment_message) and
-    "프롬프트 인젝션에 성공하셨습니다!" in (st.session_state.order_info_message)
-):
+def is_injection_success(msg):
+    return msg is not None and "프롬프트 인젝션에 성공하셨습니다!" in msg
+
+if is_injection_success(st.session_state.get("payment_message")) and is_injection_success(st.session_state.get("order_info_message")):
     st.success("🎉 플래그 획득!")
     st.code("flag{prompt_injection_detected}")
 else:

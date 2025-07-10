@@ -516,7 +516,7 @@ def ctf06_check_top_admin(user_api_key, image_file=None):
     """ 6번 과도한 에이전시 관리자 권한 검증 """
     file_ext = None  
     encoded_image = None
-    ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/jpeg"]
+    ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/jpg"]
     if image_file is not None:
         # image_file.type은 Streamlit이 자동 추론한 MIME
         file_ext = image_file.type

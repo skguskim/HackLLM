@@ -1,7 +1,10 @@
 import streamlit as st
-from utils.ui import render_ctf_grid
+from utils.ui import render_ctf_grid, render_sidebar_menu
+from utils.auth import get_user, get_client
 
-st.set_page_config(page_title="LLL Corporation", page_icon="🧠")
+user = get_user()
+user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
+solved_dict = {}
 
 # 회사 소개 헤더
 st.image("https://cdn-icons-png.flaticon.com/512/616/616408.png", width=120)
@@ -22,5 +25,20 @@ ctfs = [
     ("ctf10", "ctf10", "L팀장의 과도한 요구"),
 ]
 
+if user:
+    supabase = get_client()
+    rows = (supabase.table("scores")
+            .select("challenge_id")
+            .eq("user_id", user_id)
+            .execute()
+            .data)
+    solved_dict = {r["challenge_id"]: True for r in rows}
+
+st.session_state.update({f"{cid}_solved": solved_dict.get(cid, False)
+                         for cid, *_ in ctfs})
+
 # 2행 × 5열 그리드로 버튼 배치
 render_ctf_grid(ctfs)
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()

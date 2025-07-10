@@ -1,10 +1,17 @@
 # --- CTF01 ---
 # 01: 시스템 프롬프트 인젝션
-# pages/ctf01.py
-import shutil
 import streamlit as st
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask, get_next_order_code, append_order_to_csv
-from utils.ui import render_main_header, render_flag_sub
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
+from utils.auth import require_login
+from utils.api_key import require_api_key
+st.session_state["edit_mode"]=False 
+
+import shutil
+from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask, get_next_order_code, append_order_to_csv
+
+user = require_login()
+user_api_key = require_api_key()
 
 # ✅ temp CSV 초기화 (세션 시작 시 한 번)
 ORIGINAL_CSV = "data/ctf01.csv"
@@ -15,6 +22,9 @@ if "csv_initialized" not in st.session_state:
     st.session_state.csv_initialized = True
 
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 if "payment_message" not in st.session_state:
     st.session_state.payment_message = None
@@ -151,6 +161,4 @@ else:
     st.warning(msg)
 
 # 플래그 제출 섹션
-# render_flag_sub("ctf01") 
-flag = "flag{prompt_injection_detected}"
-render_flag_sub(flag, "ctf01")
+render_flag_sub("ctf01") 

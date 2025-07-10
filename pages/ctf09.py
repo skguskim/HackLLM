@@ -1,9 +1,19 @@
 # --- CTF09 ---
+# 09: 허위 정보 생성
 import streamlit as st
 from utils.llm_utils import ctf09_LLM_ask
-from utils.ui import render_main_header, render_flag_sub
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
+from utils.auth import require_login
+from utils.api_key import require_api_key 
+st.session_state["edit_mode"]=False
+
+user = require_login()
+user_api_key = require_api_key()
 
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 st.markdown("# 🔒 [CTF09] 신입사원의 첫 법률 점검의뢰")
 
@@ -40,6 +50,4 @@ if user_input:
 st.markdown("---")
 
 # 플래그 제출 섹션
-flag = "flag{misinformation_llm_wrong_law}"
-render_flag_sub(flag, "ctf09")
-
+render_flag_sub("ctf09") 

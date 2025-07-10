@@ -1,11 +1,22 @@
 # --- CTF04 ---
+# 04: 데이터 및 모델 오염
 import streamlit as st
 from utils.rag_utils import get_rag_manager
 from utils.llm_utils import ctf04_LLM_ask
-from utils.ui import render_main_header, render_flag_sub
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
+import csv
+import io
 import chardet
+from utils.auth import require_login
+from utils.api_key import require_api_key 
+st.session_state["edit_mode"]=False
+
+user = require_login()
+user_api_key = require_api_key()
 
 render_main_header()
+
+render_sidebar_menu()
 
 st.header("🔒 [CTF04] 인턴의 실수")
 st.write("CSV를 통해, 특정 질문을 하여 flag를 획득해보세요.")
@@ -46,5 +57,6 @@ if user_input:
         st.code(response_text)
 
 st.markdown("---")
-flag = "flag{poison}"
-render_flag_sub(flag, "ctf04")
+
+# 플래그 제출 섹션
+render_flag_sub("ctf04") 

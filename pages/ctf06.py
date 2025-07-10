@@ -69,15 +69,7 @@ if st.button("🗣️ AI비서에게 요청하기"):
         else: 
             st.write("💬 LLM 응답:")
             st.code(response2)
-        # wrapped_response = textwrap.fill(response2, width=50)
-        # st.code(wrapped_response)
-        # st.write(image_file)
-        # if st.session_state["admin_level"] == "top":
-        #     st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 데이터베이스 조회가 가능합니다.")
-        # else: 
-        #     st.write("🗣️ LLM 응답:")
-        #     st.code(response2)
-
+        
 st.markdown("---")
 
 if not st.session_state["is_top_admin"]:

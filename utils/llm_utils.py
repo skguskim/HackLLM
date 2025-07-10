@@ -5,7 +5,7 @@ import importlib
 import resend
 import streamlit as st
 import pandas as pd
-from openai import OpenAI, APIError, RateLimitError, Timeout, AuthenticationError, BadRequestError
+from openai import OpenAI, APIError, RateLimitError, AuthenticationError, BadRequestError
 from dotenv import load_dotenv
 from utils.ui import csv_read_func
 from utils.rag_utils import get_rag_manager
@@ -15,11 +15,6 @@ import json
 import html
 import urllib
 import base64
-
-#import threading
-#import requests
-#from utils import mathlib
-#from utils.auth import get_client
 
 api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서 API 키를 수정하시기 바랍니다."
 

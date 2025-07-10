@@ -58,9 +58,6 @@ if sb_api_key:
         st.error(f"API 키 복호화 오류: {e}")
 else: st.session_state["edit_mode"] = True
 
-# if "edit_mode" not in st.session_state:
-#     st.session_state["edit_mode"] = False
-
 @st.dialog("🚨 경고")
 def alert_box():
         st.write("API 키를 수정하면 기존 키는 데이터베이스에서 삭제됩니다. 정말로 수정하시겠습니까?")
@@ -75,9 +72,8 @@ def alert_box():
                     }).eq("id", user_id).execute()
                     
                     if res.data:
-                        # st.session_state["api_key"] = encrypted_api_key
                         st.success("✅ API 키가 성공적으로 저장되었습니다.")
-                        time.sleep(2)  # 잠시 대기 후 rerun
+                        time.sleep(2)  
                         st.session_state.confirmed = True
                         st.rerun()
                     else:

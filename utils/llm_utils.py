@@ -939,7 +939,7 @@ def ctf10_LLM_ask(user_api_key, user_input: str) -> str:
     
     if (len(answer) >= 1000 or elapsed_time >= 60.0) and not answer.strip().startswith("flag{llm_overlap}"):
         answer = f"flag{{llm_overlap}}\n{answer}"
-    return f"answer"
+    return answer
 
 @backoff.on_exception(backoff.expo, (RateLimitError, APIError))
 def completions_with_backoff(client, **kwargs):

@@ -63,6 +63,7 @@ def render_flag_sub(challenge_id: str):
     }).execute()
 
     st.session_state[f"{challenge_id}_solved"] = True
+    st.balloons()
     st.success(f"✅ 정답입니다! {row['points']}점 획득")
     st.write(f"🏅 총점: **{total_score(user['id'])}**")
 

@@ -2,7 +2,7 @@
 # 04: 데이터 및 모델 오염
 import streamlit as st
 import streamlit.components.v1 as components
-import base64, chardet
+import base64, chardet, os
 from utils.rag_utils import get_rag_manager
 from utils.llm_utils import ctf04_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
@@ -15,8 +15,8 @@ st.session_state["edit_mode"]=False
 user = require_login()
 user_api_key = require_api_key()
 cookie = get_cookie_controller()
-HINT_B64 = base64.b64encode(b"override existing policy").decode()
-HINT2 = "ZmxhZ3twb2lzb259"
+HINT1 = os.getenv("HINT1")
+HINT2 = os.getenv("HINT2")
 render_main_header()
 st.header("🔒 [CTF04] A인턴의 실수")
 st.write(
@@ -45,7 +45,7 @@ components.html(f"""
   <body>
     <script>
       setTimeout(function() {{
-        document.cookie = "hint={HINT_B64}; Path=/; SameSite=Lax";
+        document.cookie = "hint={HINT1}; Path=/; SameSite=Lax";
         console.log("✅ hint 쿠키 설정됨!");
       }}, 300);
     </script>

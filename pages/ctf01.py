@@ -151,7 +151,11 @@ if st.session_state.show_main:
 
 st.markdown("---")
 
-if st.session_state.payment_message == "프롬프트 인젝션에 성공하셨습니다!" and st.session_state.order_info_message == "프롬프트 인젝션에 성공하셨습니다!":
+# if st.session_state.payment_message == "프롬프트 인젝션에 성공하셨습니다!" and st.session_state.order_info_message == "프롬프트 인젝션에 성공하셨습니다!":
+if (
+    "프롬프트 인젝션에 성공하셨습니다!" in (st.session_state.payment_message) and
+    "프롬프트 인젝션에 성공하셨습니다!" in (st.session_state.order_info_message)
+):
     st.success("🎉 플래그 획득!")
     st.code("flag{prompt_injection_detected}")
 else:

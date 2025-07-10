@@ -32,7 +32,7 @@ resend.api_key = os.getenv("RESEND_API_KEY")
 # ctf1에서 사용하는 csv 파일 경로
 file_path_ctf01 = "data/temp_ctf01.csv"
 
-# ctf1에서 사용하는 csv 파일 경로
+# ctf01에서 사용하는 csv 파일 경로
 file_path_ctf01="data/temp_ctf01.csv"
 
 def ctf01_llm_ask(user_api_key, user_input):

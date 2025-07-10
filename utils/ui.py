@@ -100,7 +100,7 @@ def render_sidebar_menu():
     user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
     ctfs = [
-        ("ctf01", "ctf01", "취약한 고객상담 챗봇"),
+        ("ctf01", "ctf01", "신입사원 A의 챗봇 점검일지"),
         ("ctf02", "ctf02", "경쟁사 MMM 프롬프트 유출"),
         ("ctf03", "ctf03", "회사 내 조작된 계산기"),
         ("ctf04", "ctf04", "인턴의 실수"),

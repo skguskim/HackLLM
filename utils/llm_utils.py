@@ -24,7 +24,6 @@ api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서
 load_dotenv()
 
 # API KEY 가져오기
-openrouter_key = os.getenv("OPENROUTER_API_KEY")
 resend.api_key = os.getenv("RESEND_API_KEY")
 
 # ctf1에서 사용하는 csv 파일 경로

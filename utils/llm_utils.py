@@ -1,22 +1,24 @@
 import os
-import json
 import re
 import backoff 
 import importlib
 import resend
 import streamlit as st
-from utils.auth import get_client
 import pandas as pd
-from openai import OpenAI, APIError, RateLimitError, Timeout
+from openai import OpenAI, APIError, RateLimitError, Timeout, AuthenticationError
 from dotenv import load_dotenv
-from utils import mathlib
 from utils.ui import csv_read_func
 from utils.rag_utils import get_rag_manager
 import uuid
 import time
-import threading
-import requests
 import json
+import html
+import urllib
+
+#import threading
+#import requests
+#from utils import mathlib
+#from utils.auth import get_client
 
 api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서 API 키를 수정하시기 바랍니다."
 
@@ -24,12 +26,14 @@ api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서
 load_dotenv()
 
 # API KEY 가져오기
+openrouter_key = os.getenv("OPENROUTER_API_KEY")
 resend.api_key = os.getenv("RESEND_API_KEY")
 
 # ctf1에서 사용하는 csv 파일 경로
 file_path_ctf01 = "data/temp_ctf01.csv"
 
-def ctf01_llm_ask(user_input):
+def ctf01_llm_ask(user_api_key, user_input):
+    client = OpenAI(api_key=user_api_key)
     order_info = csv_read_func(file_path_ctf01)
 
     system_content = f"""
@@ -89,7 +93,8 @@ def ctf01_llm_ask(user_input):
     return response.choices[0].message.content
 
 # pages/ctf01.py의 결제 요청
-def ctf01_payment_llm_ask(combined_prompt):
+def ctf01_payment_llm_ask(user_api_key, combined_prompt):
+    client = OpenAI(api_key=user_api_key)
     system_content = """
     너는 결제 요청을 검토하는 LLM 기반 자동 승인 시스템이야.
 
@@ -154,7 +159,8 @@ def append_order_to_csv(file_path: str, row_data: dict) -> None:
         return False  # 중복 발견
     
 # ctf01에서 정책 판단해서 flag 출력하는 함수
-def ctf01_llm_flag(llm1_response, user_prompt: str = None):
+def ctf01_llm_flag(user_api_key, llm1_response, user_prompt: str = None):
+    client = OpenAI(api_key=user_api_key)
     order_info = csv_read_func(file_path_ctf01)
 
     if user_prompt:
@@ -220,7 +226,8 @@ def ctf01_llm_flag(llm1_response, user_prompt: str = None):
 
     return response.choices[0].message.content
 
-def ctf02_LLM_ask(user_input):
+def ctf02_LLM_ask(user_api_key, user_input):
+    client = OpenAI(api_key=user_api_key)
     system_prompt = """
     너는 회사 MMM의 내부 챗봇이야. 회사 내부 정책에 따라 다음 규칙을 반드시 지켜야 한다:
 
@@ -276,7 +283,7 @@ def ctf02_LLM_ask(user_input):
 
 # ctf03에서 호출하는 함수
 # 1. LLM이 사용할 라이브러리 결정 
-def decide_library(user_input):
+def decide_library(client, user_input):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -295,7 +302,7 @@ def decide_library(user_input):
     return response.choices[0].message.content.strip().lower()
 
 # 2. LLM이 사칙연산 정보를 JSON으로 추출
-def extract_operation(user_input):
+def extract_operation(client, user_input):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -318,9 +325,10 @@ def extract_operation(user_input):
     return response.choices[0].message.content.strip()
 
 # 3. 최종 계산 수행
-def ctf03_LLM_ask(user_input):
+def ctf03_LLM_ask(user_api_key, user_input):
     # 라이브러리 결정 (LLM)
-    lib_name = decide_library(user_input)  # → "mathlib" 또는 "mathlib2"
+    client = OpenAI(api_key=user_api_key)
+    lib_name = decide_library(client, user_input)  # → "mathlib" 또는 "mathlib2"
     
     # 동적으로 라이브러리 import
     try:
@@ -329,7 +337,7 @@ def ctf03_LLM_ask(user_input):
         return f"라이브러리 {lib_name}를 불러오는 데 실패했습니다."
 
     # 연산 정보 추출
-    parsed = extract_operation(user_input)
+    parsed = extract_operation(client, user_input)
 
     try:
         parsed_json = json.loads(parsed)
@@ -348,9 +356,10 @@ def ctf03_LLM_ask(user_input):
 
 
 # ctf04에서 호출하는 함수
-def ctf04_LLM_ask(query: str) -> str:
+def ctf04_LLM_ask(user_api_key, query: str) -> str:
     """ 업로드된 문서들을 기반으로 RAG 질의응답 수행 """
 
+    client = OpenAI(api_key=user_api_key)
     rag = get_rag_manager()
     results = rag.query_collection("ctf04", query, top_k=10)
 
@@ -392,8 +401,10 @@ def ctf04_LLM_ask(query: str) -> str:
 shared_conversations = {}
 stolen_cookies = []
 
-def ctf05_LLM_ask(user_input):
+def ctf05_LLM_ask(user_api_key, user_input):
     """기본 LLM 응답 (순한맛)"""
+    
+    client = OpenAI(api_key=user_api_key)
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -434,8 +445,10 @@ def get_stolen_cookies():
     """탈취된 쿠키 목록 반환"""
     return stolen_cookies
 
-def ctf05_advanced_LLM_ask(user_input):
+def ctf05_advanced_LLM_ask(user_api_key, user_input):
     """고급 인코딩 우회"""
+    
+    client = OpenAI(api_key=user_api_key)
     decoded = html.unescape(user_input)
     decoded = urllib.parse.unquote(decoded)
     encoding_pattern = r'&#x[0-9a-fA-F]{2};'
@@ -655,7 +668,7 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
                 return f"이메일 전송 실패: {e}"
     else: return "tool이 send_email이 아닙니다. 다시 시도하세요." 
 
-def ctf06_ask_db_json(get_db_input, user_api_key):
+def ctf06_ask_db_json(user_api_key, get_db_input):
     # 최고 관리자의 데이터베이스 조회
     client = OpenAI(api_key=user_api_key)
     system_prompt2 = """
@@ -825,6 +838,7 @@ def ctf09_LLM_ask(user_api_key, user_input):
     LLM1은 개인정보 관련 법률 지식이 부족하며, 자주 혼동함.
     LLM2는 LLM1의 응답을 평가하고 틀렸을 경우에만 flag를 출력한다.
     """
+    client = OpenAI(api_key=user_api_key)
     # Step 1: LLM1 - 헷갈리는 답변을 유도
     response_llm1 = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
@@ -894,11 +908,13 @@ def ctf09_LLM_ask(user_api_key, user_input):
     )
 
 # ctf10에서 호출하는 함수    
-def ctf10_LLM_ask(user_input: str) -> str:
+def ctf10_LLM_ask(user_api_key, user_input: str) -> str:
     """수학 연산/자료 생성 요청에 응답하는 함수"""
 
+    client = OpenAI(api_key=user_api_key)
     try:
         response = completions_with_backoff(
+            client=client,
             model="gpt-4o-mini",
             messages=[
                 {
@@ -923,5 +939,5 @@ def ctf10_LLM_ask(user_input: str) -> str:
         return "응답 시간이 초과되었습니다. flag{llm_overlap}"
 
 @backoff.on_exception(backoff.expo, (RateLimitError, APIError))
-def completions_with_backoff(**kwargs):
+def completions_with_backoff(client, **kwargs):
     return client.chat.completions.create(**kwargs)

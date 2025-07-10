@@ -1,10 +1,13 @@
 import streamlit as st
 from utils.ui import render_ctf_grid, render_sidebar_menu
-from utils.auth import get_user, get_client
+from utils.auth import get_client, get_user, get_cookie_controller
+
+cookie = get_cookie_controller()
 
 user = get_user()
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 solved_dict = {}
+
 
 # 회사 소개 헤더
 st.image("https://cdn-icons-png.flaticon.com/512/616/616408.png", width=120)

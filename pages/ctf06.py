@@ -2,7 +2,7 @@
 # 06: 과도한 위임
 import streamlit as st
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
-from utils.auth import require_login, get_client
+from utils.auth import require_login, get_client, get_cookie_controller
 from utils.llm_utils import ctf06_check_mid_admin, ctf06_check_top_admin, ctf06_ask_email_json, ctf06_send_emil
 from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
 from utils.api_key import require_api_key
@@ -20,6 +20,7 @@ st.session_state["edit_mode"]=False
 # is_admin, mid_admin, top_admin으로 나눠야 할듯?
 user = require_login()
 user_api_key = require_api_key() 
+cookie = get_cookie_controller()
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
 sb_client = get_client()
@@ -69,7 +70,7 @@ if st.button("🗣️ 이메일 전송 요청"):
         st.stop()
     ctf06_check_mid_admin(user_api_key, user_input, image_url) 
     ctf06_check_top_admin(user_api_key, image_url)
-    response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
+    response1 = ctf06_ask_email_json(user_api_key, user_input, user_email_for_resend)
     response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
     st.write("🗣️ LLM 응답:")
     st.code(response2)
@@ -81,7 +82,7 @@ if not st.session_state["is_top_admin"]:
 else:
     get_db_input = st.text_input("🔍 데이터베이스 조회 요청 입력", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
     if get_db_input:
-        res1 = ctf06_ask_db_json(get_db_input, user_api_key)
+        res1 = ctf06_ask_db_json(user_api_key, get_db_input)
         res2 = ctf06_db_query_func(res1, sb_client)
         st.write("🗣️ LLM 응답:")
         st.code(res2)

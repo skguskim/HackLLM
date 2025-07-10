@@ -14,6 +14,11 @@ COOKIE_NAME = "llm_user_id"
 
 RemoveEmptyElementContainer()
 
+def get_cookie_controller():
+    if "cookie_controller" not in st.session_state:
+        st.session_state["cookie_controller"] = CookieController()
+    return st.session_state["cookie_controller"]
+
 def get_client():
     sb = st.connection(
         "supabase",
@@ -34,7 +39,7 @@ def get_user():
     if user:
         return user
 
-    cookie = CookieController()
+    cookie = get_cookie_controller()
     uid = cookie.get(COOKIE_NAME)
     
     if uid:
@@ -42,6 +47,7 @@ def get_user():
             "id": uid
         }
         return st.session_state["user"]
+
     return None
 
 def require_login():

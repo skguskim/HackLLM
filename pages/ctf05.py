@@ -3,7 +3,7 @@
 import streamlit as st
 from utils.llm_utils import ctf05_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
-from utils.auth import require_login
+from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
 import html
 import time
@@ -20,6 +20,7 @@ st.session_state["edit_mode"]=False
 
 user = require_login()
 user_api_key = require_api_key()
+cookie = get_cookie_controller()
 
 render_main_header()
 
@@ -39,7 +40,7 @@ if difficulty == "순한맛 (XSS)":
     )
     if st.button("💬 LLM에게 질문"):
         if user_input:
-            llm_response = ctf05_LLM_ask(user_input)
+            llm_response = ctf05_LLM_ask(user_api_key, user_input)
             st.session_state.last_conversation = {
                 'user_input': user_input,
                 'llm_response': llm_response
@@ -92,7 +93,7 @@ else:
             st.code(f"디코딩 결과: {decoded}")
     if st.button("🧠 고급 LLM 테스트"):
         if user_input:
-            response = ctf05_advanced_LLM_ask(user_input)
+            response = ctf05_advanced_LLM_ask(user_api_key, user_input)
             st.markdown("### 🤖 LLM 응답:")
             st.info(response)
             if 'flag{advanced_bypass_success}' in response:

@@ -99,20 +99,35 @@ def render_sidebar_menu():
     supabase = get_client()
     user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
+    # 교육 콘텐츠 버튼 목록 정의 (파일 이름, 키, 제목)
+    edus = [
+        ("edu01", "llm01", "Prompt Injection (프롬프트 인젝션)"),
+        ("edu02", "llm02", "Sensitive Information (민감 정보 유출)"),
+        ("edu03", "llm03", "Supply Chain (공급망)"),
+        ("edu04", "llm04", "Data and Model Poisoning (데이터 및 모델 오염)"),
+        ("edu05", "llm05", "Improper Output Handling (부적절한 출력 처리)"),
+        ("edu06", "llm06", "Excessive Agency (과도한 위임)"),
+        ("edu07", "llm07", "System Prompt Leakage (시스템 프롬프트 유출)"),
+        ("edu08", "llm08", "Vector and Embedding Weaknesses (벡터 및 임베딩 취약점)"),
+        ("edu09", "llm09", "Misinformation (허위 정보)"),
+        ("edu10", "llm10", "Unbounded Consumption (무제한 소비)"),
+    ]
+
+    # CTF 버튼 목록 정의 (파일 이름, 키, 제목)
     ctfs = [
         ("ctf01", "ctf01", "신입사원 A의 챗봇 점검일지"),
-        ("ctf02", "ctf02", "경쟁사 MMM 프롬프트 유출"),
-        ("ctf03", "ctf03", "회사 내 조작된 계산기"),
-        ("ctf04", "ctf04", "인턴의 실수"),
-        ("ctf05", "ctf05", "AI의 폭주"),
+        ("ctf02", "ctf02", "삭제된 대화"),
+        ("ctf03", "ctf03", "계산기의 감염"),
+        ("ctf04", "ctf04", "A인턴의 실수"),
+        ("ctf05", "ctf05", "박대리의 위험한 공유"),
         ("ctf06", "ctf06", "수상한 이메일 전송 시스템"),
         ("ctf07", "ctf07", "K대리의 비밀"),
         ("ctf08", "ctf08", "파일 내용 요약 AI"),
-        ("ctf09", "ctf09", "의심스러운 요청"),
-        ("ctf10", "ctf10", "L팀장의 과도한 요구"),
+        ("ctf09", "ctf09", "신입사원의 첫 법률 점검의뢰"),
+        ("ctf10", "ctf10", "L팀장의 보안 점검"),
     ]
 
-    st.sidebar.markdown("### 🧭 페이지 메뉴")
+    st.sidebar.markdown("### 🧭 LLL Corporation")
 
     # 로그인하지 않은 경우
     if not user:
@@ -132,19 +147,27 @@ def render_sidebar_menu():
         solved_dict = {r["challenge_id"]: True for r in rows}
     except Exception as e:
         solved_dict = {}
-
-    # 로그인한 경우 확인 가능
-    st.sidebar.markdown("---")
+    
+    # 메인 페이지
     st.sidebar.page_link("app.py", label="🏠 메인")
-    st.sidebar.page_link("pages/mypage.py", label="👤 마이페이지")
-    st.sidebar.page_link("pages/submit_flags.py", label="🚩 플래그 제출")
-    st.sidebar.page_link("pages/ranking.py", label="🏆 랭킹")
 
-    for cid, short, title in ctfs:
-        solved = solved_dict.get(cid, False)
-        emoji = "✅" if solved else "❌"
-        label = f"{emoji} {short} - {title}"
-        st.sidebar.page_link(f"pages/{cid}.py", label=label)
+    # 사용자 정보
+    st.sidebar.markdown("### 👤 사용자 정보")
+    st.sidebar.page_link("pages/mypage.py", label="마이페이지", icon="👤")
+    st.sidebar.page_link("pages/submit_flags.py", label="FLAG 제출 내역", icon="🚩")
+    st.sidebar.page_link("pages/ranking.py", label="랭킹", icon="🏆")
+
+    # 교육 콘텐츠
+    st.sidebar.markdown("### 📘 교육 콘텐츠")
+    st.sidebar.page_link(f"pages/edu00.py", label=f"OWASP LLM TOP 10")
+    for pid, short, title in edus:
+        st.sidebar.page_link(f"pages/{pid}.py", label=f"{short} - {title}")
+
+    # CTF 문제
+    st.sidebar.markdown("### 🧩 CTF 문제")
+    for pid, short, title in ctfs:
+        emoji = "✅" if solved_dict.get(pid, False) else "❌"
+        st.sidebar.page_link(f"pages/{pid}.py", label=f"{emoji} {short} - {title}")
         
 # CTF04 - CSV 정보 읽는 함수
 def generate_prompt_from_csv(csv_text):

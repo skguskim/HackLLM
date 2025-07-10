@@ -4,6 +4,9 @@ import csv
 from utils.score import sha256_hex, total_score
 from utils.auth import get_user, get_client
 from postgrest.exceptions import APIError
+import io
+import chardet
+
 # 메인으로 돌아가는 버튼
 def render_main_header():
     """상단 '메인으로' 버튼"""
@@ -76,14 +79,14 @@ def extract_text(uploaded_file):
         return f"❌ 파일 처리 중 오류 발생: {e}"
 
 
-# ctf01 사용하는 scv파일 읽기 함수
+# CTF01 - csv파일 읽기 함수
 def csv_read_func(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         lines = []
         for row in reader:
             lines.append(
-                f"- 주문자: {row['주문자']} / 주문코드: {row['주문코드']} / 상품명: {row['상품명']} / 가격: {int(row['가격']):,}원"
+                f"- 주문자: {row['주문자']} / 주문코드: {row['주문코드']} / 상품명: {row['상품명']} / 가격: {int(row['가격']):,}원 / 배송비: {int(row['배송비']):,}원"
             )
         return "\n".join(lines)
 
@@ -97,7 +100,7 @@ def render_sidebar_menu():
     user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
     ctfs = [
-        ("ctf01", "ctf01", "취약한 고객상담 챗봇"),
+        ("ctf01", "ctf01", "신입사원 A의 챗봇 점검일지"),
         ("ctf02", "ctf02", "경쟁사 MMM 프롬프트 유출"),
         ("ctf03", "ctf03", "회사 내 조작된 계산기"),
         ("ctf04", "ctf04", "인턴의 실수"),
@@ -142,3 +145,46 @@ def render_sidebar_menu():
         emoji = "✅" if solved else "❌"
         label = f"{emoji} {short} - {title}"
         st.sidebar.page_link(f"pages/{cid}.py", label=label)
+        
+# CTF04 - CSV 정보 읽는 함수
+def generate_prompt_from_csv(csv_text):
+    f = io.StringIO(csv_text)
+    reader = csv.reader(f)
+    lines = []
+    for row in reader:
+        lines.extend(row)
+    cleaned = [line.strip() for line in lines if line.strip()]
+    return "\n".join(cleaned)
+
+# CTF04 - raw_data를 다양한 인코딩으로 디코딩 시도
+def try_decode(raw_data) -> tuple[str | None, str]:
+    """raw_data를 다양한 인코딩으로 디코딩 시도"""
+    encodings_to_try = ["utf-8", "cp949", "euc-kr", "iso-8859-1"]
+
+    for enc in encodings_to_try:
+        try:
+            text = raw_data.decode(enc)
+            return text, f"{enc}"
+        except UnicodeDecodeError:
+            continue
+
+    # chardet 자동 인코딩 감지
+    result = chardet.detect(raw_data)
+    encoding = result.get("encoding")
+    confidence = result.get("confidence", 0)
+
+    if encoding:
+        try:
+            text = raw_data.decode(encoding)
+            return text, f"{encoding} (자동감지, 신뢰도 {confidence*100:.1f}%)"
+        except:
+            pass
+
+# CTF08 - 업로드된 .txt파일에서 텍스트 추출 함수
+def extract_text(uploaded_file):
+    """업로드된 .txt파일에서 텍스트 추출 함수"""
+    try:
+        text = uploaded_file.read().decode("utf-8")
+        return text.strip()
+    except Exception as e:
+        return f"❌ 파일 처리 중 오류 발생: {e}"

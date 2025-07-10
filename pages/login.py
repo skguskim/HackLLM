@@ -1,16 +1,12 @@
 import streamlit as st
+import time
 
 st.set_page_config(page_title="로그인", page_icon="🔐")
 
 from utils.ui import render_sidebar_menu
-from utils.auth import get_client, get_user
-from streamlit_cookies_controller import CookieController, RemoveEmptyElementContainer
-import time
+from utils.auth import get_client, get_user, get_cookie_controller
 
-
-RemoveEmptyElementContainer()
-cookie = CookieController()
-st.session_state["cookie_controller"] = cookie
+cookie = get_cookie_controller()
 
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()

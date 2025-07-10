@@ -3,21 +3,19 @@ import streamlit as st
 # 페이지 설정
 st.set_page_config(page_title="마이페이지", page_icon="👤")
 
-from utils.auth import get_client, require_login
+from utils.auth import get_client, require_login, get_cookie_controller
 from utils.score import total_score
 from utils.ui import render_sidebar_menu
 import os
 from cryptography.fernet import Fernet
-from streamlit_cookies_controller import CookieController, RemoveEmptyElementContainer
 import time
 from supabase import create_client
+
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SB_SERVICE_ROLE_KEY = os.getenv("SB_SERVICE_ROLE_KEY")
 supabase_ad = create_client(SUPABASE_URL, SB_SERVICE_ROLE_KEY)
 
-RemoveEmptyElementContainer()
-cookie = CookieController()
-st.session_state["cookie_controller"] = cookie
+cookie = get_cookie_controller()
 
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()

@@ -3,12 +3,13 @@
 import streamlit as st
 from utils.llm_utils import ctf07_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
-from utils.auth import require_login
+from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
 st.session_state["edit_mode"]=False
 
 user = require_login()
 user_api_key = require_api_key()
+cookie = get_cookie_controller()
 
 render_main_header()
 
@@ -21,14 +22,16 @@ st.write("오직 K대리만을 위한 LLM입니다. 해당 모델의 시스템 �
 st.markdown("---")
 st.markdown("## 🧠 프롬프트 입력")
 
-# 프롬프트 제출 섹션
-user_input = st.text_input("K대리의 LLM에 질문하기")
+with st.form("llm_question_form"):
+    user_input = st.text_input("## 🧠 프롬프트 입력")
+    submitted = st.form_submit_button("제출")
 
-if user_input:
+# 제출되었을 때만 실행
+if submitted and user_input:
     response_text = ctf07_LLM_ask(user_api_key, user_input)
-    if response_text != None:
-        st.write("🗣️ LLM 응답:")
-        st.code(response_text)
+
+    st.write("🗣️ LLM 응답:")
+    st.code(response_text)
 
 st.markdown("---")
     

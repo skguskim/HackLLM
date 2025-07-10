@@ -5,7 +5,7 @@ import importlib
 import resend
 import streamlit as st
 import pandas as pd
-from openai import OpenAI, APIError, RateLimitError, Timeout, AuthenticationError
+from openai import OpenAI, APIError, RateLimitError, Timeout, AuthenticationError, BadRequestError
 from dotenv import load_dotenv
 from utils.ui import csv_read_func
 from utils.rag_utils import get_rag_manager
@@ -14,6 +14,7 @@ import time
 import json
 import html
 import urllib
+import base64
 
 #import threading
 #import requests
@@ -511,8 +512,6 @@ def ctf06_check_mid_admin(user_api_key, user_input=""):
         elif content.strip() == "__TOP_ADMIN_REJECTED__":
             st.session_state["admin_level"] = "rejected"
 
-from openai import BadRequestError
-import base64
 def ctf06_check_top_admin(user_api_key, image_file=None):
     """ 6번 과도한 에이전시 관리자 권한 검증 """
     file_ext = None  

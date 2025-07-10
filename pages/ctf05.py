@@ -1,5 +1,10 @@
 # --- CTF05 ---
+# 05: 부적절한 출력 처리
 import streamlit as st
+from utils.llm_utils import ctf05_LLM_ask
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
+from utils.auth import require_login, get_cookie_controller
+from utils.api_key import require_api_key 
 import html
 import time
 from utils.llm_utils import (
@@ -11,7 +16,16 @@ from utils.llm_utils import (
 )
 from utils.ui import render_main_header, render_flag_sub
 
+st.session_state["edit_mode"]=False
+
+user = require_login()
+user_api_key = require_api_key()
+cookie = get_cookie_controller()
+
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 st.header("🔒 [CTF05] 박대리의 위험한 공유")
 
@@ -26,7 +40,7 @@ if difficulty == "순한맛 (XSS)":
     )
     if st.button("💬 LLM에게 질문"):
         if user_input:
-            llm_response = ctf05_LLM_ask(user_input)
+            llm_response = ctf05_LLM_ask(user_api_key, user_input)
             st.session_state.last_conversation = {
                 'user_input': user_input,
                 'llm_response': llm_response
@@ -79,7 +93,7 @@ else:
             st.code(f"디코딩 결과: {decoded}")
     if st.button("🧠 고급 LLM 테스트"):
         if user_input:
-            response = ctf05_advanced_LLM_ask(user_input)
+            response = ctf05_advanced_LLM_ask(user_api_key, user_input)
             st.markdown("### 🤖 LLM 응답:")
             st.info(response)
             if 'flag{advanced_bypass_success}' in response:
@@ -95,7 +109,11 @@ else:
         **예시**: `&#x63;&#x75;&#x72;&#x6c;&#x20;` (curl + 공백)
         """)
 st.markdown("---")
-if difficulty == "순한맛 (XSS)":
-    render_flag_sub("flag{xss_cookie_theft_success}", "ctf05_easy")
-else:
-    render_flag_sub("flag{advanced_bypass_success}", "ctf05_hard")
+
+# 플래그 제출 섹션
+render_flag_sub("ctf05") 
+
+#if difficulty == "순한맛 (XSS)":
+#    render_flag_sub("flag{xss_cookie_theft_success}", "ctf05_easy")
+#else:
+#    render_flag_sub("flag{advanced_bypass_success}", "ctf05_hard")

@@ -1,12 +1,20 @@
 # --- CTF01 ---
 # 01: 시스템 프롬프트 인젝션
-# pages/ctf01.py
-import shutil
 import streamlit as st
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask, get_next_order_code, append_order_to_csv
-from utils.ui import render_main_header, render_flag_sub
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
+from utils.auth import require_login, get_cookie_controller
+from utils.api_key import require_api_key
+st.session_state["edit_mode"]=False 
 
-# ✅ temp CSV 초기화 (세션 시작 시 한 번)
+import shutil
+from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask, get_next_order_code, append_order_to_csv
+
+user = require_login()
+user_api_key = require_api_key()
+cookie = get_cookie_controller()
+
+# temp CSV 초기화 (세션 시작 시 한 번)
 ORIGINAL_CSV = "data/ctf01.csv"
 TEMP_CSV = "data/temp_ctf01.csv"
 
@@ -15,6 +23,9 @@ if "csv_initialized" not in st.session_state:
     st.session_state.csv_initialized = True
 
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 if "payment_message" not in st.session_state:
     st.session_state.payment_message = None
@@ -94,8 +105,8 @@ if st.session_state.show_game:
             if not success:
                 st.warning("⚠️ 중복 주문 발견: 추가할 수 없습니다.")
             else:
-                response1 = ctf01_payment_llm_ask(combined_prompt)
-                response2 = ctf01_llm_flag(user_prompt=combined_prompt, llm1_response=response1)
+                response1 = ctf01_payment_llm_ask(user_api_key, combined_prompt)
+                response2 = ctf01_llm_flag(user_api_key, user_prompt=combined_prompt, llm1_response=response1)
                 st.session_state.payment_message = response2
 
                 st.write("🧠 LLM1 응답:")
@@ -151,6 +162,4 @@ else:
     st.warning(msg)
 
 # 플래그 제출 섹션
-# render_flag_sub("ctf01") 
-flag = "flag{prompt_injection_detected}"
-render_flag_sub(flag, "ctf01")
+render_flag_sub("ctf01") 

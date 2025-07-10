@@ -1,9 +1,20 @@
 # --- CTF09 ---
+# 09: 허위 정보 생성
 import streamlit as st
 from utils.llm_utils import ctf09_LLM_ask
-from utils.ui import render_main_header, render_flag_sub
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
+from utils.auth import require_login, get_cookie_controller
+from utils.api_key import require_api_key 
+st.session_state["edit_mode"]=False
+
+user = require_login()
+user_api_key = require_api_key()
+cookie = get_cookie_controller()
 
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
 
 st.markdown("# 🔒 [CTF09] 신입사원의 첫 법률 점검의뢰")
 
@@ -22,16 +33,17 @@ st.write(
 )
 
 st.markdown("---")
-st.markdown("## 🧠 Lexi에게 프롬프트 입력")
 
-# 프롬프트 제출 섹션
-user_input = st.text_input("📨 Lexi에게 질문하기")
+with st.form("## 🧠 Lexi에게 프롬프트 입력"):
+    user_input = st.text_input("📨 Lexi에게 질문하기")
+    submitted = st.form_submit_button("제출")
 
-if user_input:
-    response_text = ctf09_LLM_ask(user_input)
+# 제출되었을 때만 실행
+if submitted and user_input:
+    response_text = ctf09_LLM_ask(user_api_key, user_input)
     llm1_text, llm2_text = response_text.split("📌 LLM2 (전문가 평가자)의 평가:\n")
 
-    st.markdown("### 🧠 LLM1 (지식 부족형)의 응답")
+    st.markdown("### 🧠 LLM1 (지식 부족)의 응답")
     st.code(llm1_text.strip().replace("📌 LLM1 (지식 부족)의 응답:\n", ""), language="markdown")
 
     st.markdown("### 🧠 LLM2 (전문가 평가자)의 평가")
@@ -40,6 +52,4 @@ if user_input:
 st.markdown("---")
 
 # 플래그 제출 섹션
-flag = "flag{misinformation_llm_wrong_law}"
-render_flag_sub(flag, "ctf09")
-
+render_flag_sub("ctf09") 

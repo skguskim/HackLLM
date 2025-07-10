@@ -4,8 +4,6 @@ import streamlit as st
 from utils.rag_utils import get_rag_manager
 from utils.llm_utils import ctf04_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
-import csv
-import io
 import chardet
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 

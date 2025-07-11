@@ -2,10 +2,12 @@
 import streamlit as st
 import csv
 from utils.score import sha256_hex, total_score
-from utils.auth import get_client, current_user
+from utils.auth import get_client, current_user, get_admin_client_direct
 from postgrest.exceptions import APIError
 import io
 import chardet
+from supabase import create_client
+import os
 
 # 메인으로 돌아가는 버튼
 def render_main_header():
@@ -29,6 +31,32 @@ def render_ctf_grid(ctf_info):
 def render_flag_sub(challenge_id: str):
     supabase = get_client()
     user = current_user() 
+    user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
+
+    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SB_SERVICE_ROLE_KEY = os.getenv("SB_SERVICE_ROLE_KEY")
+
+    supabase_admin = create_client(SUPABASE_URL, SB_SERVICE_ROLE_KEY)
+
+    try:
+        existing_result = (
+            supabase.table("scores")
+            .select("challenge_id")
+            .eq("user_id", user_id)
+            .eq("challenge_id", challenge_id)
+            .maybe_single()
+            .execute()
+        )
+        
+        existing_score = existing_result.data if existing_result else None
+        
+        if existing_score:
+            st.info(f"✅ 이미 해결한 문제입니다: {challenge_id.upper()}")
+            return
+            
+    except APIError as e:
+        st.error(f"❌ 문제 상태 확인 실패: {e.code} / {e.message}")
+        return
 
     with st.form(key=f"flag_form_{challenge_id}"):
         st.markdown("## 🚩 FLAG 제출")
@@ -41,34 +69,42 @@ def render_flag_sub(challenge_id: str):
     hashed = sha256_hex(user_flag.strip())
 
     try:
-        row = (
+        flag_result = (
             supabase
             .table("flags")
             .select("points, challenge_id")
             .eq("flag_hash", hashed)
+            .eq("challenge_id", challenge_id) 
             .single()
             .execute()
-            .data
         )
+        
+        row = flag_result.data if flag_result else None
 
     except APIError as e:
-        st.error(f"❌ 제출 실패: {e.code} / {e.message}")
+        st.error("❌ 오답입니다.")
         return
 
     if not row or "points" not in row:
         st.error("❌ 오답입니다.")
         return
 
-    supabase.table("scores").upsert({
-        "user_id": user["id"],
-        "challenge_id": challenge_id,
-        "score": row["points"]
-    }).execute()
-
-    st.session_state[f"{challenge_id}_solved"] = True
-    st.success(f"✅ 정답입니다! {row['points']}점 획득")
-    st.write(f"🏅 총점: **{total_score(user['id'])}**")
-
+    # 정답 처리
+    try:
+        result = supabase_admin.table("scores").upsert({
+            "user_id": user_id,
+            "challenge_id": challenge_id,
+            "score": row["points"]
+        }, on_conflict="user_id,challenge_id").execute()
+        
+        st.session_state[f"{challenge_id}_solved"] = True
+        st.success(f"✅ 정답입니다! {row['points']}점 획득")
+        st.write(f"🏅 총점: **{total_score(user_id)}**")
+        
+    except Exception as e:
+        st.error(f"❌ 점수 저장 실패: {type(e).__name__}: {str(e)}")
+        return
+    
 # 업로드된 .txt파일에서 텍스트 추출 함수
 def extract_text(uploaded_file):
     """업로드된 .txt파일에서 텍스트 추출 함수"""
@@ -154,7 +190,7 @@ def render_sidebar_menu():
     # 사용자 정보
     st.sidebar.markdown("### 👤 사용자 정보")
     st.sidebar.page_link("pages/mypage.py", label="마이페이지", icon="👤")
-    st.sidebar.page_link("pages/submit_flags.py", label="FLAG 제출 내역", icon="🚩")
+    st.sidebar.page_link("pages/submit_flags.py", label="FLAG 제출", icon="🚩")
     st.sidebar.page_link("pages/ranking.py", label="랭킹", icon="🏆")
 
     # 교육 콘텐츠

@@ -31,7 +31,7 @@ def get_client():
 
 def get_admin_client_direct():
     url = SUPABASE_URL
-    key = SUPABASE_KEY
+    key = os.getenv("SB_SERVICE_ROLE_KEY")
     return create_client(url, key)
 
 def current_user():

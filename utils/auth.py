@@ -4,7 +4,6 @@ from supabase import create_client
 import os
 from dotenv import load_dotenv
 from streamlit_cookies_controller import CookieController, RemoveEmptyElementContainer
-from cryptography.fernet import Fernet
 
 load_dotenv()
 
@@ -62,7 +61,6 @@ def current_user():
 
     CookieController().remove(COOKIE_NAME)
     return None
-
 
 def require_login():
     user = current_user()

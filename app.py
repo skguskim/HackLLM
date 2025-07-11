@@ -1,14 +1,8 @@
 import streamlit as st
 from utils.ui import render_ctf_grid, render_sidebar_menu
-from utils.auth import get_user, get_client
-from streamlit_cookies_controller import CookieController, RemoveEmptyElementContainer
+from utils.auth import get_client, current_user
 
-RemoveEmptyElementContainer()
-
-if "cookie_controller" not in st.session_state:
-    st.session_state["cookie_controller"] = CookieController()
-
-user = get_user()
+user = current_user()   
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 solved_dict = {}
 

@@ -1,7 +1,9 @@
 # pages/signup.py
 import streamlit as st
-from utils.auth import get_client
+from utils.auth import get_client, current_user
 from utils.ui import render_sidebar_menu
+
+user = current_user()
 
 render_sidebar_menu()
 

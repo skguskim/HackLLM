@@ -2,7 +2,7 @@
 import streamlit as st
 import csv
 from utils.score import sha256_hex, total_score
-from utils.auth import get_user, get_client
+from utils.auth import get_client, current_user
 from postgrest.exceptions import APIError
 import io
 import chardet
@@ -28,7 +28,7 @@ def render_ctf_grid(ctf_info):
 # FLAG 제출 버튼
 def render_flag_sub(challenge_id: str):
     supabase = get_client()
-    user = get_user()
+    user = current_user() 
 
     with st.form(key=f"flag_form_{challenge_id}"):
         st.markdown("## 🚩 FLAG 제출")
@@ -95,7 +95,7 @@ def render_sidebar_menu():
     """
     사이드바에 로그인 여부에 따라 조건부 메뉴 렌더링.
     """
-    user = get_user()
+    user = current_user() 
     supabase = get_client()
     user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 

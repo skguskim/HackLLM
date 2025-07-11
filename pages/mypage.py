@@ -3,31 +3,29 @@ import streamlit as st
 # 페이지 설정
 st.set_page_config(page_title="마이페이지", page_icon="👤")
 
-from utils.auth import get_client, require_login, get_cookie_controller
+from utils.auth import get_client, require_login
 from utils.score import total_score
 from utils.ui import render_sidebar_menu
 import os
 from cryptography.fernet import Fernet
 import time
 from supabase import create_client
+from streamlit_cookies_controller import CookieController
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SB_SERVICE_ROLE_KEY = os.getenv("SB_SERVICE_ROLE_KEY")
 supabase_ad = create_client(SUPABASE_URL, SB_SERVICE_ROLE_KEY)
 
-cookie = get_cookie_controller()
+# 사용자 인증 확인
+user = require_login()
+user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
+supabase = get_client()
+
+max_score = 1000
+total = total_score(user_id)
 
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
-
-# 사용자 인증 확인
-user = require_login()
-
-user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
-
-supabase = get_client()
-max_score = 1000
-total = total_score(user_id)
 
 # 프로필 조회
 rows = (
@@ -107,12 +105,8 @@ if st.session_state.get("api_key") and (st.session_state["edit_mode"] == False):
         st.rerun()
 
 if st.session_state["edit_mode"] == True:
-# not st.session_state.get("api_key") or (st.session_state["edit_mode"] == True):
     if st.button("⚙️ API 키 제출"):
         alert_box()
-
-# if st.session_state.get("confirmed"):
-#     st.success("API 키 변경이 완료되었습니다!")
 
 # 총점 표시
 st.markdown("---")
@@ -144,9 +138,8 @@ if st.button("🚪 로그아웃", type="primary"):
     supabase.auth.sign_out()
     st.session_state.pop("user", None)
 
-    cookie.remove("llm_user_id")
-    time.sleep(2)  # 쿠키 제거 대기
-    st.success("로그아웃되었습니다.")
+    CookieController().remove("user_id")
     st.session_state.clear()
-    st.rerun()
+
+    st.success("로그아웃되었습니다.")
     st.switch_page("pages/login.py")

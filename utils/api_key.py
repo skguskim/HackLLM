@@ -10,12 +10,11 @@ fernet_key = os.getenv("FERNET_KEY") # 암호화에 사용할 대칭키
 
 cipher = Fernet(fernet_key.encode()) 
 
-# 이부분 코드 리팩토링 필요
-user = require_login() 
-supabase = get_client() 
-user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
-
 def require_api_key():
+    # 먼저 사용자 로그인 확인
+    user = require_login() 
+    user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
+    
     supabase = get_client()
 
     # DB에서 직접 가져와서 session_state에 캐싱

@@ -1,16 +1,12 @@
 import streamlit as st
+import time
 
 st.set_page_config(page_title="로그인", page_icon="🔐")
 
 from utils.ui import render_sidebar_menu
-from utils.auth import get_client, get_user
-from streamlit_cookies_controller import CookieController, RemoveEmptyElementContainer
-import time
+from utils.auth import get_client, get_cookie_controller
 
-
-RemoveEmptyElementContainer()
-cookie = CookieController()
-st.session_state["cookie_controller"] = cookie
+cookie = get_cookie_controller()
 
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
@@ -19,7 +15,7 @@ st.header("🔐 로그인")
 
 supabase = get_client()
 
-if get_user():
+if st.session_state.get("user"):
     st.success("이미 로그인됨 → 마이페이지로 이동")
     st.switch_page("pages/mypage.py")
 
@@ -42,15 +38,16 @@ if st.button("로그인", use_container_width=True):
         api_key = api_key_res.data.get("api_key") if api_key_res.data else None
         
         # 쿠키에 사용자 ID 저장
-        cookie.set("llm_user_id", user_info["id"], max_age = 24 * 60 * 60) 
-        time.sleep(5) 
-        st.rerun()
+        cookie.set("user_id", user_info["id"], max_age = 24 * 60 * 60) 
+        time.sleep(1) 
 
         # 세션 상태에 API 키 저장
         if api_key != None:
             st.session_state["api_key"]=api_key
         if not st.session_state.get("edit_mode"):
             st.session_state["edit_mode"]=False
+
+        time.sleep(1)
         st.switch_page("pages/mypage.py")
     except Exception as e:
         st.error(f"❌ 로그인 실패: {e}")

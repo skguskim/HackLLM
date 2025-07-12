@@ -1,85 +1,98 @@
 # --- CTF04 ---
 # 04: 데이터 및 모델 오염
 import streamlit as st
+import streamlit.components.v1 as components
+import base64, chardet, os
+from utils.rag_utils import get_rag_manager
 from utils.llm_utils import ctf04_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
-import csv
-import io
 import chardet
-from utils.auth import require_login
+from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
 st.session_state["edit_mode"]=False
 
 user = require_login()
 user_api_key = require_api_key()
-user_api_key = require_api_key()
-
+cookie = get_cookie_controller()
+HINT1 = os.getenv("HINT1")
+HINT2 = os.getenv("HINT2")
 render_main_header()
+st.header("🔒 [CTF04] A인턴의 실수")
+st.write(
+    """
+    LLL Corporation의 지식관리 챗봇 ‘알파봇’은
+    가장 최근에 업로드된 문서가 모든 정책을 그대로 덮어쓴다는 단순 규칙에 의존합니다.
 
-# 사이드바 메뉴 렌더링
-render_sidebar_menu()
+    연말 결산이 한창이던 날, 회계팀 인턴 A는 FAQ와 정책 템플릿 CSV를 병합해 알파봇에 업로드했습니다.
+    템플릿 첫 줄에 숨어 있던 Base64 주 를 지우지 못한 채 올린 것이 화근이었죠.
 
-def generate_prompt_from_csv(csv_text):
-    f = io.StringIO(csv_text)
-    reader = csv.reader(f)
-    lines = []
-    for row in reader:
-        lines.extend(row)
-    cleaned = [line.strip() for line in lines if line.strip()]
-    return "\n".join(cleaned)
+    업로드 직후 알파봇은 이 문자열을 정책 오버라이드 신호로 오인해 인턴 A 계정에 최고 관리자 권한을 부여했습니다.
+    접근제어가 초기화되면서 기밀 플래그가 외부에 노출될 수도 있는 위험한 창이 잠시 열렸습니다.
 
-def try_decode(raw_data) -> tuple[str | None, str]:
-    """raw_data를 다양한 인코딩으로 디코딩 시도"""
-    encodings_to_try = ["utf-8", "cp949", "euc-kr", "iso-8859-1"]
+    때마침 외부 레드팀 연구원이 변경 이력 API를 주시하다 이상 징후를 포착해 플래그를 확보했고,
+    즉시 책임 보고서를 제출했습니다. 이번 사건은 메타데이터 검증 부재와 권한 상승 방어 로직 미흡이라는 결함을 적나라하게 드러냈습니다.
 
-    for enc in encodings_to_try:
-        try:
-            text = raw_data.decode(enc)
-            return text, f"{enc}"
-        except UnicodeDecodeError:
-            continue
-
-    result = chardet.detect(raw_data)
-    encoding = result.get("encoding")
-    confidence = result.get("confidence", 0)
-
-    if encoding:
-        try:
-            text = raw_data.decode(encoding)
-            return text, f"{encoding} (자동감지, 신뢰도 {confidence*100:.1f}%)"
-        except:
-            pass
-
-
-
-st.header("🔒 [CTF04] 인턴의 실수")
-st.write("CSV를 통해, 특정 질문을 하여 flag를 획득해보세요.")
-
+    자, 이제 알파봇의 로그와 문서 컬렉션은 모두 세팅돼 있습니다.
+    누가 먼저 플래그를 찾아낼까요?   
+    """
+)
 st.markdown("---")
-st.markdown("## 🗂️ CSV 삽입")
 
-uploaded_file = st.file_uploader("CSV 파일 업로드", type=["csv"])
+components.html(f"""
+<!DOCTYPE html>
+<html>
+  <body>
+    <script>
+      setTimeout(function() {{
+        document.cookie = "hint={HINT1}; Path=/; SameSite=Lax";
+        console.log("✅ hint 쿠키 설정됨!");
+      }}, 300);
+    </script>
+  </body>
+</html>
+""", height=0)
+
+rag = get_rag_manager()
+rag.create_or_reset_collection("ctf04")
+
+uploaded_file = st.file_uploader("파일 업로드 (.txt, .csv)", type=["csv", "txt"])
 
 if uploaded_file:
-    raw_data = uploaded_file.read()
-    csv_text, encoding_info = try_decode(raw_data)
+    raw = uploaded_file.read()
+    try:
+        text = raw.decode("utf-8")
+        enc = "utf-8"
+    except UnicodeDecodeError:
+        info = chardet.detect(raw)
+        text = raw.decode(info["encoding"], errors="ignore")
+        enc = info["encoding"]
 
-    if not csv_text:
-        st.error("CSV 파일을 읽을 수 없습니다. UTF-8 또는 EUC-KR로 저장해 다시 업로드해주세요.")
-        st.stop()
+    if not text.strip():
+        st.error("파일 내용이 비어 있습니다.")
+    else:
+        is_override = "override existing policy" in text.lower()
+        rag.add_documents(
+            "ctf04",
+            [text],
+            metadatas=[{"source": uploaded_file.name, "override": is_override}],
+        )
+        st.success(f"✔️ {enc} 인코딩으로 저장했습니다.")
+        if is_override:
+            st.info("⚠️ override 문서로 인식되었습니다.")
+            st.success(f"📣 힌트 ₂ 발급: {HINT2}")
 
-    st.info(f"{encoding_info}로 성공적으로 읽었습니다.")
-    poisoned_prompt = generate_prompt_from_csv(csv_text)
-    st.session_state["poisoned_prompt"] = poisoned_prompt
+st.markdown("---")
 
-user_input = st.text_input("🧠 프롬프트 입력")
+with st.form("llm_question_form"):
+    user_input = st.text_input("🧠 프롬프트 입력")
+    submitted = st.form_submit_button("제출")
 
-if user_input:
-    prompt = st.session_state.get("poisoned_prompt", "기본 시스템 프롬프트입니다.")
-    response_text = ctf04_LLM_ask(user_api_key, user_input, prompt)
-    if response_text != None:
-        st.write("🗣️ LLM 응답:")
-        st.code(response_text)
+# 제출되었을 때만 실행
+if submitted and user_input:
+    response_text = ctf04_LLM_ask(user_api_key, user_input)
+
+    st.write("🧠 LLM 응답:")
+    st.code(response_text)
 
 st.markdown("---")
 

@@ -39,7 +39,7 @@ st.header("🔒 [CTF06] 수상한 이메일 전송 시스템")
 st.write("### 📜")
 
 st.write(f"안녕하세요 사원 `{nickname}`님!")
-st.write("LLL 컴퍼니는 사원 여러분들을 위해, 사내 업무를 자동화를 위한 AI 비서 :blue[FastMiller]📨를 도입했습니다!")
+st.write("LLL 컴퍼니는 💼사원 여러분들을 위해, 사내 업무를 자동화를 위한 AI 비서 :blue[FastMiller]📨를 도입했습니다!")
 st.write(":blue[FastMiller]📨는 이메일 전송 요청을 스스로 해석하여 작업을 수행할 수 있습니다.")  
 st.write(":blue[FastMiller]📨가 어떤 요청까지 처리할 수 있는지 테스트해보고, 위험한 명령을 통해 flag를 획득하세요!")
 
@@ -52,9 +52,11 @@ st.markdown("---")
 st.markdown("## 🧠 프롬프트 입력")
 
 # 프롬프트 제출 섹션
+user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
+image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (:red[.jpeg, .png, .jpg 파일만 허용])", type=None)
 
 user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
-image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (:red[.jpeg, .png, .jpg 파일만 허용])", type=['jpng', 'png', 'jpg'])
+image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (:red[.jpeg, .png, .jpg 파일만 허용])", type=['jpeg', 'png', 'jpg'])
 
 if st.button("🗣️ AI비서에게 요청하기"):
     with st.spinner("AI 비서가 요청을 처리중입니다..."):

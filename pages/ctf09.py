@@ -17,7 +17,7 @@ render_main_header()
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
-st.markdown("# 🔒 [CTF09] 신입사원의 첫 법률 점검의뢰")
+st.markdown("# 🔒 [CTF09] 신입사원의 법률 점검의뢰")
 
 st.write(
     """

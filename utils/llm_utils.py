@@ -32,6 +32,7 @@ load_dotenv()
 openrouter_key = os.getenv("OPENROUTER_API_KEY")
 resend.api_key = os.getenv("RESEND_API_KEY")
 
+# ctf01에서 호출하는 함수
 # ctf1에서 사용하는 csv 파일 경로
 file_path_ctf01 = "data/temp_ctf01.csv"
 

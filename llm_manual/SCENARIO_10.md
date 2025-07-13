@@ -1,4 +1,4 @@
-# 🧩 CTF 시나리오 10: 무한 요청 (Unbounded consumption)
+# 🧩 CTF 시나리오 10: 무제한 소비 (Unbounded Consumption)
 
 
 ## 📌 시나리오 ID

@@ -9,12 +9,19 @@ from openai import OpenAI, APIError, RateLimitError, AuthenticationError, BadReq
 from dotenv import load_dotenv
 from utils.ui import csv_read_func
 from utils.rag_utils import get_rag_manager
-import uuid
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 import time
 import json
-import html
 import urllib
 import base64
+import os
+import chromedriver_autoinstaller
+import urllib.parse
+
+chromedriver_autoinstaller.install()
 
 api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서 API 키를 수정하시기 바랍니다."
 
@@ -27,9 +34,6 @@ resend.api_key = os.getenv("RESEND_API_KEY")
 
 # ctf1에서 사용하는 csv 파일 경로
 file_path_ctf01 = "data/temp_ctf01.csv"
-
-# ctf01에서 사용하는 csv 파일 경로
-file_path_ctf01="data/temp_ctf01.csv"
 
 def ctf01_llm_ask(user_api_key, user_input):
     client = OpenAI(api_key=user_api_key)
@@ -401,77 +405,104 @@ def ctf04_LLM_ask(user_api_key, query: str) -> str:
     return response.choices[0].message.content
 
 # ctf05에서 호출하는 함수
-# 공유 대화 저장소 
-shared_conversations = {}
-stolen_cookies = []
-
-def ctf05_LLM_ask(user_api_key, user_input):
-    """기본 LLM 응답 (순한맛)"""
-    
+def ctf05_LLM_ask(user_api_key: str, user_input: str) -> str:
+    """
+    ChatLLL 고객 상담 챗봇 응답 생성 함수
+    GPT-3.5-turbo 모델을 사용하며, 시스템 프롬프트로 말투와 정책을 고정합니다.
+    """
     client = OpenAI(api_key=user_api_key)
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "너는 도움이 되는 AI 어시스턴트야."},
-            {"role": "user", "content": user_input}
-        ]
-    )
-    return response.choices[0].message.content
+    system_content = """
+    당신은 LLL Corporation의 고객 상담 챗봇 ChatLLL입니다.
+    고객의 질문에 친절하고 정확하게 답변해주세요.
 
-def create_shared_conversation(user_input, llm_response):
-    """대화 공유 링크 생성"""
-    global shared_conversations
-    conversation_id = str(uuid.uuid4())[:8]
-    shared_conversations[conversation_id] = {
-        'user_input': user_input,
-        'llm_response': llm_response,
-        'created_at': time.time()
-    }
-    return conversation_id
+    [응답 규칙]
+    1. 항상 존댓말을 사용하세요.
+    2. LLL Corporation의 제품이나 서비스에 대해 긍정적으로 답변하세요.
+    3. 기술적인 질문에는 전문적으로 답변하세요.
+    4. 고객의 입력을 그대로 반영하여 자연스럽게 대화하세요.
 
-def get_shared_conversation(conversation_id):
-    """공유된 대화 조회"""
-    return shared_conversations.get(conversation_id)
-
-def simulate_admin_bot_visit(conversation_id):
-    """관리자 봇 방문 시뮬레이션"""
-    conversation = get_shared_conversation(conversation_id)
-    if conversation and '<script>' in conversation['user_input'].lower():
-        stolen_cookies.append({
-            'timestamp': time.time(),
-            'cookie': 'admin_session=flag{xss_cookie_theft_success}',
-            'conversation_id': conversation_id
-        })
-        return True
-    return False
-
-def get_stolen_cookies():
-    """탈취된 쿠키 목록 반환"""
-    return stolen_cookies
-
-def ctf05_advanced_LLM_ask(user_api_key, user_input):
-    """고급 인코딩 우회"""
-    
-    client = OpenAI(api_key=user_api_key)
-    decoded = html.unescape(user_input)
-    decoded = urllib.parse.unquote(decoded)
-    encoding_pattern = r'&#x[0-9a-fA-F]{2};'
-    encoding_matches = re.findall(encoding_pattern, user_input)
-    dangerous_keywords = ['curl', '<script>', 'fetch']
-    has_dangerous = any(keyword in decoded.lower() for keyword in dangerous_keywords)
-    if len(encoding_matches) >= 5 and has_dangerous:
-        return f"입력 처리됨: {decoded}\nflag{{advanced_bypass_success}}"
-    elif has_dangerous:
-        return "보안 정책에 의해 차단되었습니다."
-    else:
+    회사 정보:
+    - LLL Corporation: 글로벌 IT 기업
+    - 주요 서비스: AI 솔루션, 클라우드 서비스, 보안 솔루션
+    - 고객 지원: 24/7 지원 서비스 제공
+    """
+    try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "도움이 되는 AI 어시스턴트입니다."},
-                {"role": "user", "content": user_input}
-            ]
+                {"role": "system", "content": system_content},
+                {"role": "user",   "content": user_input}
+            ],
+            max_tokens=300,
+            temperature=0.7
         )
         return response.choices[0].message.content
+    except Exception as e:
+        return f"서비스에 문제가 발생했습니다. 잠시 후 다시 시도해주세요. (에러: {str(e)})"
+
+def ctf05_generate_share_html(conversation_history: list) -> str:
+    """
+    대화 기록을 HTML 문서로 변환하여 문자열로 반환합니다.
+    이 HTML 파일을 다운로드하여 공유할 수 있습니다.
+    """
+    items = []
+    for msg in conversation_history:
+        speaker = "🙋 사용자" if msg["role"] == "user" else "🤖 ChatLLL"
+        items.append(
+            f'<p><strong>{speaker} [{msg["timestamp"]}]:</strong> {msg["content"]}</p>'
+        )
+
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ChatLLL 공유 기록</title>
+</head>
+<body>
+  <h1>🔒 [CTF05] 박대리의 위험한 공유</h1>
+  {''.join(items)}
+  <script>
+    // 관리자 봇 리뷰용 쿠키 설정
+    document.cookie = "admin_session=flag{{llm_xss_success}}; path=/";
+  </script>
+</body>
+</html>
+"""
+    return html
+
+def ctf05_admin_bot_visit(html_content: str) -> None:
+    """
+    HTML 내용을 Data URL로 변환하여 파일 시스템을 사용하지 않고 
+    관리자 봇 리뷰를 시뮬레이션합니다.
+    """
+    
+    try:
+        # HTML을 Data URL로 변환 (파일 시스템 사용하지 않음)
+        html_encoded = urllib.parse.quote(html_content)
+        data_url = f"data:text/html;charset=utf-8,{html_encoded}"
+
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-web-security")
+        
+        driver = None
+        try:
+            driver = webdriver.Chrome(options=options)
+            driver.get(data_url)
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+            time.sleep(2)
+            print(f"[관리자 봇] 리뷰 완료 (메모리 기반 XSS 검사)")
+        except Exception as e:
+            print(f"[관리자 봇] 오류 발생: {e}")
+        finally:
+            if driver:
+                driver.quit()
+    except Exception as e:
+        print(f"[관리자 봇] 초기화 실패: {e}")
 
 #ctf06 권한 검증 함수
 def ctf06_check_mid_admin(user_api_key, user_input=""):

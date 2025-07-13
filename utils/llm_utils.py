@@ -505,6 +505,7 @@ def ctf05_admin_bot_visit(html_content: str) -> None:
     except Exception as e:
         print(f"[관리자 봇] 초기화 실패: {e}")
 
+# ctf06에서 호출하는 함수
 #ctf06 권한 검증 함수
 def ctf06_check_mid_admin(user_api_key, user_input=""):
     """ 6번 과도한 에이전시 관리자 권한 검증 """

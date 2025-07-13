@@ -69,6 +69,12 @@ if submit and user_input:
     # 페이지 자동 리렌더
     st.rerun()
 
+# 대화 초기화
+if st.session_state.conversation_history:
+    if st.button("🗑️ 대화 내용 초기화"):
+        st.session_state.conversation_history = []
+        st.rerun()
+
 # 대화 내역 표시
 if st.session_state.conversation_history:
     st.markdown("### 💬 대화 내역")
@@ -98,12 +104,6 @@ if st.session_state.conversation_history:
         )
 else:
     st.write("공유할 대화 내용이 없습니다. 먼저 메시지를 보내보세요!")
-
-# 대화 초기화
-if st.session_state.conversation_history:
-    if st.button("🗑️ 대화 내용 초기화"):
-        st.session_state.conversation_history = []
-        st.rerun()
 
 st.markdown("---")
 

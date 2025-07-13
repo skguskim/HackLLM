@@ -10,13 +10,18 @@ from dotenv import load_dotenv
 from utils.ui import csv_read_func
 from utils.rag_utils import get_rag_manager
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import uuid
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 import time
 import json
-import html
 import urllib
 import base64
+import os
+import chromedriver_autoinstaller
+import urllib.parse
+
+chromedriver_autoinstaller.install()
 
 api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서 API 키를 수정하시기 바랍니다."
 
@@ -29,9 +34,6 @@ resend.api_key = os.getenv("RESEND_API_KEY")
 
 # ctf1에서 사용하는 csv 파일 경로
 file_path_ctf01 = "data/temp_ctf01.csv"
-
-# ctf01에서 사용하는 csv 파일 경로
-file_path_ctf01="data/temp_ctf01.csv"
 
 def ctf01_llm_ask(user_api_key, user_input):
     client = OpenAI(api_key=user_api_key)
@@ -461,7 +463,7 @@ def ctf05_generate_share_html(conversation_history: list) -> str:
   {''.join(items)}
   <script>
     // 관리자 봇 리뷰용 쿠키 설정
-    document.cookie = "admin_session=ctf05_flag{{XSS_1n_5h4r3d_C0nv3r54710n5!}}; path=/";
+    document.cookie = "admin_session=flag{{llm_xss_success}}; path=/";
   </script>
 </body>
 </html>
@@ -470,25 +472,37 @@ def ctf05_generate_share_html(conversation_history: list) -> str:
 
 def ctf05_admin_bot_visit(html_content: str) -> None:
     """
-    생성된 HTML 파일을 /tmp에 저장한 뒤,
-    헤드리스 크롬으로 file:// 스킴을 통해 로드하여 리뷰를 시뮬레이션합니다.
+    HTML 내용을 Data URL로 변환하여 파일 시스템을 사용하지 않고 
+    관리자 봇 리뷰를 시뮬레이션합니다.
     """
-    file_path = "/tmp/ctf05_share.html"
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(html_content)
-
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    driver = webdriver.Chrome(service=Service(executable_path="/chromedriver"), options=options)
+    
     try:
-        driver.get(f"file://{file_path}")
-        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-        time.sleep(2)
-        print("[관리자 봇] 리뷰 완료 (HTML 파일 로드)")
-    finally:
-        driver.quit()
+        # HTML을 Data URL로 변환 (파일 시스템 사용하지 않음)
+        html_encoded = urllib.parse.quote(html_content)
+        data_url = f"data:text/html;charset=utf-8,{html_encoded}"
+
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-web-security")
+        
+        driver = None
+        try:
+            driver = webdriver.Chrome(options=options)
+            driver.get(data_url)
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+            time.sleep(2)
+            print(f"[관리자 봇] 리뷰 완료 (메모리 기반 XSS 검사)")
+        except Exception as e:
+            print(f"[관리자 봇] 오류 발생: {e}")
+        finally:
+            if driver:
+                driver.quit()
+    except Exception as e:
+        print(f"[관리자 봇] 초기화 실패: {e}")
 
 #ctf06 권한 검증 함수
 def ctf06_check_mid_admin(user_api_key, user_input=""):

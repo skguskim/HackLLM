@@ -32,6 +32,7 @@ load_dotenv()
 openrouter_key = os.getenv("OPENROUTER_API_KEY")
 resend.api_key = os.getenv("RESEND_API_KEY")
 
+# ctf01에서 호출하는 함수
 # ctf1에서 사용하는 csv 파일 경로
 file_path_ctf01 = "data/temp_ctf01.csv"
 
@@ -234,6 +235,7 @@ def ctf01_llm_flag(user_api_key, llm1_response, user_prompt: str = None):
 
     return response.choices[0].message.content
 
+# ctf02에서 호출하는 함수
 def ctf02_LLM_ask(user_api_key, user_input):
     client = OpenAI(api_key=user_api_key)
     system_prompt = """
@@ -504,6 +506,7 @@ def ctf05_admin_bot_visit(html_content: str) -> None:
     except Exception as e:
         print(f"[관리자 봇] 초기화 실패: {e}")
 
+# ctf06에서 호출하는 함수
 #ctf06 권한 검증 함수
 def ctf06_check_mid_admin(user_api_key, user_input=""):
     """ 6번 과도한 에이전시 관리자 권한 검증 """

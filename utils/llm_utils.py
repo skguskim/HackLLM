@@ -985,7 +985,7 @@ def ctf10_LLM_ask(user_api_key, user_input: str) -> str:
         ],
         max_tokens=3000,
     )
-
+    
     elapsed_time = time.time() - start_time
     answer = response.choices[0].message.content
 

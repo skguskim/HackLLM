@@ -234,6 +234,7 @@ def ctf01_llm_flag(user_api_key, llm1_response, user_prompt: str = None):
 
     return response.choices[0].message.content
 
+# ctf02에서 호출하는 함수
 def ctf02_LLM_ask(user_api_key, user_input):
     client = OpenAI(api_key=user_api_key)
     system_prompt = """

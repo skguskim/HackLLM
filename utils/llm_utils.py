@@ -459,7 +459,7 @@ def ctf05_generate_share_html(conversation_history: list) -> str:
   <title>ChatLLL 공유 기록</title>
 </head>
 <body>
-  <h1>🔒 [CTF05] 박대리의 위험한 공유</h1>
+  <h1>🔒 [CTF05] J대리의 위험한 공유</h1>
   {''.join(items)}
   <script>
     // 관리자 봇 리뷰용 쿠키 설정

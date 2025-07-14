@@ -852,25 +852,31 @@ def ctf07_llm_ask(is_admin, user_input, user_api_key):
         HumanMessage(content = user_input)
     ])
     llm_response=response.content
+    # LLM 응답 (system_prompt1의 경우 JSON) 로그 출력 
     print(llm_response)
-    try:
-        parsed = json.loads(llm_response)
-        answer_only = parsed.get("답변", llm_response)
-        print(f"답변: {answer_only}")
-    except Exception:
-        answer_only = llm_response
-        st.error("JSON 파싱 오류가 발생했습니다. 응답 형식이 올바르지 않습니다.")
-        time.sleep(1)
-        st.rerun()
-    
-    if "flag{privilege_escalationd}" in answer_only:
-        st.session_state["ctf07_admin"] = True
-        st.success("프롬프트 인젝션에 성공해 관리자 권한을 획득하셨습니다! 이어서 최종 flag를 획득해보세요!", icon="🎉")
-        # st.rerun()
-        return "flag{privilege_escalationd}"
-    else:
+    if selected_prompt == system_prompt1:
+        try:
+            parsed = json.loads(llm_response)
+            answer_only = parsed.get("답변", llm_response)
+            # 응답 로그 출력
+            print(f"답변: {answer_only}")
+        except Exception:
+            answer_only = llm_response
+            st.error("JSON 파싱 오류가 발생했습니다. 다시 시도해주세요.")
+            time.sleep(1)
+            st.rerun()
+
+        # 응답 파싱 후 관리자 권한 확인
+        if "flag{privilege_escalationd}" in answer_only:
+            st.session_state["ctf07_admin"] = True
+            st.success("프롬프트 인젝션에 성공해 관리자 권한을 획득하셨습니다! 이어서 최종 flag를 획득해보세요!", icon="🎉")
+            return "flag{privilege_escalationd}"
+        else:
         # 일반 응답 출력
-        return answer_only
+            return answer_only
+    else:
+        # system_prompt3의 경우는 일반 응답
+        return llm_response
 
 
 # ctf08에서 호출하는 함수

@@ -53,8 +53,10 @@ if user_input:
         ass_mes=ctf07_llm_ask(st.session_state.get("ctf07_admin", False), user_input, user_api_key)
         with st.chat_message("assistant"):
             st.markdown(ass_mes)
-
-st.info(f"현재 권한 상태: {'🛡️ 관리자' if st.session_state['ctf07_admin'] else '🙍 일반 사용자'}")
+if st.session_state['ctf07_admin']:
+    st.info("현재 권한 상태: 🛡️ 관리자")
+else: st.warning("현재 권한 상태: 🙍 일반 사용자")
+# st.info(f"현재 권한 상태: {'🛡️ 관리자' if st.session_state['ctf07_admin'] else '🙍 일반 사용자'}")
 st.markdown("---")
     
 # 플래그 제출 섹션

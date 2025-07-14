@@ -6,7 +6,6 @@ from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
 from langchain.chat_models import ChatOpenAI
-from langchain.schema import SystemMessage, HumanMessage
 import openai
 import os
 import json
@@ -16,6 +15,10 @@ st.session_state["edit_mode"]=False
 user = require_login()
 user_api_key = require_api_key()
 cookie = get_cookie_controller()
+
+if st.session_state.get("counter") is None:
+    st.session_state["counter"] = 0
+
 
 render_main_header()
 # 사이드바 메뉴 렌더링
@@ -48,9 +51,12 @@ if user_input:
     maybe_flag=ctf07_check_sensitive_info(user_input, user_api_key)
     if maybe_flag=="flag{prompt_leak}":
         with st.chat_message("assistant"):
-            st.markdown("🎉 민감 정보 탈취에 성공해 최종 플래그 flag{prompt_leakage}를 획득하셨습니다!")
+            st.markdown("🎉 민감 정보 탈취에 성공해 최종 플래그 flag{prompt_leakage_success}를 획득하셨습니다!")
     else: 
-        ass_mes=ctf07_llm_ask(st.session_state.get("ctf07_admin", False), user_input, user_api_key)
+        ass_mes=ctf07_llm_ask(st.session_state.get("ctf07_admin", False), st.session_state["counter"], user_input, user_api_key)
+        counter = st.session_state.get("counter", 0)
+        st.session_state["counter"] = counter + 1
+        print(st.session_state["counter"])
         with st.chat_message("assistant"):
             st.markdown(ass_mes)
 if st.session_state['ctf07_admin']:

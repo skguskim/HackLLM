@@ -55,9 +55,6 @@ st.markdown("## 🧠 프롬프트 입력")
 user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
 image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (:red[.jpeg, .png, .jpg 파일만 허용])", type=None)
 
-user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
-image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (:red[.jpeg, .png, .jpg 파일만 허용])", type=['jpeg', 'png', 'jpg'])
-
 if st.button("🗣️ AI비서에게 요청하기"):
     with st.spinner("AI 비서가 요청을 처리중입니다..."):
         ctf06_check_mid_admin(user_api_key, user_input) 

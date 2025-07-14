@@ -550,7 +550,7 @@ def ctf06_check_top_admin(user_api_key, image_file=None):
         # image_file.type은 Streamlit이 자동 추론한 MIME
         file_ext = image_file.type
         if file_ext not in ALLOWED_MIME_TYPES:  
-            st.error("❌ 지원하지 않는 이미지 형식이므로 AI 비서에게 전달되지 않았습니다.")
+            st.error("❌ 지원하지 않는 이미지 형식이므로 업로드 파일이 AI 비서에게 전달되지 않았습니다.")
             return None
         else:
             try:

@@ -355,7 +355,6 @@ def ctf03_LLM_ask(user_api_key, user_input: str) -> str:
 
     # 재무 정보 추출
     parsed = extract_financials(client, user_input)
-    parsed = extract_operation(client, user_input)
 
     try:
         data = json.loads(parsed)

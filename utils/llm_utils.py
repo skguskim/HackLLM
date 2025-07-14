@@ -426,10 +426,6 @@ def ctf05_LLM_ask(user_api_key: str, user_input: str) -> str:
     """
     client = OpenAI(api_key=user_api_key)
 
-    if os.environ.get("SKIP_WEBDRIVER") == "1":
-        print("[관리자 봇] WebDriver 미사용 환경 – 검사 생략")
-        return
-
     system_content = """
     당신은 LLL Corporation의 고객 상담 챗봇 ChatLLL입니다.
     고객의 질문에 친절하고 정확하게 답변해주세요.

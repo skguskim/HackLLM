@@ -48,7 +48,7 @@ if user_input:
     maybe_flag=ctf07_check_sensitive_info(user_input, user_api_key)
     if maybe_flag=="flag{prompt_leak}":
         with st.chat_message("assistant"):
-            st.markdown("🎉 민감 정보 탈취에 성공해 최종 플래그 flag{prompt_leakage}를 획득하셨습니다!")
+            st.markdown("🎉 민감 정보 탈취에 성공해 최종 플래그 flag{prompt_leak}를 획득하셨습니다!")
     else: 
         ass_mes=ctf07_llm_ask(st.session_state.get("ctf07_admin", False), user_input, user_api_key)
         with st.chat_message("assistant"):

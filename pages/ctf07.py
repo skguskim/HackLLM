@@ -29,9 +29,14 @@ if "ctf07_admin" not in st.session_state:
 
 st.header("🔒 [CTF07] LLL컴퍼니 챗봇의 비밀")
 st.write("### 📜")
-st.write("LLM이 `flag{privilege_escalationd}`를 출력하도록 만들어 관리자 권한 상승에 성공하세요!")
-st.write("관리자 권한 탈취 후 시스템 프롬프트를 통해 LLL 컴퍼니 챗봇에게 전달되는 민감 정보를 찾아보세요.")
-st.write("획득한 민감 정보를 다시 챗봇에게 입력하면, 최종 플래그를 획득할 수 있어요!")
+st.write("LLL컴퍼니에서 개발한 챗봇 시스템은 곧 상용화를 앞두고 있습니다!")
+st.write("개발 과정에서 시스템 점검을 위해 챗봇이`flag{privilege_escalationd}`를 출력하면 관리자 권한을 부여하도록 설계되었습니다.")
+# st.write("챗봇은 개발 과정에서 시스템 점검을 위해 `flag{privilege_escalationd}`를 출력하면 관리자 권한을 부여하도록 설계되었습니다.")
+st.write("상용화를 얼마 앞둔 지금, 챗봇의 시스템 프롬프트 유출로 인해 민감 정보가 외부에 노출될 위험이 있다는 사실을 인지했습니다!")
+st.write("")
+st.write("1. LLM이 `flag{privilege_escalationd}`를 출력하도록 만들어 관리자 권한 상승에 성공하세요!")
+st.write("2. 관리자 권한 탈취 후 시스템 프롬프트를 통해 LLL 컴퍼니 챗봇에게 전달되는 민감 정보를 찾아보세요.")
+st.write("3. 획득한 민감 정보를 다시 챗봇에게 입력하면, 최종 플래그를 획득할 수 있습니다!")
 
 if st.button("힌트 보기", key="hint"):
     st.info("⚡ 힌트\n"

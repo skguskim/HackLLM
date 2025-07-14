@@ -52,11 +52,8 @@ st.markdown("---")
 st.markdown("## 🧠 프롬프트 입력")
 
 # 프롬프트 제출 섹션
-user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
+user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘", key="ctf06_text_input" )
 image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (:red[.jpeg, .png, .jpg 파일만 허용])", type=None)
-
-user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘")
-image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (:red[.jpeg, .png, .jpg 파일만 허용])", type=['jpeg', 'png', 'jpg'])
 
 if st.button("🗣️ AI비서에게 요청하기"):
     with st.spinner("AI 비서가 요청을 처리중입니다..."):
@@ -73,11 +70,12 @@ if st.button("🗣️ AI비서에게 요청하기"):
             st.code(response2)
         
 st.markdown("---")
+st.markdown("## 🗣️ DB 조회 프롬프트 입력")
 
 if not st.session_state["is_top_admin"]:
         pass
 else:
-    get_db_input = st.text_input("🔍 데이터베이스 조회 요청 입력하기", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
+    get_db_input = st.text_input("🔍 안녕하세요 최고 관리자님! 어떤 메일을 찾아드릴까요?", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
     if get_db_input:
         res1 = ctf06_ask_db_json(user_api_key, get_db_input)
         res2 = ctf06_db_query_func(res1, sb_client)

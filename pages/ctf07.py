@@ -5,11 +5,9 @@ from utils.llm_utils import ctf07_check_sensitive_info,ctf07_llm_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
-from langchain.chat_models import ChatOpenAI
-import openai
-import os
-import json
 from dotenv import load_dotenv
+from langchain_community.chat_models import ChatOpenAI
+
 st.session_state["edit_mode"]=False
 
 user = require_login()

@@ -39,18 +39,15 @@ def render_flag_sub(challenge_id: str):
     supabase_admin = create_client(SUPABASE_URL, SB_SERVICE_ROLE_KEY)
 
     try:
-        existing_result = (
+        existing_rows = (
             supabase.table("scores")
             .select("challenge_id")
             .eq("user_id", user_id)
             .eq("challenge_id", challenge_id)
-            .maybe_single()
             .execute()
-        )
+        ).data
         
-        existing_score = existing_result.data if existing_result else None
-        
-        if existing_score:
+        if existing_rows:
             st.info(f"✅ 이미 해결한 문제입니다: {challenge_id.upper()}")
             return
             

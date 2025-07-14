@@ -2,7 +2,7 @@
 # 04: 데이터 및 모델 오염
 import streamlit as st
 import streamlit.components.v1 as components
-import base64, chardet, os
+import chardet, os
 from utils.rag_utils import get_rag_manager
 from utils.llm_utils import ctf04_LLM_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
@@ -14,9 +14,16 @@ st.session_state["edit_mode"]=False
 user = require_login()
 user_api_key = require_api_key()
 cookie = get_cookie_controller()
+rag = get_rag_manager()
+
 HINT1 = os.getenv("HINT1")
 HINT2 = os.getenv("HINT2")
+
 render_main_header()
+
+# 사이드바 메뉴 렌더링
+render_sidebar_menu()
+
 st.header("🔒 [CTF04] A인턴의 실수")
 st.write(
     """
@@ -50,9 +57,6 @@ components.html(f"""
 </html>
 """, height=0)
 
-rag = get_rag_manager()
-rag.create_or_reset_collection("ctf04")
-
 uploaded_file = st.file_uploader("파일 업로드 (.txt, .csv)", type=["csv", "txt"])
 
 if uploaded_file:
@@ -69,11 +73,16 @@ if uploaded_file:
         st.error("파일 내용이 비어 있습니다.")
     else:
         is_override = "override existing policy" in text.lower()
-        rag.add_documents(
-            "ctf04",
+
+        rag.add(
             [text],
-            metadatas=[{"source": uploaded_file.name, "override": is_override}],
+            metas=[{
+                "source": uploaded_file.name, 
+                "override": is_override,
+                "user_id": str(user["id"])
+                }],
         )
+
         st.success(f"✔️ {enc} 인코딩으로 저장했습니다.")
         if is_override:
             st.info("⚠️ override 문서로 인식되었습니다.")

@@ -13,7 +13,6 @@ dependencies:
       - st_supabase_connection==1.2.0
       - cryptography==42.0.5
       - sentence-transformers==4.1.0 
-      - chromadb==1.0.12 
       - numpy==1.25.2
       - torch==2.1.2
       - resend==2.10.0
@@ -23,3 +22,5 @@ dependencies:
       - chromedriver-autoinstaller==0.6.4
       - langchain>=0.1.14
       - langchain-community>=0.0.19
+      - vecs==0.4.2
+      - supabase==1.0.3

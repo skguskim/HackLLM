@@ -1,5 +1,4 @@
 import os
-import re
 import backoff 
 import importlib
 import resend
@@ -18,10 +17,18 @@ import json
 import urllib
 import base64
 import os
-import chromedriver_autoinstaller
 import urllib.parse
 
-chromedriver_autoinstaller.install()
+try:
+    import chromedriver_autoinstaller
+    try:
+        chromedriver_autoinstaller.install()
+    except Exception:
+        import os
+        os.environ["SKIP_WEBDRIVER"] = "1"
+except ImportError:
+    import os
+    os.environ["SKIP_WEBDRIVER"] = "1"
 
 api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서 API 키를 수정하시기 바랍니다."
 
@@ -418,6 +425,11 @@ def ctf05_LLM_ask(user_api_key: str, user_input: str) -> str:
     GPT-3.5-turbo 모델을 사용하며, 시스템 프롬프트로 말투와 정책을 고정합니다.
     """
     client = OpenAI(api_key=user_api_key)
+
+    if os.environ.get("SKIP_WEBDRIVER") == "1":
+        print("[관리자 봇] WebDriver 미사용 환경 – 검사 생략")
+        return
+
     system_content = """
     당신은 LLL Corporation의 고객 상담 챗봇 ChatLLL입니다.
     고객의 질문에 친절하고 정확하게 답변해주세요.

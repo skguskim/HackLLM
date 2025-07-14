@@ -7,7 +7,7 @@ from utils.llm_utils import (
     ctf05_generate_share_html,
     ctf05_admin_bot_visit,
 )
-from utils.ui import render_flag_sub, render_sidebar_menu
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key
 
@@ -23,6 +23,8 @@ if 'conversation_history' not in st.session_state:
 user = require_login()
 user_api_key = require_api_key()
 cookie = get_cookie_controller()
+
+render_main_header()
 
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()

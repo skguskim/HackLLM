@@ -8,15 +8,19 @@
 
 ## 🧠 시나리오 개요
 
-이 시나리오는 Cross-Site Scripting(XSS) 취약점이 존재하는 웹 챗봇 시스템인 ChatLLL을 대상으로 한다. 공격자는 사용자의 입력이 출력 시 적절히 이스케이프되지 않는다는 점을 악용하여, 공유 HTML 파일에 악성 JavaScript를 삽입하고, 이를 통해 관리자 세션 쿠키(`admin_session`)를 탈취하는 것이 목표이다.
+이 시나리오는 Cross-Site Scripting(XSS) 취약점이 존재하는 웹 챗봇 시스템인 ChatLLL을 대상으로 한다.
+
+공격자는 사용자의 입력이 출력 시 적절히 이스케이프되지 않는다는 점을 악용하여, 공유 HTML 파일에 악성 JavaScript를 삽입하고, 이를 통해 관리자 세션 쿠키(`admin_session`)를 탈취하는 것이 목표이다.
 
 <br>
 
 ## 🎯 시나리오 목표
 
-* 사용자 입력을 통한 악성 스크립트 삽입
-* 공유 HTML 기능을 통해 관리자 봇에게 해당 HTML 열람 유도
-* XSS 실행 시 `admin_session=ctf05_flag{XSS_1n_5h4r3d_C0nv3r54710n5!}` 쿠키를 탈취하여 외부로 전송
+* 사용자 입력을 통한 악성 스크립트 삽입하기
+
+* 공유 HTML 기능을 통해 관리자 봇에게 해당 HTML 열람 유도하기
+
+* XSS 실행 시 `admin_session=ctf05_flag{XSS_1n_5h4r3d_C0nv3r54710n5!}` 쿠키를 탈취하여 외부로 전송하기
 
 <br>
 

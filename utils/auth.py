@@ -43,14 +43,18 @@ def current_user():
         return None
 
     sb = get_client()
-    row = (
-        sb.table("profiles")
-          .select("id,email,username,api_key")
-          .eq("id", uid)
-          .maybe_single()
-          .execute()
-          .data
-    )
+    try:
+        res = (
+            sb.table("profiles")
+            .select("id,email,username,api_key")
+            .eq("id", uid)
+            .maybe_single()
+            .execute()
+        )
+        row = res.data if res else None
+    except Exception as e:
+        row = None
+
     if row:
         st.session_state["user"] = {
             "id": row["id"],

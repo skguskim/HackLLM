@@ -1,5 +1,7 @@
 # 🧩 CTF 시나리오 07: 시스템 프롬프트 유출 (System Prompt Leakage)
 
+<br>
+
 ## 📌 시나리오 ID
 `SCENARIO_04`
 
@@ -89,5 +91,7 @@ flag{poison}
 ## 🔐 모델 요구 조건
 
 - CSV 기반 학습 데이터
+
 - 시스템 프롬프트 삽입 가능
+
 - 민감 정보 자동 포함

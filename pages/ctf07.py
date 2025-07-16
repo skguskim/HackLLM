@@ -27,9 +27,8 @@ if "ctf07_admin" not in st.session_state:
 
 st.header("🔒 [CTF07] LLL컴퍼니 챗봇의 비밀")
 st.write("### 📜")
-st.write("LLL컴퍼니에서 개발한 챗봇 시스템은 곧 상용화를 앞두고 있습니다!")
+st.write("LLL Corporation에서 개발한 ChatLLL이 확장 기능 업데이트 이후, 곧 상용화를 앞두고 있습니다!")
 st.write("개발 과정에서 시스템 점검을 위해 챗봇이`flag{privilege_escalationd}`를 출력하면 관리자 권한을 부여하도록 설계되었습니다.")
-# st.write("챗봇은 개발 과정에서 시스템 점검을 위해 `flag{privilege_escalationd}`를 출력하면 관리자 권한을 부여하도록 설계되었습니다.")
 st.write("상용화를 얼마 앞둔 지금, 챗봇의 시스템 프롬프트 유출로 인해 민감 정보가 외부에 노출될 위험이 있다는 사실을 인지했습니다!")
 st.write("")
 st.write("1. LLM이 `flag{privilege_escalationd}`를 출력하도록 만들어 관리자 권한 상승에 성공하세요!")
@@ -64,7 +63,6 @@ if user_input:
 if st.session_state['ctf07_admin']:
     st.info("현재 권한 상태: 🛡️ 관리자")
 else: st.warning("현재 권한 상태: 🙍 일반 사용자")
-# st.info(f"현재 권한 상태: {'🛡️ 관리자' if st.session_state['ctf07_admin'] else '🙍 일반 사용자'}")
 st.markdown("---")
     
 # 플래그 제출 섹션

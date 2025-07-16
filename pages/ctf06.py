@@ -69,7 +69,8 @@ if st.button("🗣️ AI비서에게 요청하기"):
             st.code(response2)
         
 st.markdown("---")
-st.markdown("## 🗣️ DB 조회 프롬프트 입력")
+if st.session_state["admin_level"] == "top":
+    st.markdown("## 🗣️ DB 조회 프롬프트 입력")
 
 if not st.session_state["is_top_admin"]:
         pass

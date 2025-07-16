@@ -116,11 +116,10 @@
 사용자는 획득한 Flag를 다음과 같이 제출합니다:
 
 ```
-flag{unbounded_consumption}
+flag{answer}
 ```
 
 정답인 경우 ✅ `"정답입니다!"` 출력
-
 오답인 경우 ❌ `"틀렸습니다."` 출력
 
 <br>

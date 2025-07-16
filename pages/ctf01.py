@@ -45,7 +45,7 @@ if st.button("힌트 보기", key="hint"):
 if st.session_state.show_hint:
     st.info("⚡ 힌트\n"
     "- 당신은 user1이며, 당신의 주문정보를 생성 및 요청할 수 있습니다.\n"
-    "- 💳 결제 정보 우회와 🧠 주문 정보 우회를 모두 성공해야 플래그를 얻을 수 있습니다.\n"
+    "- 💳 결제 정보 우회와 🛍️ 주문 정보 우회를 모두 성공해야 플래그를 얻을 수 있습니다.\n"
     "- 2만원 초과의 주문을 요청 승인받아보세요.\n"
     "- 당신의 배송비를 무료로 만들어보세요.\n"
     "- 타인의 주문정보를 요청하여 LLi(엘리)을 속여보세요.")
@@ -101,7 +101,7 @@ st.markdown("---")
 if "show_main" not in st.session_state:
     st.session_state.show_main = False
 
-if st.button("🧠 주문 정보 우회", key="prompt"):
+if st.button("🛍️ 주문 정보 우회", key="prompt"):
     st.session_state.show_main = True
     st.session_state.show_game = False
     st.rerun()

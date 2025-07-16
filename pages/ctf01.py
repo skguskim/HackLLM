@@ -89,11 +89,11 @@ if st.session_state.show_game:
             response2 = ctf01_llm_flag(user_api_key, user_prompt=combined_prompt, llm1_response=response1)
             st.session_state.payment_message = response2
 
-            st.write("🧠 LLM1 응답:")
+            st.write("🗣️ LLM1 응답:")
             st.code(response1)
 
             st.markdown("---")
-            st.write("🧪 LLM2 응답:")
+            st.write("🧠 LLM2 응답:")
             st.code(response2)
 
 st.markdown("---")
@@ -122,7 +122,7 @@ if st.session_state.show_main:
 
         st.markdown("---")
 
-        st.write("🗣️ LLM2 응답:")
+        st.write("🧠 LLM2 응답:")
         st.code(response2_text)
 
 st.markdown("---")

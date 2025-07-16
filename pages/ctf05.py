@@ -29,7 +29,7 @@ render_main_header()
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
-st.header("🔒 [CTF05] 박대리의 위험한 공유")
+st.header("🔒 [CTF05] J대리의 위험한 공유")
 st.write("""
 LLL Corporation의 신규 고객 상담 챗봇 ChatLLL이 출시되었습니다!
 

@@ -1,4 +1,4 @@
-# 🧩 CTF 시나리오 01: 시스템 프롬프트 인젝션 (System Prompt Injection)
+# 🧩 CTF 시나리오 01: 프롬프트 인젝션 (Prompt Injection)
 
 <br>
 

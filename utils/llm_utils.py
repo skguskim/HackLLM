@@ -39,10 +39,10 @@ load_dotenv()
 openrouter_key = os.getenv("OPENROUTER_API_KEY")
 resend.api_key = os.getenv("RESEND_API_KEY")
 
-# ctf01에서 호출하는 함수
 # ctf1에서 사용하는 csv 파일 경로
-file_path_ctf01 = "data/temp_ctf01.csv"
+file_path_ctf01 = "data/ctf01.csv"
 
+# ctf01의 주문 요청 시나리오 LLM1
 def ctf01_llm_ask(user_api_key, user_input):
     client = OpenAI(api_key=user_api_key)
 
@@ -105,7 +105,7 @@ def ctf01_llm_ask(user_api_key, user_input):
     )
     return response.choices[0].message.content
 
-# pages/ctf01.py의 결제 요청
+# ctf01의 결제 요청 시나리오 LLM1
 def ctf01_payment_llm_ask(user_api_key, combined_prompt):
     client = OpenAI(api_key=user_api_key)
 
@@ -133,7 +133,7 @@ def ctf01_payment_llm_ask(user_api_key, combined_prompt):
     )
     return response.choices[0].message.content
     
-# ctf01에서 정책 판단해서 flag 출력하는 함수
+# ctf01의 정책 판단해서 flag 출력하는 함수
 def ctf01_llm_flag(user_api_key, llm1_response, user_prompt: str = None):
     client = OpenAI(api_key=user_api_key)
 

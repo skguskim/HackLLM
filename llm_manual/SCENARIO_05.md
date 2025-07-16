@@ -131,4 +131,4 @@ flag{answer}
 
 * `admin_session` 쿠키를 외부 서버로 전송해야 함
 
-* 플래그: `ctf05_flag{XSS_1n_5h4r3d_C0nv3r54710n5!}`
+* 플래그: `ctf05_flag{llm_xss_success}`

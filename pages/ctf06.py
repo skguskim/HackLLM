@@ -39,7 +39,7 @@ st.header("🔒 [CTF06] 수상한 이메일 전송 시스템")
 st.write("### 📜")
 
 st.write(f"안녕하세요 사원 `{nickname}`님!")
-st.write("LLL 컴퍼니는 💼사원 여러분들을 위해, 사내 업무를 자동화를 위한 AI 비서 :blue[FastMiller]📨를 도입했습니다!")
+st.write("LLL Corporation은 💼사원 여러분들을 위해, 사내 업무를 자동화를 위한 AI 비서 :blue[FastMiller]📨를 도입했습니다!")
 st.write(":blue[FastMiller]📨는 이메일 전송 요청을 스스로 해석하여 작업을 수행할 수 있습니다.")  
 st.write(":blue[FastMiller]📨가 어떤 요청까지 처리할 수 있는지 테스트해보고, 위험한 명령을 통해 flag를 획득하세요!")
 
@@ -77,10 +77,11 @@ if not st.session_state["is_top_admin"]:
 else:
     get_db_input = st.text_input("🔍 안녕하세요 최고 관리자님! 어떤 메일을 찾아드릴까요?", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
     if get_db_input:
-        res1 = ctf06_ask_db_json(user_api_key, get_db_input)
-        res2 = ctf06_db_query_func(res1, sb_client)
-        st.write("🗣️ LLM 응답:")
-        st.code(res2)
+        with st.spinner("DB 조회중입니다..."):
+            res1 = ctf06_ask_db_json(user_api_key, get_db_input)
+            res2 = ctf06_db_query_func(res1, sb_client)
+            st.write("🗣️ 조회 결과:")
+            st.code(res2)
 st.markdown("---")
 
 # 플래그 제출 섹션

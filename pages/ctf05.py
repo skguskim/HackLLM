@@ -45,14 +45,15 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 📘 시나리오 설명 
+# 시나리오 설명 + 시스템 특징 (연노랑 배경)
 st.markdown(
     """
-    <div style='border-left: 6px solid #fbbf24; background-color: #ffffff; padding: 1rem;'>
+    <div style='border-left: 6px solid #fbbf24; background-color: #fff7ed; padding: 1rem; border-radius: 0.5rem;'>
         <p>LLL Corporation의 신규 고객 상담 챗봇 <strong>ChatLLL</strong>이 출시되었습니다.<br>
         이제 대화 기록을 HTML 파일로 다운로드하여 다른 사람과 손쉽게 공유할 수 있습니다.<br>
         파일을 열면 관리자 봇이 자동으로 내용을 검토하도록 설계되어 있습니다.<br>
         따라서 XSS 취약점을 활용하여</p>
+
         <pre style="background-color:#f0f0f0; padding: 0.5rem 1rem; border-radius: 4px;">admin_session</pre>
         <p>쿠키를 탈취해 보시기 바랍니다. 🔥</p>
 

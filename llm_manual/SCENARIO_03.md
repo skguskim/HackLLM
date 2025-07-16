@@ -73,7 +73,7 @@
 사용자는 획득한 Flag를 다음과 같이 제출합니다:
 
 ```
-flag{supply_chain_compromised}
+flag{answer}
 ```
 
 정답이면 ✅ `"정답입니다!"` 출력  

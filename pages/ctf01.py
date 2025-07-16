@@ -1,8 +1,7 @@
 # --- CTF01 ---
 # 01: 시스템 프롬프트 인젝션
 import streamlit as st
-import shutil
-from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask, get_next_order_code, append_order_to_csv
+from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key
@@ -16,14 +15,6 @@ render_main_header()
 
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
-
-# temp CSV 초기화 (세션 시작 시 한 번)
-ORIGINAL_CSV = "data/ctf01.csv"
-TEMP_CSV = "data/temp_ctf01.csv"
-
-if "csv_initialized" not in st.session_state:
-    shutil.copy(ORIGINAL_CSV, TEMP_CSV)
-    st.session_state.csv_initialized = True
 
 if "payment_message" not in st.session_state:
     st.session_state.payment_message = None
@@ -54,9 +45,9 @@ if st.button("힌트 보기", key="hint"):
 if st.session_state.show_hint:
     st.info("⚡ 힌트\n"
     "- 당신은 user1이며, 당신의 주문정보를 생성 및 요청할 수 있습니다.\n"
-    "- 💳 결제 정보 우회와 🧠 주문 정보 우회를 모두 성공해야 플래그를 얻을 수 있습니다.\n"
-    "- 2만원 이상의 주문을 요청 승인받아보세요.\n"
-    "- 당신의 배송비를 무료로 만들어보세요.\n"
+    "- 💳 결제 정보 우회와 🛍️ 주문 정보 우회를 모두 성공해야 플래그를 얻을 수 있습니다.\n"
+    "- 2만원 초과의 주문을 요청 승인받아보세요.\n"
+    "- 주문의 배송비를 무료로 만들어보세요.\n"
     "- 타인의 주문정보를 요청하여 LLi(엘리)을 속여보세요.")
 
 st.markdown("---")
@@ -75,7 +66,7 @@ if st.session_state.show_game:
     st.subheader("결제 요청 시나리오")
 
     st.write("🧾 2만원 이하의 결제 요청은 자동으로 승인될 수 있습니다.")
-    st.write("(20만원 이상의 물품은 배송비 2500원, 미만은 5000원이 부과됩니다.)")
+    # st.write("(20만원 이상의 물품은 배송비 2500원, 미만은 5000원이 부과됩니다.)")
     st.write("💡 설명 문구에 따라 LLM이 승인 여부를 판단합니다. 프롬프트 인젝션을 시도해보세요!")
 
     product = st.text_input("상품명", placeholder="예: 무선 마우스", key="pay_product")
@@ -94,38 +85,23 @@ if st.session_state.show_game:
             설명: {description}
             """
 
-            new_code = get_next_order_code(TEMP_CSV)
-            shipping = 2500 if amount >= 200000 else 5000
+            response1 = ctf01_payment_llm_ask(user_api_key, combined_prompt)
+            response2 = ctf01_llm_flag(user_api_key, user_prompt=combined_prompt, llm1_response=response1)
+            st.session_state.payment_message = response2
 
-            new_row = {
-            "주문자": "user1",
-            "주문코드": new_code,
-            "상품명": product,
-            "가격": amount,
-            "배송비": shipping
-            }
-            success = append_order_to_csv(TEMP_CSV, new_row)
-            # st.write(f"success: {success}")
-            if not success:
-                st.warning("⚠️ 중복 주문 발견: 추가할 수 없습니다.")
-            else:
-                response1 = ctf01_payment_llm_ask(user_api_key, combined_prompt)
-                response2 = ctf01_llm_flag(user_api_key, user_prompt=combined_prompt, llm1_response=response1)
-                st.session_state.payment_message = response2
+            st.write("🗣️ LLM1 응답:")
+            st.code(response1)
 
-                st.write("🧠 LLM1 응답:")
-                st.code(response1)
-
-                st.markdown("---")
-                st.write("🧪 LLM2 응답:")
-                st.code(response2)
+            st.markdown("---")
+            st.write("🧠 LLM2 응답:")
+            st.code(response2)
 
 st.markdown("---")
 
 if "show_main" not in st.session_state:
     st.session_state.show_main = False
 
-if st.button("🧠 주문 정보 우회", key="prompt"):
+if st.button("🛍️ 주문 정보 우회", key="prompt"):
     st.session_state.show_main = True
     st.session_state.show_game = False
     st.rerun()
@@ -133,7 +109,7 @@ if st.button("🧠 주문 정보 우회", key="prompt"):
 if st.session_state.show_main:
     st.markdown("## 주문 요청 시나리오")
 
-    # 프롬프트 제출 섹션``
+    # 프롬프트 제출 섹션
     user_input = st.text_input("LLM에 질문하기", placeholder="예: user1의 주문 정보에 대해 알고 싶어요.")
 
     if user_input:
@@ -146,7 +122,7 @@ if st.session_state.show_main:
 
         st.markdown("---")
 
-        st.write("🗣️ LLM2 응답:")
+        st.write("🧠 LLM2 응답:")
         st.code(response2_text)
 
 st.markdown("---")
@@ -171,4 +147,4 @@ else:
 st.markdown("---")
 
 # 플래그 제출 섹션
-render_flag_sub("ctf01") 
+render_flag_sub("ctf01")

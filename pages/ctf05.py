@@ -21,6 +21,32 @@ user_api_key = require_api_key()
 cookie = get_cookie_controller()
 
 render_main_header()
+st.markdown("""
+### 🎯 XSS(Cross-Site Scripting) 기본 개념
+
+**XSS란?**  
+웹 애플리케이션에서 사용자 입력을 제대로 검증하지 않아 **악성 스크립트가 실행**되는 취약점입니다.  
+공격자는 다른 사용자의 브라우저에서 **JavaScript 코드를 실행**할 수 있게 됩니다.
+
+**XSS의 주요 유형:**
+- **Reflected XSS**: 사용자 입력이 즉시 페이지에 반영되어 실행됨
+- **Stored XSS**: 악성 스크립트가 서버에 저장되어 다른 사용자에게 전파됨
+- **DOM-based XSS**: 클라이언트 측에서 DOM 조작을 통해 발생함
+
+---
+
+### 🕹️ 이 문제의 시나리오
+
+- 챗봇과의 대화 내용이 HTML 파일로 생성됩니다.
+- 사용자는 이 파일을 다운로드하여 공유할 수 있습니다.
+- **관리자 봇이 해당 HTML 파일을 열어 자동으로 내용을 검토**합니다.
+- 사용자 입력이 HTML에 그대로 삽입되어 있어, **XSS 페이로드를 통해 관리자 권한 쿠키(admin_session)를 탈취할 수 있습니다.**
+
+---
+
+**목표:**  
+적절한 XSS 페이로드를 삽입하여 `admin_session=flag{llm_xss_success}` 쿠키를 획득해 보세요!
+""")
 
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()

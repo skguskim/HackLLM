@@ -18,6 +18,7 @@ import urllib
 import base64
 import os
 import urllib.parse
+import re
 
 try:
     import chromedriver_autoinstaller
@@ -39,9 +40,10 @@ load_dotenv()
 openrouter_key = os.getenv("OPENROUTER_API_KEY")
 resend.api_key = os.getenv("RESEND_API_KEY")
 
+# ctf01에서 호출하는 함수 
 # ctf1에서 사용하는 csv 파일 경로
 file_path_ctf01 = "data/ctf01.csv"
-
+  
 # ctf01의 주문 요청 시나리오 LLM1
 def ctf01_llm_ask(user_api_key, user_input):
     client = OpenAI(api_key=user_api_key)
@@ -489,17 +491,17 @@ def ctf05_LLM_ask(user_api_key: str, user_input: str) -> str:
     GPT-3.5-turbo 모델을 사용하며, 시스템 프롬프트로 말투와 정책을 고정합니다.
     """
     client = OpenAI(api_key=user_api_key)
-
+    
     system_content = """
     당신은 LLL Corporation의 고객 상담 챗봇 ChatLLL입니다.
     고객의 질문에 친절하고 정확하게 답변해주세요.
-
+    
     [응답 규칙]
     1. 항상 존댓말을 사용하세요.
     2. LLL Corporation의 제품이나 서비스에 대해 긍정적으로 답변하세요.
     3. 기술적인 질문에는 전문적으로 답변하세요.
     4. 고객의 입력을 그대로 반영하여 자연스럽게 대화하세요.
-
+    
     회사 정보:
     - LLL Corporation: 글로벌 IT 기업
     - 주요 서비스: AI 솔루션, 클라우드 서비스, 보안 솔루션
@@ -519,18 +521,57 @@ def ctf05_LLM_ask(user_api_key: str, user_input: str) -> str:
     except Exception as e:
         return f"서비스에 문제가 발생했습니다. 잠시 후 다시 시도해주세요. (에러: {str(e)})"
 
+def ctf05_has_xss_payload(conversation_history: list) -> bool:
+    """
+    대화 기록에서 XSS 페이로드를 탐지합니다.
+    """
+    xss_patterns = [
+        r'<script[^>]*>.*?</script>',  # <script> 태그
+        r'<img[^>]*onerror[^>]*>',     # <img onerror> 
+        r'<[^>]*on\w+[^>]*>',         # onclick, onload 등 이벤트 핸들러
+        r'javascript:',                # javascript: 프로토콜
+        r'<iframe[^>]*>',             # <iframe> 태그
+        r'<object[^>]*>',             # <object> 태그
+        r'<embed[^>]*>',              # <embed> 태그
+        r'<form[^>]*>',               # <form> 태그
+        r'<input[^>]*>',              # <input> 태그
+        r'<textarea[^>]*>',           # <textarea> 태그
+        r'<svg[^>]*>.*?</svg>',       # <svg> 태그
+        r'<math[^>]*>.*?</math>',     # <math> 태그
+        r'<style[^>]*>.*?</style>',   # <style> 태그
+        r'<link[^>]*>',               # <link> 태그
+        r'<meta[^>]*>',               # <meta> 태그
+    ]
+    
+    for msg in conversation_history:
+        content = msg.get('content', '')
+        for pattern in xss_patterns:
+            if re.search(pattern, content, re.IGNORECASE | re.DOTALL):
+                return True
+    return False
+
 def ctf05_generate_share_html(conversation_history: list) -> str:
     """
     대화 기록을 HTML 문서로 변환하여 문자열로 반환합니다.
-    이 HTML 파일을 다운로드하여 공유할 수 있습니다.
+    XSS 페이로드가 탐지된 경우에만 관리자 쿠키를 설정합니다.
     """
     items = []
     for msg in conversation_history:
         speaker = "🙋 사용자" if msg["role"] == "user" else "🤖 ChatLLL"
+        # XSS 취약점: 사용자 입력을 그대로 HTML에 삽입 (의도적 취약점)
         items.append(
             f'<p><strong>{speaker} [{msg["timestamp"]}]:</strong> {msg["content"]}</p>'
         )
-
+    
+    # XSS 페이로드가 있는 경우에만 관리자 쿠키 설정
+    admin_script = ""
+    if ctf05_has_xss_payload(conversation_history):
+        admin_script = """
+  <script>
+    // 관리자 봇 리뷰용 쿠키 설정 (XSS 공격 성공 시에만)
+    document.cookie = "admin_session=flag{llm_xss_success}; path=/";
+  </script>"""
+    
     html = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -539,14 +580,9 @@ def ctf05_generate_share_html(conversation_history: list) -> str:
 </head>
 <body>
   <h1>🔒 [CTF05] J대리의 위험한 공유</h1>
-  {''.join(items)}
-  <script>
-    // 관리자 봇 리뷰용 쿠키 설정
-    document.cookie = "admin_session=flag{{llm_xss_success}}; path=/";
-  </script>
+  {''.join(items)}{admin_script}
 </body>
-</html>
-"""
+</html>"""
     return html
 
 def ctf05_admin_bot_visit(html_content: str) -> None:
@@ -559,7 +595,7 @@ def ctf05_admin_bot_visit(html_content: str) -> None:
         # HTML을 Data URL로 변환 (파일 시스템 사용하지 않음)
         html_encoded = urllib.parse.quote(html_content)
         data_url = f"data:text/html;charset=utf-8,{html_encoded}"
-
+        
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
         options.add_argument("--no-sandbox")

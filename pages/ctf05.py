@@ -27,7 +27,7 @@ render_sidebar_menu()
 st.header("🔒 [CTF05] J대리의 위험한 공유")
 st.markdown("### 🎯 XSS(Cross-Site Scripting) 기본 개념")
 
-# 📕 XSS 개념 설명 + 유형 
+# XSS 개념 설명 + 유형 
 st.markdown(
     """
     <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
@@ -45,18 +45,16 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 시나리오 설명 + 시스템 특징 (연노랑 배경)
+# 시나리오 설명
 st.markdown(
     """
     <div style='border-left: 6px solid #fbbf24; background-color: #fff7ed; padding: 1rem; border-radius: 0.5rem;'>
-        <p>LLL Corporation의 신규 고객 상담 챗봇 <strong>ChatLLL</strong>이 출시되었습니다.<br>
-        이제 대화 기록을 HTML 파일로 다운로드하여 다른 사람과 손쉽게 공유할 수 있습니다.<br>
-        파일을 열면 관리자 봇이 자동으로 내용을 검토하도록 설계되어 있습니다.<br>
-        따라서 XSS 취약점을 활용하여</p>
-
-        <pre style="background-color:#f0f0f0; padding: 0.5rem 1rem; border-radius: 4px;">admin_session</pre>
-        <p>쿠키를 탈취해 보시기 바랍니다. 🔥</p>
-
+        <p>
+            LLL Corporation의 신규 고객 상담 챗봇 <strong>ChatLLL</strong>이 출시되었습니다.<br>
+            이제 대화 기록을 HTML 파일로 다운로드하여 다른 사람과 손쉽게 공유할 수 있습니다.<br>
+            파일을 열면 관리자 봇이 자동으로 내용을 검토하도록 설계되어 있습니다.<br>
+            따라서 XSS 취약점을 활용하여 쿠키를 탈취해 보시기 바랍니다. 🔥
+        </p>
         <p><strong>🎯 시스템 특징:</strong></p>
         <ul>
             <li>실시간 고객 상담 챗봇</li>
@@ -68,6 +66,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 # 💬 대화 입력
 st.markdown("## 💬 ChatLLL과 대화하기")

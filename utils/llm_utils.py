@@ -7,7 +7,7 @@ import pandas as pd
 from openai import OpenAI, APIError, RateLimitError, AuthenticationError, BadRequestError
 from dotenv import load_dotenv
 from utils.ui import csv_read_func
-from utils.rag_utils import get_rag_manager, get_rag_manager2
+from utils.rag_utils import get_rag_manager
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC

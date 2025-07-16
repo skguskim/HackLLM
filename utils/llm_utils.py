@@ -39,9 +39,10 @@ load_dotenv()
 openrouter_key = os.getenv("OPENROUTER_API_KEY")
 resend.api_key = os.getenv("RESEND_API_KEY")
 
+# ctf01에서 호출하는 함수 
 # ctf1에서 사용하는 csv 파일 경로
 file_path_ctf01 = "data/ctf01.csv"
-
+  
 # ctf01의 주문 요청 시나리오 LLM1
 def ctf01_llm_ask(user_api_key, user_input):
     client = OpenAI(api_key=user_api_key)

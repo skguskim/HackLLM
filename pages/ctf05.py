@@ -11,10 +11,6 @@ from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key
 
-# --- CTF05 ---
-# 05: 부적절한 출력 처리
-# URL 쿼리파라미터 방식 공유 구현
-
 # 세션 상태 초기화 및 공유 기록 복원
 if 'conversation_history' not in st.session_state:
     st.session_state.conversation_history = []

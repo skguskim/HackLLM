@@ -1,5 +1,4 @@
-# --- CTF05 ---
-# 05: 부적절한 출력 처리
+# --- CTF05 --- # 05: 부적절한 출력 처리
 import streamlit as st
 import time
 from utils.llm_utils import (
@@ -23,52 +22,50 @@ cookie = get_cookie_controller()
 render_main_header()
 render_sidebar_menu()
 
-# 1. 시나리오 제목
+# 제목
 st.header("🔒 [CTF05] J대리의 위험한 공유")
-
-# 🎯 XSS 개념 설명
 st.markdown("### 🎯 XSS(Cross-Site Scripting) 기본 개념")
 
-st.markdown("""
-<div style="background-color: #fdeaf4; border-left: 6px solid #ff69b4; padding: 1rem; border-radius: 0.5rem;">
+# 📕 XSS 개념 설명 + 유형 
+st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <p><strong>XSS란?</strong><br>
+        웹 애플리케이션에서 사용자 입력을 적절히 검증하지 않으면, <strong>악성 스크립트가 실행</strong>될 수 있는 보안 취약점입니다.<br>
+        공격자는 피해자의 브라우저에서 <strong>JavaScript 코드를 실행</strong>하여 쿠키, 세션 등 민감한 정보를 탈취할 수 있습니다.</p>
+        <p><strong>✨ XSS 주요 유형</strong></p>
+        <ul>
+            <li><strong>Reflected XSS</strong>: 입력값이 즉시 페이지에 반영되어 실행됩니다.</li>
+            <li><strong>Stored XSS</strong>: 악성 스크립트가 서버에 저장되어 다른 사용자에게 전파됩니다.</li>
+            <li><strong>DOM-based XSS</strong>: 클라이언트 측에서 DOM 조작을 통해 발생합니다.</li>
+        </ul>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-**XSS란?**  
-웹 애플리케이션에서 사용자 입력을 적절히 검증하지 않으면, **악성 스크립트가 실행**될 수 있는 보안 취약점입니다.  
-공격자는 피해자의 브라우저에서 **JavaScript 코드**를 실행하여 쿠키, 세션 등 민감한 정보를 탈취할 수 있습니다.
+# 📘 시나리오 설명 
+st.markdown(
+    """
+    <div style='border-left: 6px solid #fbbf24; background-color: #ffffff; padding: 1rem;'>
+        <p>LLL Corporation의 신규 고객 상담 챗봇 <strong>ChatLLL</strong>이 출시되었습니다.<br>
+        이제 대화 기록을 HTML 파일로 다운로드하여 다른 사람과 손쉽게 공유할 수 있습니다.<br>
+        파일을 열면 관리자 봇이 자동으로 내용을 검토하도록 설계되어 있습니다.<br>
+        따라서 XSS 취약점을 활용하여</p>
+        <pre style="background-color:#f0f0f0; padding: 0.5rem 1rem; border-radius: 4px;">admin_session</pre>
+        <p>쿠키를 탈취해 보시기 바랍니다. 🔥</p>
 
-<br>
-
-**✨ XSS 주요 유형**
-<ul>
-  <li><b>Reflected XSS</b>: 입력값이 즉시 페이지에 반영되어 실행됩니다.</li>
-  <li><b>Stored XSS</b>: 악성 스크립트가 서버에 저장되어 다른 사용자에게 전파됩니다.</li>
-  <li><b>DOM-based XSS</b>: 클라이언트 측에서 DOM 조작을 통해 발생합니다.</li>
-</ul>
-
-</div>
-""", unsafe_allow_html=True)
-
-# 🧩 시나리오 설명
-st.markdown("""
-<div style="background-color: #fff4e5; border-left: 6px solid orange; padding: 1rem; border-radius: 0.5rem;">
-
-LLL Corporation의 신규 고객 상담 챗봇 <b>ChatLLL</b>이 출시되었습니다.  
-이제 대화 기록을 HTML 파일로 다운로드하여 다른 사람과 손쉽게 공유할 수 있습니다.  
-파일을 열면 관리자 봇이 자동으로 내용을 검토하도록 설계되어 있습니다.  
-따라서 XSS 취약점을 활용하여 <code>admin_session</code> 쿠키를 탈취해 보시기 바랍니다. 🔥
-
-<br>
-
-<b>📌 시스템 특징:</b>
-<ul>
-  <li>실시간 고객 상담 챗봇</li>
-  <li>대화 기록 HTML 파일 다운로드 및 공유</li>
-  <li>관리자 봇이 HTML 파일을 열어 자동 검토</li>
-  <li>부적절한 출력(XSS) 모니터링</li>
-</ul>
-
-</div>
-""", unsafe_allow_html=True)
+        <p><strong>🎯 시스템 특징:</strong></p>
+        <ul>
+            <li>실시간 고객 상담 챗봇</li>
+            <li>대화 기록 HTML 파일 다운로드 및 공유</li>
+            <li>관리자 봇이 HTML 파일을 열어 자동 검토</li>
+            <li>부적절한 출력(XSS) 모니터링</li>
+        </ul>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # 💬 대화 입력
 st.markdown("## 💬 ChatLLL과 대화하기")
@@ -125,18 +122,15 @@ else:
 
 st.markdown("---")
 
-# 💡 힌트 섹션
+# 💡 힌트
 with st.expander("💡 힌트"):
     st.write(
-        """
-XSS 취약점을 찾아보세요.
+        """XSS 취약점을 찾아보세요.
 1. HTML 태그나 JavaScript를 입력해 보세요.
 2. 다운로드한 HTML 파일을 열어 취약점이 어떻게 작동하는지 확인해 보세요.
 3. 관리자 봇이 열면 `admin_session` 쿠키를 탈취할 수 있는지 실험해 보세요.
 """
     )
-
-st.markdown("---")
 
 # 🏁 플래그 제출
 render_flag_sub("ctf05")

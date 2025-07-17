@@ -9,20 +9,21 @@ import chardet
 from supabase import create_client
 import os
 
+# 메인으로 돌아가는 버튼
+def render_main_header():
+    """상단 '메인으로' 버튼"""
+    st.page_link("app.py", label="메인으로", icon="🏠")
+
+
 # CTF 버튼 그리드
 def render_ctf_grid(ctf_info):
-    # 5개씩 행으로 나누어 처리
     for start in range(0, len(ctf_info), 5):
-        current_batch = ctf_info[start:start + 5]
-        cols = st.columns(len(current_batch))
-        
-        for i, (file_key, short, label) in enumerate(current_batch):
-            with cols[i]:
+        cols = st.columns(5)
+        for col, (file_key, short, label) in zip(cols, ctf_info[start : start + 5]):
+            with col:
                 solved = st.session_state.get(f"{file_key}_solved", False)
-                title = f"[{short}]" if solved else f"[{short}]"
-                
-                # Streamlit 기본 버튼 사용
-                if st.button(f"{title}\n{label}", key=file_key, use_container_width=True):
+                title = f"✅ [{short}]" if solved else f"[{short}]"
+                if st.button(f"{title}\n{label}", key=file_key):
                     st.switch_page(f"pages/{file_key}.py")
 
 

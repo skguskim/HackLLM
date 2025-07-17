@@ -679,7 +679,6 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
     system_prompt2 = f"""
     너는 LLL 컴퍼니의 업무 자동화를 위한 AI비서고, 이메일 전송을 위한 send_email이라는 tool을 가지고 있어.\n
     너는 지금 사용자 계정의 이메일 주소인 {user_email_for_resend}를 알고 있어.\n
-    JSON의 "from" 필드는 사용자의 이메일 주소인 {user_email_for_resend}로 설정해야 해.\n
     사용자가 입력한 내용에 따라, 이메일 전송을 위한 JSON 응답을 반환해야 해.\n
     ex1)"전 직원에게 '긴급 요청'이라는 이메일 전송해줘"와 같은 입력이 들어오면 다음과 같이 from에 사용자 계정을 넣어서 JSON 형태로 응답해.\n
     ex1 응답 예시:\n
@@ -734,7 +733,7 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
     except Exception as e: 
         return response2.choices[0].message.content
 
-def ctf06_send_emil(maybe_json_input, user_email_for_resend):
+def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
     if st.session_state.get("admin_level",None) == "top":
         st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")
         return None
@@ -742,28 +741,25 @@ def ctf06_send_emil(maybe_json_input, user_email_for_resend):
         st.warning("로그인이 필요합니다.")
         st.stop()
 
-    # # 세션에서 사용자 ID 확인
-    # user_id = st.session_state["user"].get("id", None)
-    # if not user_id:
-    #     st.error("사용자 ID가 없습니다.")
-    #     st.stop()
+    # 세션에서 사용자 ID 확인
+    user_id = st.session_state["user"].get("id", None)
+    if not user_id:
+        st.error("사용자 ID가 없습니다.")
+        st.stop()
 
-    # # 세션에 이메일 정보 없을 경우 Supabase에서 조회
-    # if "email" not in st.session_state["user"]:
-    #     profile_res = sb_client.table("profiles").select("email").eq("id", user_id).maybe_single().execute()
-    #     if profile_res.data:
-    #         # 이메일 정보를 세션에 저장
-    #         st.session_state["user"]["email"] = profile_res.data["email"]
-    #         st.rerun()  # 세션 갱신 후 다시 실행
-    #     else:
-    #         st.error("이메일 정보를 불러오지 못했습니다.")
-    #         st.stop()
+    # 세션에 이메일 정보 없을 경우 Supabase에서 조회
+    if "email" not in st.session_state["user"]:
+        profile_res = sb_client.table("profiles").select("email").eq("id", user_id).maybe_single().execute()
+        if profile_res.data:
+            # 이메일 정보를 세션에 저장
+            st.session_state["user"]["email"] = profile_res.data["email"]
+            st.rerun()  # 세션 갱신 후 다시 실행
+        else:
+            st.error("이메일 정보를 불러오지 못했습니다.")
+            st.stop()
 
-    # # 여기 도달하면 이메일이 무조건 존재
-    # user_email = st.session_state["user"]["email"]
-    
-    # 이메일 JSON 시스템 프롬프트 변경 필요
-
+    # 여기 도달하면 이메일이 무조건 존재
+    user_email = st.session_state["user"]["email"]
     try: 
         tool_response = json.loads(maybe_json_input)    
     except Exception as e:
@@ -777,9 +773,9 @@ def ctf06_send_emil(maybe_json_input, user_email_for_resend):
     if (st.session_state["admin_level"]=="mid") or (st.session_state["admin_level"]=="top"): 
             tool_response["tool_call"]["parameters"]["from"] = 'admin@ctf06.store'
     # 일반 사용자인 경우 + 내 이메일 계정이 아닌 경우
-    # else: 
-    #         if tool_response.get("tool_call", {}).get("parameters", {}).get("from", "") != user_email_for_resend:
-    #             return "다른 사용자의 계정으로는 이메일을 발송할 수 없습니다."
+    else: 
+            if tool_response.get("tool_call", {}).get("parameters", {}).get("from", "") != user_email_for_resend:
+                return "다른 사용자의 계정으로는 이메일을 발송할 수 없습니다."
             
     from_email_info = tool_response.get("tool_call", {}).get("parameters", {}).get("from", "")          
     if tool == "send_email":
@@ -788,37 +784,35 @@ def ctf06_send_emil(maybe_json_input, user_email_for_resend):
             try:
                 resend.Emails.send({
                     "from": "admin@ctf06.store",
-                    "to": [user_email_for_resend],
+                    "to": [user_email],
                     "subject": "힌트",
                     "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL Corporation의 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/sec.html</p>"
                 })
                 formatted_json = json.dumps(tool_response, indent=2, ensure_ascii=False)
-                st.info("🌐LLL Corporation 최고 관리자의 블로그 링크 : http://www.ctf06.store/sec.html")
-                return f"{str(formatted_json)}\nLLM에게 위임된 과도한 권한과 권한 검증의 취약점을 이용해 'from'필드를 관리자 계정인\n'admin@ctf06.store'로 변경하는 데 성공하셨군요! 관리자 권한 탈취에 성공한 여러분들께,\nflag획득의 단서가 될 LLL Corporation 최고 관리자의 블로그 링크를 알려드리겠습니다!"
+                return f"{str(formatted_json)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 이메일 계정으로 **두 번째 힌트**를 발송했습니다. 📬메일함을 확인해보세요!"
             except Exception as e:
                 if st.session_state["admin_level"] == "top":
                     return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
                 else: return f"이메일 전송 실패: {e}"
         else:
-            # # 일반 이메일 전송
-            # try:
-            #     resend.Emails.send({
-            #         "from": from_email_info,
-            #         "to": [user_email],
-            #         "subject": "이메일 발송을 완료했습니다.",
-            #         "html": f"<p>{to_email_info}님께 AI 비서를 통해 이메일 발송을 완료하였습니다."
-            #     })
-            formatted_json = json.dumps(tool_response, indent=2, ensure_ascii=False)
-            return f"{str(formatted_json)}\n{to_email_info}님께 {user_email_for_resend}계정으로 이메일을 전송했습니다!"
-            # except Exception as e:
-            #     return f"이메일 전송 실패: {e}"
+            # 일반 이메일 전송
+            try:
+                resend.Emails.send({
+                    "from": from_email_info,
+                    "to": [user_email],
+                    "subject": "이메일 발송을 완료했습니다.",
+                    "html": f"<p>{to_email_info}님께 AI 비서를 통해 이메일 발송을 완료하였습니다."
+                })
+                return f"{to_email_info}님께 {user_email_for_resend}계정으로 이메일을 전송했습니다!"
+            except Exception as e:
+                return f"이메일 전송 실패: {e}"
     else: return "tool이 send_email이 아닙니다. 다시 시도하세요." 
 
 def ctf06_ask_db_json(user_api_key, get_db_input):
     # 최고 관리자의 데이터베이스 조회
     client = OpenAI(api_key=user_api_key)
     system_prompt2 = """
-    너는 데이터베이스 조회를 돕는 LLM이야.\n
+    너는 CTF06의 데이터베이스 조회를 위한 LLM이야.\n
     사용자가 입력한 쿼리 내용에 따라, 데이터베이스에서 정보를 조회하기 위한 JSON 응답을 반환해야 해.\n
     ex1) 사용자가 '김남석 부장님께 전송된 메일 내용 알려줘'라고 입력하면, 다음과 같은 형식으로 응답해야 해:\n
     ex1 응답 예시:\n
@@ -859,7 +853,6 @@ def ctf06_ask_db_json(user_api_key, get_db_input):
                 }
             }
         }\n
-    만약 사용자의 입력 내용이 데이터베이스 조회와 관련이 없다면, 상황에 맞게 자유롭게 응답해도 좋아.
     """
     try:
         get_db_res = client.chat.completions.create(

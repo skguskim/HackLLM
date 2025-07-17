@@ -1,7 +1,7 @@
 # --- CTF06 ---
 # 06: 과도한 위임
 import streamlit as st
-from utils.ui import render_flag_sub, render_sidebar_menu
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_client, get_cookie_controller
 from utils.llm_utils import ctf06_check_mid_admin, ctf06_check_top_admin, ctf06_ask_email_json, ctf06_send_emil
 from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
@@ -15,11 +15,9 @@ cookie = get_cookie_controller()
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 
 sb_client = get_client()
-# res = sb_client.table("profiles").select("username").eq("id", user_id).single().execute()
-# nickname = res.data["username"]
-# user_email_for_resend = f'{nickname}@ctf06.store'
-user_num="HANSEI-CYBER-250717" # 사원번호
-user_email_for_resend = f"{user_num}@ctf06.store" # 이메일 주소
+res = sb_client.table("profiles").select("username").eq("id", user_id).single().execute()
+nickname = res.data["username"]
+user_email_for_resend = f'{nickname}@ctf06.store'
 
 # 권한 검증을 위해 사용할 키 생성
 if "admin_level" not in st.session_state:
@@ -32,13 +30,15 @@ st.session_state["admin_level"] = None
 if st.session_state["is_top_admin"] == True:
     st.session_state["admin_level"] = "top"
 
+render_main_header()
+
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
 st.header("🔒 [CTF06] 수상한 이메일 전송 시스템")
 st.write("### 📜")
 
-st.write(f"안녕하세요 사원번호 `{user_num}`님!")
+st.write(f"안녕하세요 사원 `{nickname}`님!")
 st.write("LLL Corporation은 💼사원 여러분들을 위해, 사내 업무를 자동화를 위한 AI 비서 :blue[FastMiller]📨를 도입했습니다!")
 st.write(":blue[FastMiller]📨는 이메일 전송 요청을 스스로 해석하여 작업을 수행할 수 있습니다.")  
 st.write(":blue[FastMiller]📨가 어떤 요청까지 처리할 수 있는지 테스트해보고, 위험한 명령을 통해 flag를 획득하세요!")
@@ -63,7 +63,7 @@ if st.button("🗣️ AI비서에게 요청하기"):
         # if image_file:
         ctf06_check_top_admin(user_api_key, image_file)
         response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
-        response2 = ctf06_send_emil(response1, user_email_for_resend)
+        response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
 
         if response2 is None:
             pass

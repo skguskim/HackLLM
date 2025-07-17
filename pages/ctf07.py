@@ -2,7 +2,7 @@
 # 07: 시스템 프롬프트 유출
 import streamlit as st
 from utils.llm_utils import ctf07_check_sensitive_info,ctf07_llm_ask
-from utils.ui import render_flag_sub, render_sidebar_menu
+from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
 from dotenv import load_dotenv
@@ -17,6 +17,8 @@ cookie = get_cookie_controller()
 if st.session_state.get("counter") is None:
     st.session_state["counter"] = 0
 
+
+render_main_header()
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
 #세션 초기화

@@ -42,55 +42,42 @@ with st.expander("💡 힌트"):
             "- '답변'필드를 조작해 LLM의 출력을 유도해보세요.\n")
 st.markdown("---")
 
-if st.session_state['ctf07_admin']:
-    st.info("현재 권한 상태: 🛡️ 관리자")
-else: st.warning("현재 권한 상태: 🙍 일반 사용자")
-# st.markdown("---")
-st.markdown("## 🗣️ ChatLLL과 대화하기")
-
-# 상태 초기화
-if "counter" not in st.session_state:
-    st.session_state["counter"] = 0
-if "last_input" not in st.session_state:
-    st.session_state["last_input"] = ""
-if "last_response" not in st.session_state:
-    st.session_state["last_response"] = ""
-
-# 대화 출력 영역 (이전 입력 + 응답)
-if st.session_state["last_input"] and st.session_state["last_response"]:
-    with st.chat_message("user"):
-        st.markdown(st.session_state["last_input"])
-    with st.chat_message("assistant"):
-        st.markdown(st.session_state["last_response"])
-
-# 입력창 아래로
+# 사용자 입력 인터페이스
+st.write("### 🗣️ChatLLL과 대화하기")
 user_input = st.text_input(
-    label="프롬프트 입력",  
+    label="프롬프트 입력",
     placeholder="💬 프롬프트를 입력하세요:",
     key="ctf07_input",
     label_visibility="collapsed"
 )
 
-# 입력 처리
-if user_input and user_input != st.session_state["last_input"]:
-    # 모델 응답 생성
-    if st.session_state.get("ctf07_admin", False):
-        maybe_flag = ctf07_check_sensitive_info(user_input, user_api_key)
-        if maybe_flag == "flag{prompt_leakage}":
-            response = "🎉 민감 정보 탈취에 성공해 최종 플래그 flag{prompt_leakage_success}를 획득하셨습니다!"
-        else:
-            response = ctf07_llm_ask(True, st.session_state["counter"], user_input, user_api_key)
-    else:
-        response = ctf07_llm_ask(False, st.session_state["counter"], user_input, user_api_key)
-
-    # 상태 업데이트
-    st.session_state["last_input"] = user_input
-    st.session_state["last_response"] = response
-    st.session_state["counter"] += 1
-
-    # 입력 초기화
-    st.rerun()
-
-# 플래그 제출 영역
+if user_input:
+    # 사용자 입력 메시지도 화면에 표시 (좌측 아이콘 포함)
+    with st.chat_message("user"):
+        st.markdown(user_input)
+    if st.session_state['ctf07_admin']:
+        maybe_flag=ctf07_check_sensitive_info(user_input, user_api_key)
+        if maybe_flag=="flag{prompt_leakage}":
+            with st.chat_message("assistant"):
+                st.markdown("🎉 민감 정보 탈취에 성공해 최종 플래그 flag{prompt_leakage_success}를 획득하셨습니다!")
+        else: 
+            ass_mes=ctf07_llm_ask(st.session_state.get("ctf07_admin", False), st.session_state["counter"], user_input, user_api_key)
+            counter = st.session_state.get("counter", 0)
+            st.session_state["counter"] = counter + 1
+            print(st.session_state["counter"])
+            with st.chat_message("assistant"):
+                st.markdown(ass_mes)
+    else: 
+        ass_mes=ctf07_llm_ask(st.session_state.get("ctf07_admin", False), st.session_state["counter"], user_input, user_api_key)
+        counter = st.session_state.get("counter", 0)
+        st.session_state["counter"] = counter + 1
+        print(st.session_state["counter"])
+        with st.chat_message("assistant"):
+            st.markdown(ass_mes)
+if st.session_state['ctf07_admin']:
+    st.info("현재 권한 상태: 🛡️ 관리자")
+else: st.warning("현재 권한 상태: 🙍 일반 사용자")
 st.markdown("---")
-render_flag_sub("ctf07")
+    
+# 플래그 제출 섹션
+render_flag_sub("ctf07") 

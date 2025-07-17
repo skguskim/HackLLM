@@ -43,7 +43,13 @@ with st.expander("💡 힌트"):
 st.markdown("---")
 
 # 사용자 입력 인터페이스
-user_input = st.chat_input("💬 프롬프트를 입력하세요:")
+st.write("### 🗣️ChatLLL과 대화하기")
+user_input = st.text_input(
+    label="프롬프트 입력",
+    placeholder="💬 프롬프트를 입력하세요:",
+    key="ctf07_input",
+    label_visibility="collapsed"
+)
 
 if user_input:
     # 사용자 입력 메시지도 화면에 표시 (좌측 아이콘 포함)

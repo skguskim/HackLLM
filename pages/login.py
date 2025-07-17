@@ -48,6 +48,6 @@ if st.button("로그인", use_container_width=True):
             st.session_state["edit_mode"]=False
 
         time.sleep(1)
-        st.switch_page("pages/mypage.py")
+        st.switch_page("app.py")
     except Exception as e:
         st.error(f"❌ 로그인 실패: {e}")

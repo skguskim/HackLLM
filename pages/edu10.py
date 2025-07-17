@@ -24,16 +24,76 @@ st.markdown(
 )
 st.markdown("## OWASP LLM10 - Unbounded Consumption (무제한 소비)")
 
-st.markdown("""
-Unbounded Consumption (무제한 소비)란 공격자가 LLM에 과도하게 많은 요청을 보내거나 끝없이 처리해야 하는 작업을 시켜서, 시스템의 CPU·메모리·저장공간 등 자원을 고갈시키는 보안 취약점입니다.
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["취약점 설명", "발생 가능한 피해", "시스템 동작 과정", "악용 가능성", "보안 중요성", "요약"])
 
-쉽게 말하면... 카페에서 커피 한 잔을 시키는 대신, 수천 잔을 한꺼번에 주문해서 직원이 너무 바빠져 다른 손님을 응대하지 못하게 만드는 것과 비슷합니다.
+# 취약점 설명
+with tab1:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-왜 위험할까요?
-            
-모델은 엄청난 계산을 시도하다가 CPU 사용률이 폭증해 처리 시간이 길어지며 응답이 지연되거나 서버가 다운될 수도 있습니다.
-            
-다수 사용자가 이런 요청을 반복하면 서비스 전체가 마비될 수 있습니다.
+# 발생 가능한 피해
+with tab2:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-이러한 취약점을 CTF10 실습을 통해 배워보고자 합니다.
-""")
+# 시스템 동작 과정
+with tab3:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# 악용 가능성
+with tab4:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# 보안 중요성
+with tab5:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# 요약
+with tab6:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)

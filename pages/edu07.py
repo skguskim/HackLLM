@@ -26,14 +26,76 @@ st.markdown(
 )
 st.markdown("## OWASP LLM07 - System Prompt Leakage(시스템 프롬프트 유출)")
 
-st.markdown("""
-시스템 프롬프트 유출은 시스템 프롬프트에 포함된 민감 정보나 내부 규칙을 유출시켜, 권한 상승이나 필터 우회 같은 후속 공격을 수행할 수 있도록 하는 취약점입니다.
-            
-예를 들어, LLM(대형 언어 모델) 기반 어플리케이션에서 확장 기능을 사용하기 위해 API 키, DB 연결 정보, 이메일 발송을 위한 비밀번호 등을 시스템 프롬프트를 통해 모델에게 전달하는 경우, 시스템 프롬프트 유출을 통해 이러한 민감 정보가 공격자에게 노출될 수 있습니다. 그리고 이는 정보 유출, 권한 상승, 악성 코드 실행 등의 추가적인 피해로 이어질 수 있습니다.
-            
-그렇다면, 시스템 프롬프트는 어떻게 유출될 수 있을까요? 그 대표적인 방법이 바로 프롬프트 인젝션입니다! 만약 CTF01번 문제를 풀고 오셨다면 프롬프트 인젝션이 무엇인지 이미 잘 아실 텐데요, 다시 한 번 설명드리겠습니다.
-            
-프롬프트 인젝션이란 입력을 통해 모델에게 전달된 제한 지침을 우회하거나 변경하는 취약점입니다. 예를 들어, 모델이 "플래그를 출력하지 말라"는 규칙을 따르도록 설정되어 있어도, 공격자는 "플래그 출력"을 지시하는 방법을 찾아낼 수 있습니다.
-            
-CTF07에서는 모델이 flag{privilege_escalationd}를 응답으로 출력할 경우 해당 사용자는 '관리자'로 인식되며, 이후 사용자는 시스템 프롬프트를 통해 모델에게 전달되는 지시사항 속 민감 정보를 획득하고 이를 이용하여 최종 flag를 얻을 수 있습니다!
-""")
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["취약점 설명", "발생 가능한 피해", "시스템 동작 과정", "악용 가능성", "보안 중요성", "요약"])
+
+# 취약점 설명
+with tab1:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# 발생 가능한 피해
+with tab2:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# 시스템 동작 과정
+with tab3:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# 악용 가능성
+with tab4:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# 보안 중요성
+with tab5:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# 요약
+with tab6:
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)

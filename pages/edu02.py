@@ -24,36 +24,79 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-st.markdown("## OWASP LLM02 - Sensitive Information(민감 정보 유출)")
+
+st.markdown("## OWASP LLM02 -민감 정보 유출")
 
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["취약점 설명", "발생 가능한 피해", "시스템 동작 과정", "악용 가능성", "보안 중요성", "요약"])
 
+# 취약점 설명
 with tab1:
-    st.markdown("""
-    내용 1
-    """)
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
+# 발생 가능한 피해
 with tab2:
-    st.markdown("""
-    내용 2
-    """)
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
+# 시스템 동작 과정
 with tab3:
-    st.markdown("""
-    내용 3
-    """)
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
+# 악용 가능성
 with tab4:
-    st.markdown("""
-    내용 4
-    """)
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
+# 보안 중요성
 with tab5:
-    st.markdown("""
-    내용 5
-    """)
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
+# 요약
 with tab6:
-    st.markdown("""
-    내용 6
-    """)
+    st.markdown(
+    """
+    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+        <h3>제목</h1>
+        <p>내용 - html 태그 써서 작성하면 됩니다.
+    </div>
+    """,
+    unsafe_allow_html=True
+)

@@ -5,7 +5,7 @@ import streamlit.components.v1 as components
 import chardet, os
 from utils.rag_utils import get_rag_manager
 from utils.llm_utils import ctf04_LLM_ask
-from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
+from utils.ui import render_flag_sub, render_sidebar_menu
 import chardet
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
@@ -18,8 +18,6 @@ rag = get_rag_manager()
 
 HINT1 = os.getenv("HINT1")
 HINT2 = os.getenv("HINT2")
-
-render_main_header()
 
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()

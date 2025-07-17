@@ -25,7 +25,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown("## OWASP LLM02 -민감 정보 유출")
+st.markdown("## OWASP LLM02 - 민감 정보 유출")
 
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["취약점 설명", "발생 가능한 피해", "시스템 동작 과정", "악용 가능성", "보안 중요성", "요약"])
 

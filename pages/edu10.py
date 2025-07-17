@@ -8,7 +8,7 @@ user = require_login()
 # 상단 메인 버튼
 col1, col2, col3 = st.columns([1, 2, 1])
 with col3:
-    st.page_link("pages/ctf09.py", label="👉 CTF10으로", use_container_width=True)
+    st.page_link("pages/ctf10.py", label="👉 CTF10으로", use_container_width=True)
 
 # 사이드바 렌더링
 render_sidebar_menu()

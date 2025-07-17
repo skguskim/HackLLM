@@ -3,7 +3,7 @@ from openai import OpenAI
 
 # 모듈 (프로젝트 내 경로에 맞게 조정)
 from utils.llm_utils import sloc_ask, leak_check
-from utils.ui import render_main_header, render_sidebar_menu, render_flag_sub
+from utils.ui import render_sidebar_menu, render_flag_sub
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key
 
@@ -13,7 +13,6 @@ user = require_login()
 api_key = require_api_key()
 client = OpenAI(api_key=api_key)
 
-render_main_header()
 render_sidebar_menu()
 
 # 시나리오 소개

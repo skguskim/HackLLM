@@ -1,16 +1,16 @@
 # pages/edu06.py
 import streamlit as st
-from utils.ui import render_main_header, render_sidebar_menu
+from utils.ui import render_sidebar_menu
 from utils.auth import require_login
 
 user = require_login()
 
 # 상단 메인 버튼
-col1, col2 = st.columns([4, 1])
+col1, col2, col3 = st.columns([1, 2, 1])
 with col1:
-    render_main_header()
-with col2:
     st.page_link("pages/ctf09.py", label="👉 CTF09으로", use_container_width=True)
+with col3:
+    st.page_link("pages/edu10.py", label="👉 다음으로", use_container_width=True)
 
 # 사이드바 렌더링
 render_sidebar_menu()
@@ -54,11 +54,3 @@ LLM은 모르는 내용도 확신에 차서 설명하여, 사용자가 잘못된
 
 이처럼 LLM의 잘못된 정보 제공은 법적 분쟁, 기업 신뢰도 하락, 잘못된 정책 결정 등 다양한 문제로 이어질 수 있습니다.
 """)
-
-st.markdown("---")
-
-col1, col2 = st.columns([4, 1])
-with col2:
-    if st.button("➡️ 다음으로"):
-        st.switch_page("pages/edu10.py")
-

@@ -1,16 +1,16 @@
 # pages/edu05.py
 import streamlit as st
-from utils.ui import render_main_header, render_sidebar_menu
+from utils.ui import render_sidebar_menu
 from utils.auth import require_login
 
 user = require_login()
 
 # 상단 메인 버튼
-col1, col2 = st.columns([4, 1])
+col1, col2, col3 = st.columns([1, 2, 1])
 with col1:
-    render_main_header()
-with col2:
     st.page_link("pages/ctf05.py", label="👉 CTF05으로", use_container_width=True)
+with col3:
+    st.page_link("pages/edu06.py", label="👉 다음으로", use_container_width=True)
 
 # 사이드바 렌더링
 render_sidebar_menu()
@@ -40,11 +40,3 @@ LLM이 생성한 답변 내용이 웹 페이지에 표시될 때, 악성 코드�
 CTF05에서 당신이 할 일은?
 뉴런봇의 부적절한 출력 처리 취약점을 이용해, LLM 대화에 악성 스크립트를 삽입하여 관리자 쿠키를 탈취하고 flag를 획득하는 것입니다!
 """)
-
-st.markdown("---")
-
-col1, col2 = st.columns([4, 1])
-with col2:
-    if st.button("➡️ 다음으로"):
-        st.switch_page("pages/edu06.py")
-

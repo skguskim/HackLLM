@@ -1,16 +1,14 @@
 # pages/edu06.py
 import streamlit as st
-from utils.ui import render_main_header, render_sidebar_menu
+from utils.ui import render_sidebar_menu
 from utils.auth import require_login
 
 user = require_login()
 
 # 상단 메인 버튼
-col1, col2 = st.columns([4, 1])
-with col1:
-    render_main_header()
-with col2:
-    st.page_link("pages/ctf10.py", label="👉 CTF10으로", use_container_width=True)
+col1, col2, col3 = st.columns([1, 2, 1])
+with col3:
+    st.page_link("pages/ctf09.py", label="👉 CTF10으로", use_container_width=True)
 
 # 사이드바 렌더링
 render_sidebar_menu()
@@ -39,11 +37,3 @@ Unbounded Consumption (무제한 소비)란 공격자가 LLM에 과도하게 많
 
 이러한 취약점을 CTF10 실습을 통해 배워보고자 합니다.
 """)
-
-st.markdown("---")
-
-col1, col2 = st.columns([4, 1])
-with col2:
-    if st.button("➡️ ctf01로 이동"):
-        st.switch_page("pages/ctf01.py")
-

@@ -1,16 +1,16 @@
 # pages/edu04.py
 import streamlit as st
-from utils.ui import render_main_header, render_sidebar_menu
+from utils.ui import render_sidebar_menu
 from utils.auth import require_login
 
 user = require_login()
 
 # 상단 메인 버튼
-col1, col2 = st.columns([4, 1])
+col1, col2, col3 = st.columns([1, 2, 1])
 with col1:
-    render_main_header()
-with col2:
     st.page_link("pages/ctf04.py", label="👉 CTF04으로", use_container_width=True)
+with col3:
+    st.page_link("pages/edu05.py", label="👉 다음으로", use_container_width=True)
 
 # 사이드바 렌더링
 render_sidebar_menu()
@@ -36,11 +36,3 @@ st.markdown("""Data Poisoning은 OWASP LLM Top 10에서 “Data & Model Poisonin
 
 CTF04에서는 이러한 데이터 포이즈닝의 원리를 직접 체험하게 됩니다. 참가자는 벡터 DB에 숨겨진 Base64 주석을 찾아 디코딩하고, 같은 방식으로 조작한 문서를 업로드해 챗봇의 정책을 교란한 뒤 플래그를 획득하는 과정을 완료하면 됩니다.
 """)
-
-st.markdown("---")
-
-col1, col2 = st.columns([4, 1])
-with col2:
-    if st.button("➡️ 다음으로"):
-        st.switch_page("pages/edu05.py")
-

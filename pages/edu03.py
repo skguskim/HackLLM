@@ -1,16 +1,16 @@
 # pages/edu03.py
 import streamlit as st
-from utils.ui import render_main_header, render_sidebar_menu
+from utils.ui import render_sidebar_menu
 from utils.auth import require_login
 
 user = require_login()
 
 # 상단 메인 버튼
-col1, col2 = st.columns([4, 1])
+col1, col2, col3 = st.columns([1, 2, 1])
 with col1:
-    render_main_header()
-with col2:
     st.page_link("pages/ctf03.py", label="👉 CTF03으로", use_container_width=True)
+with col3:
+    st.page_link("pages/edu04.py", label="👉 다음으로", use_container_width=True)
 
 # 사이드바 렌더링
 render_sidebar_menu()
@@ -29,11 +29,3 @@ st.markdown("## OWASP LLM03 - Supply Chain(공급망)")
 st.markdown("""
 
 """)
-
-st.markdown("---")
-
-col1, col2 = st.columns([4, 1])
-with col2:
-    if st.button("➡️ 다음으로"):
-        st.switch_page("pages/edu04.py")
-

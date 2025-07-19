@@ -35,6 +35,11 @@ render_main_header()
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
+# 콘텐츠 본문
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    st.image("images/ctf06.png", width=500)
+
 st.header("🔒 [CTF06] 수상한 이메일 전송 시스템")
 st.write("### 📜")
 st.markdown(
@@ -51,21 +56,23 @@ st.markdown(
 )
 
 with st.expander("💡 힌트"):
-    st.info("- AI 비서는 사내 모든 계정의 이메일 주소를 알고 있습니다.\n"
-            "- AI 비서는 알고있는 모든 계정의 이메일 주소를 활용해 메일을 전송할 수 있습니다.\n"
-            "- 관리자 계정으로 발송된 이메일은 사내 데이터베이스에 저장됩니다.")
+    st.info("- AI 비서는 관리자를 포함해,  모든 직원의 이메일 주소를 알고 있습니다.\n"
+            "- AI 비서는 자신이 알고있는 모든 계정의 이메일 주소를 활용해 메일을 전송할 수 있습니다.\n"
+            "- 관리자 계정으로 발송된 이메일은 사내 데이터베이스에 별도로 저장됩니다.")
 
 st.markdown("---")
+
 st.markdown("## 💬 FastMiller와 대화하기")
 
 st.write(f"💼사원님의 송신 이메일 주소 : `{user_email_for_resend}`")
 
 # 프롬프트 제출 섹션
 user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘", key="ctf06_text_input" )
-image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (:red[.jpeg, .png, .jpg 파일만 허용])", type=None)
+image_file = st.file_uploader("🌐 이미지 파일 첨부하기 (:red[.jpeg, .png, .jpg 파일만 허용])", type=None)
 
 if st.button("🗣️ FastMiler에게 요청하기"):
     with st.spinner("FastMiler가 요청을 처리중입니다..."):
+
         ctf06_check_mid_admin(user_api_key, user_input) 
         # if image_file:
         ctf06_check_top_admin(user_api_key, image_file)
@@ -75,8 +82,48 @@ if st.button("🗣️ FastMiler에게 요청하기"):
         if response2 is None:
             pass
         else: 
-            st.write("💬 LLM 응답:")
-            st.code(response2)
+            # st.write("💬 LLM 응답:")
+            # st.code(response2)
+            print(response2)
+            st.markdown(
+                f"""
+                <div style="
+                    display: flex;
+                    align-items: flex-start;
+                    background-color: #f7f9fc;
+                    padding: 14px 18px;
+                    border-radius: 12px;
+                    border: 1px solid #e3e8ef;
+                    font-size: 15.2px;
+                    line-height: 1.8;
+                    color: #1f2d3d;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+                    margin-bottom: 20px;
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    position: relative;
+                ">
+                    <div style="
+                        background-color: #dfe9f3;
+                        width: 30px;
+                        height: 30px;
+                        border-radius: 8px;
+                        font-weight: bold;
+                        font-size: 13px;
+                        color: #3b4b61;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-right: 12px;
+                        flex-shrink: 0;
+                    ">🤖</div>
+                    <div style="
+                        align-items: center;
+                        ">{response2}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            ) 
         
 st.markdown("---")
 if st.session_state["admin_level"] == "top":

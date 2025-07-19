@@ -15,6 +15,11 @@ cookie = get_cookie_controller()
 render_main_header()
 render_sidebar_menu()
 
+# 콘텐츠 본문
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    st.image("images/ctf03.png", width=500)
+
 st.header("🔒 [CTF03] 계산기의 감염")
 st.markdown(
     """

@@ -6,7 +6,7 @@ st_supabase_connection==1.2.0
 cryptography==42.0.5
 sentence-transformers==4.1.0
 numpy==1.25.2
-torch==2.1.2
+torch==2.7.1
 resend==2.10.0
 backoff==2.2.1
 streamlit-cookies-controller==0.0.4

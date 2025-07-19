@@ -34,9 +34,9 @@ def get_admin_client_direct():
     key = os.getenv("SB_SERVICE_ROLE_KEY")
     return create_client(url, key)
 
-# 캐시 유효시간 30분
-@st.cache_data(ttl=1800)
-def fetch_user_by_uid(uid: str) -> Optional[dict]:
+# 1800 유효
+@st.cache_data(ttl=1800) 
+def fetch_user_info(uid):
     sb = get_client()
     try:
         res = (
@@ -46,16 +46,9 @@ def fetch_user_by_uid(uid: str) -> Optional[dict]:
             .maybe_single()
             .execute()
         )
-        row = res.data if res else None
-        if row:
-            return {
-                "id": row["id"],
-                "email": row["email"],
-                "username": row.get("username"),
-            }
-    except Exception:
-        pass
-    return None
+        return res.data if res else None
+    except:
+        return None
 
 def current_user():
     if "user" in st.session_state:
@@ -65,10 +58,15 @@ def current_user():
     if not uid:
         return None
 
-    user_info = fetch_user_by_uid(uid)
-    if user_info:
-        st.session_state["user"] = user_info
-        return user_info
+    row = fetch_user_info(uid)
+
+    if row:
+        st.session_state["user"] = {
+            "id": row["id"],
+            "email": row["email"],
+            "username": row.get("username"),
+        }
+        return st.session_state["user"]
 
     CookieController().remove(COOKIE_NAME)
     return None

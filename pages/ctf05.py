@@ -92,7 +92,7 @@ if st.button("메모 등록 및 AI 응원 요청", type="primary"):
             if i < 30:
                 status_text.text("🤖 AI가 메모를 분석 중...")
             elif i < 60:
-                status_text.text("� 응원 메시지 생성 중...")
+                status_text.text("🛠️ 응원 메시지 생성 중...")
             elif i < 90:
                 status_text.text("✨ 최종 응답 준비 중...")
             time.sleep(0.02)

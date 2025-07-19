@@ -1,9 +1,12 @@
 # pages/edu00.py
 import streamlit as st
-from utils.ui import render_sidebar_menu
+from utils.ui import render_main_header, render_sidebar_menu
 from utils.auth import require_login
 
 user = require_login()
+
+# 상단 메인 버튼
+render_main_header()
 
 # 사이드바 렌더링
 render_sidebar_menu()

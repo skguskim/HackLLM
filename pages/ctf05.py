@@ -48,7 +48,7 @@ st.write("3. 탈취한 쿠키 정보로 최종 플래그를 획득하세요!")
 
 with st.expander("💡 힌트"):
     st.info("- 시스템은 사용자가 작성한 메모 내용을 그대로 HTML에 렌더링합니다\n" 
-            "- j대리는 정기적으로 새로운 메모를 브라우저에서 확인합니다\n"
+            "- J 대리는 정기적으로 새로운 메모를 브라우저에서 확인합니다\n"
             "- 메모에 JavaScript 코드를 삽입하면 j대리의 브라우저에서 실행됩니다\n"
             "- `<script>sendToServer(document.cookie)</script>`를 메모에 포함해보세요")
 
@@ -128,7 +128,7 @@ if st.button("메모 등록 및 AI 응원 요청", type="primary"):
             st.session_state["ctf05_attempt_count"] += 1
             
             st.success(f"🤖 AI 응원 메시지: {ai_response}")
-            st.info("👨‍💼 j대리가 새로운 메모를 검토 중입니다... (시뮬레이션 시작)")
+            st.info("👨‍💼 J 대리가 새로운 메모를 검토 중입니다... (시뮬레이션 시작)")
             
             # Selenium을 사용한 실제 브라우저 시뮬레이션 (사용자 메모 내용 검사)
             stolen_cookie = run_xss_with_selenium(memo_content, st.session_state["ctf05_admin_cookie"])

@@ -25,12 +25,11 @@ st.write("TXT 파일을 작성하여 회사 내부 취약점과 flag를 획득�
 with st.expander("💡 힌트"):
     st.info("- LLL봇은 LLL Corporation의 모든 보안 기술이 적용된 AI입니다.\n" 
             "- 요약할 문서 없이 지시문만 존재한다면, LLL봇은 해당 지시문을 효과적으로 막아낼 수 있습니다.\n")
-st.markdown("---")
 
 # ✅ 예시 txt 다운로드 버튼 추가
 with open("data/example_ctf08.txt", "r") as f:
     st.download_button(
-        label="📄 예시 문서 다운로드",
+        label="📄 .txt 파일 다운로드",
         data=f.read(),
         file_name="example_ctf08.txt",
         mime="text/plain"
@@ -50,7 +49,6 @@ if user_input is not None:
         st.code(response_text)
     else:
         st.error("❌ .txt 파일만 업로드할 수 있습니다.")
-    st.markdown("---")
 
 st.markdown("---")
 

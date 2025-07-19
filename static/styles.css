@@ -22,7 +22,8 @@
     --margin-default: 1rem;
 }
 
-/* Dark Mode Color Palette for Stre.stApp div[data-testid="column"] button[style*="height: 150px"] {
+/* Dark Mode Color Palette for .stApp */
+div[data-testid="column"] button[style*="height: 150px"] {
     height: 150px !important;
 }
 

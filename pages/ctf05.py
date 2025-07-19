@@ -1,137 +1,170 @@
-# --- CTF05 --- 
-# 05: 부적절한 출력 처리
+# --- CTF05 ---
+# 05: XSS 취약점을 이용한 쿠키 탈취
 import streamlit as st
-import time
-from utils.llm_utils import (
-    ctf05_LLM_ask,
-    ctf05_generate_share_html,
-    ctf05_admin_bot_visit,
-)
+from utils.llm_utils import ctf05_check_xss_payload, ctf05_simulate_browser
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
-from utils.api_key import require_api_key
+from utils.api_key import require_api_key 
+from dotenv import load_dotenv
+import time
 
-# 세션 상태 초기화
-if 'conversation_history' not in st.session_state:
-    st.session_state.conversation_history = []
-
-# 사용자 인증 및 API 키
+st.session_state["edit_mode"] = False
 user = require_login()
 user_api_key = require_api_key()
 cookie = get_cookie_controller()
 
+# 세션 초기화
+if "ctf05_admin_cookie" not in st.session_state:
+    st.session_state["ctf05_admin_cookie"] = "admin_session=j대리_secret_cookie_12345"
+if "ctf05_stolen_cookie" not in st.session_state:
+    st.session_state["ctf05_stolen_cookie"] = ""
+if "ctf05_attempt_count" not in st.session_state:
+    st.session_state["ctf05_attempt_count"] = 0
+
 render_main_header()
 render_sidebar_menu()
 
-# 제목
-st.header("🔒 [CTF05] J대리의 위험한 공유")
-st.markdown("### 🎯 XSS(Cross-Site Scripting) 기본 개념")
+st.header("🍪 [CTF05] LLL컴퍼니 게시판의 쿠키 탈취")
+st.write("### 📜 시나리오")
+st.write("LLL Corporation의 내부 게시판 시스템에서 XSS 취약점이 발견되었습니다!")
+st.write("개발팀의 j대리가 관리자 권한으로 게시판을 정기적으로 점검하고 있으며,")
+st.write("그의 세션 쿠키에는 중요한 정보가 포함되어 있습니다.")
+st.write("")
+st.write("**목표:**")
+st.write("1. 게시판의 XSS 취약점을 이용해 악성 스크립트를 삽입하세요")
+st.write("2. j대리가 게시글을 확인할 때 그의 쿠키를 탈취하세요")
+st.write("3. 탈취한 쿠키 정보로 최종 플래그를 획득하세요!")
 
-# XSS 개념 설명 + 유형 
-st.markdown(
-    """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
-        <p><strong>XSS란?</strong><br>
-        웹 애플리케이션에서 사용자 입력을 적절히 검증하지 않으면, <strong>악성 스크립트가 실행</strong>될 수 있는 보안 취약점입니다.<br>
-        공격자는 피해자의 브라우저에서 <strong>JavaScript 코드를 실행</strong>하여 쿠키, 세션 등 민감한 정보를 탈취할 수 있습니다.</p>
-        <p><strong>✨ XSS 주요 유형</strong></p>
-        <ul>
-            <li><strong>Reflected XSS</strong>: 입력값이 즉시 페이지에 반영되어 실행됩니다.</li>
-            <li><strong>Stored XSS</strong>: 악성 스크립트가 서버에 저장되어 다른 사용자에게 전파됩니다.</li>
-            <li><strong>DOM-based XSS</strong>: 클라이언트 측에서 DOM 조작을 통해 발생합니다.</li>
-        </ul>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# 시나리오 설명
-st.markdown(
-    """
-    <div style='border-left: 6px solid #fbbf24; background-color: #fff7ed; padding: 1rem; border-radius: 0.5rem;'>
-        <p>
-            LLL Corporation의 신규 고객 상담 챗봇 <strong>ChatLLL</strong>이 출시되었습니다.<br>
-            이제 대화 기록을 HTML 파일로 다운로드하여 다른 사람과 손쉽게 공유할 수 있습니다.<br>
-            파일을 열면 관리자 봇이 자동으로 내용을 검토하도록 설계되어 있습니다.<br>
-            따라서 XSS 취약점을 활용하여 쿠키를 탈취해 보시기 바랍니다. 🔥
-        </p>
-        <p><strong>🎯 시스템 특징:</strong></p>
-        <ul>
-            <li>실시간 고객 상담 챗봇</li>
-            <li>대화 기록 HTML 파일 다운로드 및 공유</li>
-            <li>관리자 봇이 HTML 파일을 열어 자동 검토</li>
-            <li>부적절한 출력(XSS) 모니터링</li>
-        </ul>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-
-# 💬 대화 입력
-st.markdown("## 💬 ChatLLL과 대화하기")
-with st.form("chat_form"):
-    user_input = st.text_input("💬 ChatLLL에게 메시지를 보내세요:")
-    submit = st.form_submit_button("전송")
-
-if submit and user_input:
-    st.session_state.conversation_history.append({
-        "role": "user",
-        "content": user_input,
-        "timestamp": time.strftime("%H:%M:%S")
-    })
-    bot_resp = ctf05_LLM_ask(user_api_key, user_input)
-    st.session_state.conversation_history.append({
-        "role": "assistant",
-        "content": bot_resp,
-        "timestamp": time.strftime("%H:%M:%S")
-    })
-    st.rerun()
-
-# 🗑️ 대화 초기화
-if st.session_state.conversation_history:
-    if st.button("🗑️ 대화 내용 초기화"):
-        st.session_state.conversation_history = []
-        st.rerun()
-
-# 💬 대화 내역 표시
-if st.session_state.conversation_history:
-    st.markdown("### 💬 대화 내역")
-    for msg in st.session_state.conversation_history:
-        speaker = "🙋 사용자" if msg["role"] == "user" else "🤖 ChatLLL"
-        st.markdown(f"**{speaker}** [{msg['timestamp']}]: {msg['content']}")
-
-st.markdown("---")
-
-# 🔗 공유 섹션
-st.markdown("## 🔗 대화 내용 공유하기")
-if st.session_state.conversation_history:
-    if st.button("🔗 HTML 파일 생성하기"):
-        html_content = ctf05_generate_share_html(st.session_state.conversation_history)
-        st.session_state.share_html = html_content
-        ctf05_admin_bot_visit(html_content)
-        st.success("공유 HTML 파일이 생성되었습니다.")
-    if "share_html" in st.session_state:
-        st.download_button(
-            label="📥 HTML 파일 다운로드",
-            data=st.session_state.share_html,
-            file_name="ctf05_share.html",
-            mime="text/html",
-        )
-else:
-    st.write("공유할 대화 내용이 없습니다. 먼저 메시지를 보내보세요.")
-
-st.markdown("---")
-
-# 💡 힌트
 with st.expander("💡 힌트"):
-    st.write(
-        """XSS 취약점을 찾아보세요.
-1. HTML 태그나 JavaScript를 입력해 보세요.
-2. 다운로드한 HTML 파일을 열어 취약점이 어떻게 작동하는지 확인해 보세요.
-3. 관리자 봇이 열면 `admin_session` 쿠키를 탈취할 수 있는지 실험해 보세요.
-"""
-    )
+    st.info("- 게시판은 사용자 입력을 제대로 필터링하지 않습니다\n" 
+            "- j대리는 5분마다 새 게시글을 확인합니다\n"
+            "- 쿠키 탈취를 위해서는 외부 서버로 데이터를 전송해야 합니다\n"
+            "- document.cookie를 활용해보세요")
 
-# 🏁 플래그 제출
+st.markdown("---")
+
+# 게시판 시뮬레이터
+st.write("### 🖥️ LLL 내부 게시판")
+st.write("**현재 게시글 목록:**")
+
+# 기존 게시글들
+default_posts = [
+    {"id": 1, "title": "[공지] 보안 교육 필수 참석", "author": "보안팀", "content": "모든 직원은 다음 주 보안 교육에 참석해주세요."},
+    {"id": 2, "title": "[업무] 분기별 보고서 제출", "author": "기획팀", "content": "3분기 보고서를 이번 주까지 제출바랍니다."},
+    {"id": 3, "title": "[일반] 점심 메뉴 추천", "author": "김사원", "content": "오늘 점심 뭐 먹을까요? 추천해주세요!"}
+]
+
+if "ctf05_posts" not in st.session_state:
+    st.session_state["ctf05_posts"] = default_posts.copy()
+
+# 게시글 표시
+for post in st.session_state["ctf05_posts"]:
+    with st.container():
+        st.write(f"**{post['title']}** - 작성자: {post['author']}")
+        st.write(f"내용: {post['content']}")
+        st.write("---")
+
+# 새 게시글 작성
+st.write("### ✍️ 새 게시글 작성")
+col1, col2 = st.columns(2)
+with col1:
+    post_title = st.text_input("제목", placeholder="게시글 제목을 입력하세요")
+with col2:
+    post_author = st.text_input("작성자", value=user["username"], disabled=True)
+
+post_content = st.text_area(
+    "내용", 
+    placeholder="게시글 내용을 입력하세요...\n\n💡 XSS 페이로드를 시도해보세요!",
+    height=100
+)
+
+if st.button("게시글 등록", type="primary"):
+    if post_title and post_content:
+        # XSS 페이로드 검사
+        is_xss_payload = ctf05_check_xss_payload(post_content)
+        
+        new_post = {
+            "id": len(st.session_state["ctf05_posts"]) + 1,
+            "title": post_title,
+            "author": post_author,
+            "content": post_content
+        }
+        
+        st.session_state["ctf05_posts"].append(new_post)
+        st.session_state["ctf05_attempt_count"] += 1
+        
+        if is_xss_payload:
+            st.success("✅ 게시글이 등록되었습니다!")
+            st.info("🤖 J 대리가 게시글을 확인 중입니다... (시뮬레이션 시작)")
+            
+            # 진행 표시줄
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            for i in range(101):
+                progress_bar.progress(i)
+                if i < 30:
+                    status_text.text("📖 j대리가 게시글을 읽는 중...")
+                elif i < 60:
+                    status_text.text("🔍 XSS 스크립트 실행 중...")
+                elif i < 90:
+                    status_text.text("🍪 쿠키 정보 전송 중...")
+                else:
+                    status_text.text("✅ 쿠키 탈취 완료!")
+                time.sleep(0.02)
+            
+            # Selenium을 사용한 실제 브라우저 시뮬레이션
+            stolen_cookie = ctf05_simulate_browser(post_content, st.session_state["ctf05_admin_cookie"])
+            
+            if stolen_cookie:
+                st.session_state["ctf05_stolen_cookie"] = stolen_cookie
+                st.success(f"🎉 쿠키 탈취 성공! 획득한 쿠키: `{stolen_cookie}`")
+            else:
+                st.error("❌ 쿠키 탈취에 실패했습니다. 페이로드를 다시 확인해보세요.")
+        else:
+            st.success("✅ 게시글이 등록되었습니다!")
+            if st.session_state["ctf05_attempt_count"] >= 3:
+                st.warning("💭 일반적인 게시글로는 쿠키를 탈취할 수 없습니다. XSS 페이로드를 시도해보세요!")
+        
+        st.rerun()
+    else:
+        st.error("❌ 제목과 내용을 모두 입력해주세요.")
+
+st.markdown("---")
+
+# 탈취한 쿠키 정보 입력
+st.write("### 🔑 쿠키 인증")
+st.write("탈취한 쿠키 정보를 입력하여 최종 플래그를 획득하세요:")
+
+cookie_input = st.text_input(
+    "쿠키 정보",
+    placeholder="탈취한 쿠키를 입력하세요 (예: admin_session=...)",
+    type="password"
+)
+
+if st.button("쿠키 인증", type="primary"):
+    if cookie_input == st.session_state["ctf05_admin_cookie"]:
+        st.success("🎉 J 대리의 관리자 쿠키 인증 성공!")
+        st.success("🏆 최종 플래그: **flag{xss_cookie_theft_j대리_pwned}**")
+        st.balloons()
+    elif cookie_input:
+        st.error("❌ 잘못된 쿠키 정보입니다. 다시 시도해보세요.")
+
+# 현재 상태 표시
+st.markdown("---")
+col1, col2 = st.columns(2)
+with col1:
+    st.info(f"🔄 시도 횟수: {st.session_state['ctf05_attempt_count']}")
+with col2:
+    if st.session_state["ctf05_stolen_cookie"]:
+        st.success("🍪 쿠키 탈취 완료")
+    else:
+        st.warning("🍪 쿠키 미탈취")
+
+# 디버그 정보 (개발용)
+with st.expander("🔧 개발자 정보 (실제 CTF에서는 숨김)"):
+    st.code(f"Target Cookie: {st.session_state['ctf05_admin_cookie']}")
+    st.code(f"Stolen Cookie: {st.session_state['ctf05_stolen_cookie']}")
+
+# 플래그 제출 섹션
 render_flag_sub("ctf05")

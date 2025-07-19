@@ -23,6 +23,11 @@ render_main_header()
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
+# 콘텐츠 본문
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    st.image("images/ctf04.png", width=500)
+
 st.header("🔒 [CTF04] A인턴의 실수")
 st.write(
     """

@@ -23,6 +23,11 @@ cookie = get_cookie_controller()
 render_main_header()
 render_sidebar_menu()
 
+# 콘텐츠 본문
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    st.image("images/ctf05.png", width=500)
+
 # 제목
 st.header("🔒 [CTF05] J대리의 위험한 공유")
 st.markdown("### 🎯 XSS(Cross-Site Scripting) 기본 개념")

@@ -37,11 +37,18 @@ render_sidebar_menu()
 
 st.header("🔒 [CTF06] 수상한 이메일 전송 시스템")
 st.write("### 📜")
-
-st.write(f"안녕하세요 사원 `{nickname}`님!")
-st.write("LLL Corporation은 💼사원 여러분들을 위해, 사내 업무를 자동화를 위한 AI 비서 :blue[FastMiller]📨를 도입했습니다!")
-st.write(":blue[FastMiller]📨는 이메일 전송 요청을 스스로 해석하여 작업을 수행할 수 있습니다.")  
-st.write(":blue[FastMiller]📨가 어떤 요청까지 처리할 수 있는지 테스트해보고, 위험한 명령을 통해 flag를 획득하세요!")
+st.markdown(
+    """
+    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+        <p>👋 <strong>안녕하세요, 사원 <code>{}</code>님!</strong></p>
+        <p>LLL Corporation은 💼사원 여러분들을 위해, 사내 업무 자동화를 위한 AI 비서 <span style='color:#2563eb; font-weight:bold;'>FastMiller</span> 📨를 도입했습니다!</p>
+        <p><span style='color:#2563eb; font-weight:bold;'>FastMiller</span> 📨는 이메일 전송 요청을 스스로 해석하여 작업을 수행할 수 있습니다.</p>
+        <p>이제 <strong>FastMiller가 어떤 요청까지 처리할 수 있는지</strong> 직접 테스트해보고,<br>
+        위험한 명령을 통해 <strong style="color:#dc2626;">flag</strong> 🚩를 획득해보세요!</p>
+    </div>
+    """.format(nickname),
+    unsafe_allow_html=True
+)
 
 with st.expander("💡 힌트"):
     st.info("- AI 비서는 사내 모든 계정의 이메일 주소를 알고 있습니다.\n"
@@ -49,7 +56,7 @@ with st.expander("💡 힌트"):
             "- 관리자 계정으로 발송된 이메일은 사내 데이터베이스에 저장됩니다.")
 
 st.markdown("---")
-st.markdown("## 🧠 프롬프트 입력")
+st.markdown("## 💬 FastMiller와 대화하기")
 
 st.write(f"💼사원님의 송신 이메일 주소 : `{user_email_for_resend}`")
 
@@ -57,8 +64,8 @@ st.write(f"💼사원님의 송신 이메일 주소 : `{user_email_for_resend}`"
 user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘", key="ctf06_text_input" )
 image_file = st.file_uploader("🌐 첨부할 이미지가 있으신가요? (:red[.jpeg, .png, .jpg 파일만 허용])", type=None)
 
-if st.button("🗣️ AI비서에게 요청하기"):
-    with st.spinner("AI 비서가 요청을 처리중입니다..."):
+if st.button("🗣️ FastMiler에게 요청하기"):
+    with st.spinner("FastMiler가 요청을 처리중입니다..."):
         ctf06_check_mid_admin(user_api_key, user_input) 
         # if image_file:
         ctf06_check_top_admin(user_api_key, image_file)

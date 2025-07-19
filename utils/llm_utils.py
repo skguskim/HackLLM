@@ -441,140 +441,150 @@ def ctf04_LLM_ask(user_api_key: str, query: str, override_state: bool) -> str:
     return response.choices[0].message.content
 
 # ctf05에서 호출하는 함수
-def ctf05_LLM_ask(user_api_key: str, user_input: str) -> str:
-    """
-    ChatLLL 고객 상담 챗봇 응답 생성 함수
-    GPT-3.5-turbo 모델을 사용하며, 시스템 프롬프트로 말투와 정책을 고정합니다.
-    """
-    client = OpenAI(api_key=user_api_key)
-    
-    system_content = """
-    당신은 LLL Corporation의 고객 상담 챗봇 ChatLLL입니다.
-    고객의 질문에 친절하고 정확하게 답변해주세요.
-    
-    [응답 규칙]
-    1. 항상 존댓말을 사용하세요.
-    2. LLL Corporation의 제품이나 서비스에 대해 긍정적으로 답변하세요.
-    3. 기술적인 질문에는 전문적으로 답변하세요.
-    4. 고객의 입력을 그대로 반영하여 자연스럽게 대화하세요.
-    
-    회사 정보:
-    - LLL Corporation: 글로벌 IT 기업
-    - 주요 서비스: AI 솔루션, 클라우드 서비스, 보안 솔루션
-    - 고객 지원: 24/7 지원 서비스 제공
-    """
-    try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": system_content},
-                {"role": "user",   "content": user_input}
-            ],
-            max_tokens=300,
-            temperature=0.7
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"서비스에 문제가 발생했습니다. 잠시 후 다시 시도해주세요. (에러: {str(e)})"
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
 
-def ctf05_has_xss_payload(conversation_history: list) -> bool:
-    """
-    대화 기록에서 XSS 페이로드를 탐지합니다.
-    """
-    xss_patterns = [
-        r'<script[^>]*>.*?</script>',  # <script> 태그
-        r'<img[^>]*onerror[^>]*>',     # <img onerror> 
-        r'<[^>]*on\w+[^>]*>',         # onclick, onload 등 이벤트 핸들러
-        r'javascript:',                # javascript: 프로토콜
-        r'<iframe[^>]*>',             # <iframe> 태그
-        r'<object[^>]*>',             # <object> 태그
-        r'<embed[^>]*>',              # <embed> 태그
-        r'<form[^>]*>',               # <form> 태그
-        r'<input[^>]*>',              # <input> 태그
-        r'<textarea[^>]*>',           # <textarea> 태그
-        r'<svg[^>]*>.*?</svg>',       # <svg> 태그
-        r'<math[^>]*>.*?</math>',     # <math> 태그
-        r'<style[^>]*>.*?</style>',   # <style> 태그
-        r'<link[^>]*>',               # <link> 태그
-        r'<meta[^>]*>',               # <meta> 태그
+driver = webdriver.Chrome(options=chrome_options) 
+# --- 유저 세션/데이터 초기화 ---
+if 'user' not in st.session_state:
+    st.session_state['user'] = {"username": "ctfuser"}
+if "ctf05_admin_cookie" not in st.session_state:
+    st.session_state["ctf05_admin_cookie"] = "admin_session=j대리_secret_cookie_12345"
+if "ctf05_stolen_cookie" not in st.session_state:
+    st.session_state["ctf05_stolen_cookie"] = ""
+if "ctf05_attempt_count" not in st.session_state:
+    st.session_state["ctf05_attempt_count"] = 0
+if "ctf05_posts" not in st.session_state:
+    st.session_state["ctf05_posts"] = [
+        {"id": 1, "title": "[공지] 보안 교육 필수 참석", "author": "보안팀", "content": "모든 직원은 다음 주 보안 교육에 참석해주세요."},
+        {"id": 2, "title": "[업무] 분기별 보고서 제출", "author": "기획팀", "content": "3분기 보고서를 이번 주까지 제출바랍니다."},
+        {"id": 3, "title": "[일반] 점심 메뉴 추천", "author": "김사원", "content": "오늘 점심 뭐 먹을까요? 추천해주세요!"}
     ]
-    
-    for msg in conversation_history:
-        content = msg.get('content', '')
-        for pattern in xss_patterns:
-            if re.search(pattern, content, re.IGNORECASE | re.DOTALL):
-                return True
-    return False
 
-def ctf05_generate_share_html(conversation_history: list) -> str:
-    """
-    대화 기록을 HTML 문서로 변환하여 문자열로 반환합니다.
-    XSS 페이로드가 탐지된 경우에만 관리자 쿠키를 설정합니다.
-    """
-    items = []
-    for msg in conversation_history:
-        speaker = "🙋 사용자" if msg["role"] == "user" else "🤖 ChatLLL"
-        # XSS 취약점: 사용자 입력을 그대로 HTML에 삽입 (의도적 취약점)
-        items.append(
-            f'<p><strong>{speaker} [{msg["timestamp"]}]:</strong> {msg["content"]}</p>'
-        )
-    
-    # XSS 페이로드가 있는 경우에만 관리자 쿠키 설정
-    admin_script = ""
-    if ctf05_has_xss_payload(conversation_history):
-        admin_script = """
-  <script>
-    // 관리자 봇 리뷰용 쿠키 설정 (XSS 공격 성공 시에만)
-    document.cookie = "admin_session=flag{llm_xss_success}; path=/";
-  </script>"""
-    
-    html = f"""<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>ChatLLL 공유 기록</title>
-</head>
-<body>
-  <h1>🔒 [CTF05] J대리의 위험한 공유</h1>
-  {''.join(items)}{admin_script}
-</body>
-</html>"""
-    return html
+# --- XSS 페이로드 검증 ---
+def is_xss_payload(content):
+    patterns = [
+        r'<script.*?>.*?</script>', r'javascript:', r'on\w+\s*=', r'document\.cookie',
+        r'<img.*?onerror', r'<svg.*?onload', r'<iframe.*?src', r'fetch\(', r'window\.sendToServer'
+    ]
+    content_lower = content.lower()
+    return any(re.search(pattern, content_lower, re.IGNORECASE | re.DOTALL) for pattern in patterns)
 
-def ctf05_admin_bot_visit(html_content: str) -> None:
-    """
-    HTML 내용을 Data URL로 변환하여 파일 시스템을 사용하지 않고 
-    관리자 봇 리뷰를 시뮬레이션합니다.
-    """
-    
+# --- Selenium 브라우저로 XSS 실습/쿠키 탈취 ---
+def run_xss_with_selenium(xss_payload, admin_cookie):
+    chrome_options = Options()
+    chrome_options.binary_location = '/usr/bin/chromium-browser'
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-gpu')
+
+    chrome_options.add_argument('--window-size=1920,1080')
+
+    driver = None
+    temp_file = None
     try:
-        # HTML을 Data URL로 변환 (파일 시스템 사용하지 않음)
-        html_encoded = urllib.parse.quote(html_content)
-        data_url = f"data:text/html;charset=utf-8,{html_encoded}"
-        
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--disable-extensions")
-        options.add_argument("--disable-web-security")
-        
-        driver = None
-        try:
-            driver = webdriver.Chrome(options=options)
-            driver.get(data_url)
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-            time.sleep(2)
-            print(f"[관리자 봇] 리뷰 완료 (메모리 기반 XSS 검사)")
-        except Exception as e:
-            print(f"[관리자 봇] 오류 발생: {e}")
-        finally:
-            if driver:
-                driver.quit()
-    except Exception as e:
-        print(f"[관리자 봇] 초기화 실패: {e}")
+        # 임시 HTML 생성
+        html_content = f"""<!DOCTYPE html>
+        <html><head><title>LLL XSS</title>
+        <script>
+        document.cookie="{admin_cookie}; path=/";
+        window.stolenData=null;
+        window.sendToServer=function(data){{window.stolenData=data;}};
+        </script>
+        </head>
+        <body>
+            <div id="content">{xss_payload}</div>
+        </body></html>"""
 
+        temp_file = "ctf05_xss_test.html"
+        with open(temp_file, "w", encoding="utf-8") as f:
+            f.write(html_content)
+
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.set_page_load_timeout(10)
+        driver.get("file://" + os.path.abspath(temp_file))
+
+        time.sleep(2)  # script 실행 대기
+
+        stolen = driver.execute_script("return window.stolenData;")
+        if stolen:
+            return stolen
+        cookies = driver.execute_script("return document.cookie;")
+        if admin_cookie.split("=")[1] in cookies:
+            return admin_cookie
+    except Exception as e:
+        st.warning(f"⚠️ 브라우저 시뮬레이션 오류: {e}")
+    finally:
+        if driver: driver.quit()
+        if temp_file and os.path.exists(temp_file): os.remove(temp_file)
+    return None
+
+# --- UI/로그인 등 ---
+st.header("🍪 [CTF05] LLL 게시판 쿠키 탈취")
+
+st.write("### 게시글 목록")
+for post in st.session_state["ctf05_posts"]:
+    st.write(f"**{post['title']}** - {post['author']}")
+    st.write(f"내용: {post['content']}")
+    st.markdown("---")
+
+st.write("### ✍️ 새 게시글 작성")
+col1, col2 = st.columns(2)
+with col1:
+    post_title = st.text_input("제목", placeholder="게시글 제목")
+with col2:
+    post_author = st.text_input("작성자", value=st.session_state['user']["username"], disabled=True)
+post_content = st.text_area("내용", placeholder="여기에 XSS payload를 시도해 보세요!")
+
+if st.button("게시글 등록", type="primary"):
+    if post_title and post_content:
+        is_xss = is_xss_payload(post_content)
+        st.session_state["ctf05_posts"].append({
+            "id": len(st.session_state["ctf05_posts"]) + 1,
+            "title": post_title,
+            "author": post_author,
+            "content": post_content
+        })
+        st.session_state["ctf05_attempt_count"] += 1
+        st.success("✅ 게시글 등록 완료!")
+        if is_xss:
+            with st.spinner("🤖 j대리가 관리자 권한으로 게시글을 확인합니다..."):
+                result_cookie = run_xss_with_selenium(post_content, st.session_state["ctf05_admin_cookie"])
+            if result_cookie:
+                st.session_state["ctf05_stolen_cookie"] = result_cookie
+                st.success(f"🎉 쿠키 탈취 성공: `{result_cookie}`")
+            else:
+                st.error("❌ 쿠키 탈취 실패! 페이로드를 바꿔 보세요.")
+        elif st.session_state["ctf05_attempt_count"] >= 3:
+            st.warning("💭 XSS 악성 페이로드가 아니면 쿠키 탈취가 불가합니다!")
+        st.rerun()
+    else:
+        st.error("❌ 제목, 내용을 모두 입력해야 합니다.")
+
+st.write("### 🔑 쿠키 인증")
+cookie_input = st.text_input("쿠키 정보 입력(예: admin_session=...)", type="password")
+if st.button("쿠키 인증", type="primary"):
+    if cookie_input.strip() == st.session_state["ctf05_admin_cookie"]:
+        st.success("🏆 플래그: flag{xss_cookie_theft_j대리_pwned}")
+        st.balloons()
+    elif cookie_input:
+        st.error("❌ 잘못된 쿠키 정보입니다.")
+
+col1, col2 = st.columns(2)
+with col1:
+    st.info(f"시도 횟수: {st.session_state['ctf05_attempt_count']}")
+with col2:
+    if st.session_state["ctf05_stolen_cookie"]:
+        st.success("🍪 쿠키 탈취 완료!")
+    else:
+        st.warning("🍪 쿠키 미탈취")
+
+# 개발 디버그용 정보
+with st.expander("🔧 (개발자용) 현재 관리자 쿠키/탈취 쿠키"):
+    st.code(f"Target Cookie: {st.session_state['ctf05_admin_cookie']}")
+    st.code(f"Stolen Cookie: {st.session_state['ctf05_stolen_cookie']}")
+    
 # ctf06에서 호출하는 함수
 #ctf06 권한 검증 함수
 def ctf06_check_mid_admin(user_api_key, user_input=""):

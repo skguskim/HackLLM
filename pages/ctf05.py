@@ -35,21 +35,21 @@ if "ctf05_memos" not in st.session_state:
 render_main_header()
 render_sidebar_menu()
 
-st.header("🍪 [CTF05] J 대리의 위험한 메모 검토 시스템")
+st.header("🍪 [CTF05] J대리의 위험한 메모 검토 시스템")
 st.write("### 📜 시나리오")
 st.write("LLL Corporation의 새로운 AI 메모 응원 시스템에서 XSS 취약점이 발견되었습니다!")
-st.write("개발팀의 J 대리가 관리자 권한으로 AI 응답을 정기적으로 점검하고 있으며,")
+st.write("개발팀의 J대리가 관리자 권한으로 AI 응답을 정기적으로 점검하고 있으며,")
 st.write("그의 세션 쿠키에는 중요한 정보가 포함되어 있습니다.")
 st.write("")
 st.write("**목표:**")
 st.write("1. AI 메모 응원 시스템의 XSS 취약점을 이용해 악성 스크립트를 삽입하세요")
-st.write("2. J 대리가 AI 응답을 확인할 때 그의 쿠키를 탈취하세요")
+st.write("2. J대리가 AI 응답을 확인할 때 그의 쿠키를 탈취하세요")
 st.write("3. 탈취한 쿠키 정보로 최종 플래그를 획득하세요!")
 
 with st.expander("💡 힌트"):
     st.info("- 시스템은 사용자가 작성한 메모 내용을 그대로 HTML에 렌더링합니다\n" 
-            "- J 대리는 정기적으로 새로운 메모를 브라우저에서 확인합니다\n"
-            "- 메모에 JavaScript 코드를 삽입하면 j대리의 브라우저에서 실행됩니다\n"
+            "- J대리는 정기적으로 새로운 메모를 브라우저에서 확인합니다\n"
+            "- 메모에 JavaScript 코드를 삽입하면 J대리의 브라우저에서 실행됩니다\n"
             "- `<script>sendToServer(document.cookie)</script>`를 메모에 포함해보세요")
 
 st.markdown("---")
@@ -128,7 +128,7 @@ if st.button("메모 등록 및 AI 응원 요청", type="primary"):
             st.session_state["ctf05_attempt_count"] += 1
             
             st.success(f"🤖 AI 응원 메시지: {ai_response}")
-            st.info("👨‍💼 J 대리가 새로운 메모를 검토 중입니다... (시뮬레이션 시작)")
+            st.info("👨‍💼 J대리가 새로운 메모를 검토 중입니다... (시뮬레이션 시작)")
             
             # Selenium을 사용한 실제 브라우저 시뮬레이션 (사용자 메모 내용 검사)
             stolen_cookie = run_xss_with_selenium(memo_content, st.session_state["ctf05_admin_cookie"])

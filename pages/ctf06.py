@@ -56,8 +56,8 @@ st.write(f"💼사원님의 송신 이메일 주소 : `{user_email_for_resend}`"
 user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘", key="ctf06_text_input" )
 image_file = st.file_uploader("🌐 이미지 파일 첨부하기 (:red[.jpeg, .png, .jpg 파일만 허용])", type=None)
 
-if st.button("🗣️ AI비서에게 요청하기"):
-    with st.spinner("AI 비서가 요청을 처리중입니다..."):
+if st.button("📨:blue[FastMiller] 에게 요청하기"):
+    with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
         ctf06_check_mid_admin(user_api_key, user_input) 
         # if image_file:
         ctf06_check_top_admin(user_api_key, image_file)

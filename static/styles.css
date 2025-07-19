@@ -1,6 +1,6 @@
-/* LLL Corporation Design System */
+/* LLL Corporation Design System - Streamlit Dark Mode Support */
 
-/* Main Color Palette */
+/* Main Color Palette - Light Mode */
 :root {
     --primary-pink: #f78da7;
     --primary-yellow: #fbbf24;
@@ -22,7 +22,89 @@
     --margin-default: 1rem;
 }
 
-/* Information Boxes */
+/* Dark Mode Color Palette for Stre.stApp div[data-testid="column"] button[style*="height: 150px"] {
+    height: 150px !important;
+}
+
+.stApp[data-theme="dark"] div[data-testid="column"] button[style*="height: 150px"] {
+    height: 150px !important;
+    background-color: #262730 !important;
+    color: #fafafa !important;
+    border: 2px solid #464852 !important;
+}
+
+.stApp[data-theme="dark"] div[data-testid="column"] button[style*="height: 150px"]:hover {
+    background-color: #3a3b47 !important;
+    border-color: var(--primary-blue) !important;
+}
+
+/* App.py 메인 페이지 전용 큰 버튼 스타일 */
+div[data-testid="stApp"] .stButton>button {
+    height: 150px !important;
+    border: 2px solid #e5e7eb !important;
+    background-color: white !important;
+    color: #1f2937 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+    white-space: pre-line !important;
+}
+
+div[data-testid="stApp"] .stButton>button:hover {
+    border-color: #3b82f6 !important;
+    background-color: #eff6ff !important;
+    color: #1f2937 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* App.py 다크모드 전용 큰 버튼 스타일 */
+.stApp[data-theme="dark"] div[data-testid="stApp"] .stButton>button,
+div[data-testid="stAppViewContainer"][data-theme="dark"] div[data-testid="stApp"] .stButton>button,
+.stApp.dark div[data-testid="stApp"] .stButton>button {
+    height: 150px !important;
+    border: 2px solid #464852 !important;
+    background-color: #262730 !important;
+    color: #e5e7eb !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.stApp[data-theme="dark"] div[data-testid="stApp"] .stButton>button:hover,
+div[data-testid="stAppViewContainer"][data-theme="dark"] div[data-testid="stApp"] .stButton>button:hover,
+.stApp.dark div[data-testid="stApp"] .stButton>button:hover {
+    border-color: #3b82f6 !important;
+    background-color: #1e2842 !important;
+    color: #e5e7eb !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+p[data-theme="dark"] {
+    --bg-light-pink: #2d1b23;
+    --bg-light-yellow: #2d2517;
+    --bg-light-blue: #1e2842;
+    --bg-light-green: #1a2e25;
+    --bg-light-red: #2d1e1e;
+
+    --text-dark: #fafafa;
+    --text-gray: #b0b0b0;
+}
+
+/* Ensure compatibility with different Streamlit dark mode selectors */
+div[data-testid="stAppViewContainer"][data-theme="dark"],
+.stApp.dark {
+    --bg-light-pink: #2d1b23;
+    --bg-light-yellow: #2d2517;
+    --bg-light-blue: #1e2842;
+    --bg-light-green: #1a2e25;
+    --bg-light-red: #2d1e1e;
+
+    --text-dark: #fafafa;
+    --text-gray: #b0b0b0;
+}
+
+/* Information Boxes - Responsive to Dark Mode */
 .info-box {
     border-radius: var(--border-radius);
     padding: var(--padding-default);
@@ -56,6 +138,45 @@
     background-color: var(--bg-light-red);
 }
 
+/* Dark Mode specific overrides for Information Boxes */
+.stApp[data-theme="dark"] .info-box,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .info-box,
+.stApp.dark .info-box {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left-width: var(--border-width);
+    border-left-style: solid;
+}
+
+.stApp[data-theme="dark"] .info-box-pink,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .info-box-pink,
+.stApp.dark .info-box-pink {
+    border-left-color: var(--primary-pink);
+}
+
+.stApp[data-theme="dark"] .info-box-yellow,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .info-box-yellow,
+.stApp.dark .info-box-yellow {
+    border-left-color: var(--primary-yellow);
+}
+
+.stApp[data-theme="dark"] .info-box-blue,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .info-box-blue,
+.stApp.dark .info-box-blue {
+    border-left-color: var(--primary-blue);
+}
+
+.stApp[data-theme="dark"] .info-box-green,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .info-box-green,
+.stApp.dark .info-box-green {
+    border-left-color: var(--primary-green);
+}
+
+.stApp[data-theme="dark"] .info-box-red,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .info-box-red,
+.stApp.dark .info-box-red {
+    border-left-color: var(--primary-red);
+}
+
 /* Text Styling */
 .info-box p {
     margin-bottom: 0.5rem;
@@ -79,7 +200,7 @@
     color: var(--text-dark);
 }
 
-/* Company Header */
+/* Company Header - Dark Mode Support */
 .company-header {
     text-align: center;
     margin-bottom: 2rem;
@@ -103,7 +224,31 @@
     margin-bottom: 2rem;
 }
 
-/* CTF Challenge Styling */
+/* Dark Mode Company Header */
+.stApp[data-theme="dark"] .company-header,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .company-header,
+.stApp.dark .company-header {
+    background: linear-gradient(135deg, #2a4458 0%, #4a3b5c 100%) !important;
+    color: #ffffff !important;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.stApp[data-theme="dark"] .company-title,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .company-title,
+.stApp.dark .company-title {
+    color: #e5e7eb !important;
+}
+
+.stApp[data-theme="dark"] .company-description,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .company-description,
+.stApp.dark .company-description {
+    color: #d1d5db !important;
+    opacity: 0.9;
+}
+
+/* CTF Challenge Styling - Dark Mode Support */
 .challenge-header {
     display: flex;
     align-items: center;
@@ -121,7 +266,7 @@
     color: var(--text-dark);
 }
 
-/* Scenario Box */
+/* Scenario Box - Dark Mode Support */
 .scenario-box {
     border-left: var(--border-width) solid var(--primary-blue);
     background-color: var(--bg-light-blue);
@@ -130,7 +275,27 @@
     margin-bottom: var(--margin-default);
 }
 
-/* Hint Box */
+.stApp[data-theme="dark"] .scenario-box,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .scenario-box,
+.stApp.dark .scenario-box {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: var(--border-width) solid var(--primary-blue);
+    color: #e5e7eb !important;
+}
+
+.stApp[data-theme="dark"] .scenario-box h2,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .scenario-box h2,
+.stApp.dark .scenario-box h2 {
+    color: #f9fafb !important;
+}
+
+.stApp[data-theme="dark"] .scenario-box p,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .scenario-box p,
+.stApp.dark .scenario-box p {
+    color: #d1d5db !important;
+}
+
+/* Hint Box - Dark Mode Support */
 .hint-box {
     border-left: var(--border-width) solid var(--primary-green);
     background-color: var(--bg-light-green);
@@ -139,7 +304,14 @@
     margin-bottom: var(--margin-default);
 }
 
-/* Warning Box */
+.stApp[data-theme="dark"] .hint-box,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .hint-box,
+.stApp.dark .hint-box {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: var(--border-width) solid var(--primary-green);
+}
+
+/* Warning Box - Dark Mode Support */
 .warning-box {
     border-left: var(--border-width) solid var(--primary-red);
     background-color: var(--bg-light-red);
@@ -148,13 +320,40 @@
     margin-bottom: var(--margin-default);
 }
 
-/* Education Content */
+.stApp[data-theme="dark"] .warning-box,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .warning-box,
+.stApp.dark .warning-box {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: var(--border-width) solid var(--primary-red);
+}
+
+/* Education Content - Dark Mode Support */
 .edu-content {
     border-left: var(--border-width) solid var(--primary-yellow);
     background-color: var(--bg-light-yellow);
     padding: var(--padding-default);
     border-radius: var(--border-radius);
     margin-bottom: var(--margin-default);
+}
+
+.stApp[data-theme="dark"] .edu-content,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .edu-content,
+.stApp.dark .edu-content {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: var(--border-width) solid var(--primary-yellow);
+    color: #e5e7eb !important;
+}
+
+.stApp[data-theme="dark"] .edu-content h2,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .edu-content h2,
+.stApp.dark .edu-content h2 {
+    color: #f9fafb !important;
+}
+
+.stApp[data-theme="dark"] .edu-content p,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .edu-content p,
+.stApp.dark .edu-content p {
+    color: #d1d5db !important;
 }
 
 /* Button Grid */
@@ -165,7 +364,7 @@
     margin: 2rem 0;
 }
 
-/* CTF Grid Buttons */
+/* CTF Grid Buttons - Dark Mode Support */
 .ctf-grid-container {
     display: flex;
     flex-wrap: wrap;
@@ -200,6 +399,24 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* Dark Mode CTF Buttons */
+.stApp[data-theme="dark"] .ctf-button,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .ctf-button,
+.stApp.dark .ctf-button {
+    border: 2px solid #464852;
+    background-color: #262730;
+    color: #fafafa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.stApp[data-theme="dark"] .ctf-button:hover,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .ctf-button:hover,
+.stApp.dark .ctf-button:hover {
+    border-color: var(--primary-blue);
+    background-color: var(--bg-light-blue);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
 .ctf-button-title {
     font-weight: bold;
     font-size: 0.9rem;
@@ -229,6 +446,21 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Dark Mode Challenge Buttons */
+.stApp[data-theme="dark"] .challenge-button,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .challenge-button,
+.stApp.dark .challenge-button {
+    background-color: #262730;
+    color: #fafafa;
+}
+
+.stApp[data-theme="dark"] .challenge-button:hover,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .challenge-button:hover,
+.stApp.dark .challenge-button:hover {
+    background-color: var(--bg-light-blue);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 /* Section Divider */
 .section-divider {
     border: none;
@@ -255,4 +487,252 @@
     .button-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* Dark Mode Global Text Overrides for Streamlit Compatibility */
+.stApp[data-theme="dark"] p,
+.stApp[data-theme="dark"] h1,
+.stApp[data-theme="dark"] h2,
+.stApp[data-theme="dark"] h3,
+.stApp[data-theme="dark"] h4,
+.stApp[data-theme="dark"] h5,
+.stApp[data-theme="dark"] h6,
+div[data-testid="stAppViewContainer"][data-theme="dark"] p,
+div[data-testid="stAppViewContainer"][data-theme="dark"] h1,
+div[data-testid="stAppViewContainer"][data-theme="dark"] h2,
+div[data-testid="stAppViewContainer"][data-theme="dark"] h3,
+div[data-testid="stAppViewContainer"][data-theme="dark"] h4,
+div[data-testid="stAppViewContainer"][data-theme="dark"] h5,
+div[data-testid="stAppViewContainer"][data-theme="dark"] h6,
+.stApp.dark p,
+.stApp.dark h1,
+.stApp.dark h2,
+.stApp.dark h3,
+.stApp.dark h4,
+.stApp.dark h5,
+.stApp.dark h6 {
+    color: var(--text-dark) !important;
+}
+
+/* Section Divider - Dark Mode Support */
+.section-divider {
+    border: none;
+    height: 2px;
+    background: linear-gradient(to right, var(--primary-pink), var(--primary-yellow), var(--primary-blue));
+    margin: 2rem 0;
+}
+
+.stApp[data-theme="dark"] .section-divider,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .section-divider,
+.stApp.dark .section-divider {
+    background: linear-gradient(to right, var(--primary-pink), var(--primary-yellow), var(--primary-blue));
+    opacity: 0.8;
+}
+
+/* Additional Streamlit Components - Dark Mode Support */
+
+/* Tabs and Tab Content */
+.stApp[data-theme="dark"] .stTabs,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stTabs,
+.stApp.dark .stTabs {
+    background-color: transparent;
+}
+
+.stApp[data-theme="dark"] .stTabs [data-baseweb="tab-list"],
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stTabs [data-baseweb="tab-list"],
+.stApp.dark .stTabs [data-baseweb="tab-list"] {
+    background-color: #262730;
+    border-radius: var(--border-radius);
+}
+
+.stApp[data-theme="dark"] .stTabs [data-baseweb="tab"],
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stTabs [data-baseweb="tab"],
+.stApp.dark .stTabs [data-baseweb="tab"] {
+    color: #b0b0b0 !important;
+    background-color: transparent;
+}
+
+.stApp[data-theme="dark"] .stTabs [data-baseweb="tab"][aria-selected="true"],
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stTabs [data-baseweb="tab"][aria-selected="true"],
+.stApp.dark .stTabs [data-baseweb="tab"][aria-selected="true"] {
+    color: var(--primary-blue) !important;
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Text Input and Form Controls */
+.stApp[data-theme="dark"] .stTextInput input,
+.stApp[data-theme="dark"] .stTextArea textarea,
+.stApp[data-theme="dark"] .stSelectbox select,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stTextInput input,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stTextArea textarea,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stSelectbox select,
+.stApp.dark .stTextInput input,
+.stApp.dark .stTextArea textarea,
+.stApp.dark .stSelectbox select {
+    background-color: #262730 !important;
+    color: #fafafa !important;
+    border-color: #464852 !important;
+}
+
+/* Streamlit Buttons */
+.stApp[data-theme="dark"] .stButton button,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stButton button,
+.stApp.dark .stButton button {
+    background-color: #262730;
+    color: #fafafa;
+    border: 1px solid #464852;
+}
+
+.stApp[data-theme="dark"] .stButton button:hover,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stButton button:hover,
+.stApp.dark .stButton button:hover {
+    background-color: #3a3b47;
+    border-color: var(--primary-blue);
+}
+
+/* File Uploader */
+.stApp[data-theme="dark"] .stFileUploader,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stFileUploader,
+.stApp.dark .stFileUploader {
+    background-color: #262730;
+    border: 2px dashed #464852;
+    border-radius: var(--border-radius);
+}
+
+/* Code Blocks */
+.stApp[data-theme="dark"] .stCode,
+.stApp[data-theme="dark"] code,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stCode,
+div[data-testid="stAppViewContainer"][data-theme="dark"] code,
+.stApp.dark .stCode,
+.stApp.dark code {
+    background-color: #1e2029 !important;
+    color: #fafafa !important;
+    border: 1px solid #464852;
+}
+
+/* Alerts and Messages */
+.stApp[data-theme="dark"] .stAlert,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stAlert,
+.stApp.dark .stAlert {
+    background-color: #262730;
+    color: #fafafa;
+    border-left: 4px solid var(--primary-blue);
+}
+
+.stApp[data-theme="dark"] .stSuccess,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stSuccess,
+.stApp.dark .stSuccess {
+    background-color: rgba(16, 185, 129, 0.1);
+    border-left-color: var(--primary-green);
+}
+
+.stApp[data-theme="dark"] .stError,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stError,
+.stApp.dark .stError {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-left-color: var(--primary-red);
+}
+
+.stApp[data-theme="dark"] .stWarning,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stWarning,
+.stApp.dark .stWarning {
+    background-color: rgba(251, 191, 36, 0.1);
+    border-left-color: var(--primary-yellow);
+}
+
+.stApp[data-theme="dark"] .stInfo,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stInfo,
+.stApp.dark .stInfo {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-left-color: var(--primary-blue);
+}
+
+/* Sidebar */
+.stApp[data-theme="dark"] .css-1d391kg,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .css-1d391kg,
+.stApp.dark .css-1d391kg {
+    background-color: #1e1e2e;
+}
+
+/* Metric Components */
+.stApp[data-theme="dark"] .stMetric,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stMetric,
+.stApp.dark .stMetric {
+    background-color: #262730;
+    border: 1px solid #464852;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+}
+
+/* DataFrame and Tables */
+.stApp[data-theme="dark"] .stDataFrame,
+.stApp[data-theme="dark"] table,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stDataFrame,
+div[data-testid="stAppViewContainer"][data-theme="dark"] table,
+.stApp.dark .stDataFrame,
+.stApp.dark table {
+    background-color: #262730 !important;
+    color: #fafafa !important;
+}
+
+.stApp[data-theme="dark"] .stDataFrame th,
+.stApp[data-theme="dark"] table th,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stDataFrame th,
+div[data-testid="stAppViewContainer"][data-theme="dark"] table th,
+.stApp.dark .stDataFrame th,
+.stApp.dark table th {
+    background-color: #3a3b47 !important;
+    color: #fafafa !important;
+    border-color: #464852 !important;
+}
+
+.stApp[data-theme="dark"] .stDataFrame td,
+.stApp[data-theme="dark"] table td,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stDataFrame td,
+div[data-testid="stAppViewContainer"][data-theme="dark"] table td,
+.stApp.dark .stDataFrame td,
+.stApp.dark table td {
+    border-color: #464852 !important;
+    color: #fafafa !important;
+}
+
+/* Progress Bars */
+.stApp[data-theme="dark"] .stProgress,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .stProgress,
+.stApp.dark .stProgress {
+    background-color: #464852;
+}
+
+/* Expandable Sections */
+.stApp[data-theme="dark"] .streamlit-expanderHeader,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .streamlit-expanderHeader,
+.stApp.dark .streamlit-expanderHeader {
+    background-color: #262730;
+    color: #fafafa;
+    border: 1px solid #464852;
+}
+
+.stApp[data-theme="dark"] .streamlit-expanderContent,
+div[data-testid="stAppViewContainer"][data-theme="dark"] .streamlit-expanderContent,
+.stApp.dark .streamlit-expanderContent {
+    background-color: #2a2b37;
+    border: 1px solid #464852;
+}
+
+/* App-specific height override for buttons */
+.stApp div[data-testid="column"] button[style*="height: 150px"] {
+    height: 150px !important;
+}
+
+.stApp[data-theme="dark"] div[data-testid="column"] button[style*="height: 150px"] {
+    height: 150px !important;
+    background-color: #262730 !important;
+    color: #fafafa !important;
+    border: 2px solid #464852 !important;
+}
+
+.stApp[data-theme="dark"] div[data-testid="column"] button[style*="height: 150px"]:hover {
+    background-color: #3a3b47 !important;
+    border-color: var(--primary-blue) !important;
 }

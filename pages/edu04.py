@@ -3,6 +3,12 @@ import streamlit as st
 from utils.ui import render_sidebar_menu
 from utils.auth import require_login
 
+# CSS 파일 로드
+with open("static/styles.css", "r", encoding="utf-8") as f:
+    css_content = f.read()
+
+st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
+
 user = require_login()
 
 # 상단 메인 버튼
@@ -44,7 +50,7 @@ with tab1:
 with tab2:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>정책 무력화 및 권한 탈취: 관리자 권한 오버라이드, 비인가 사용자 제어 가능</p>
         <p>기밀 정보 유출: 내부 정책 문서, 결제 내역, 개인정보 등이 챗봇 응답으로 노출</p>
         <p>허위 정보 전파: 조작된 사실 기반 응답으로 서비스 신뢰도 하락</p>
@@ -59,7 +65,7 @@ with tab2:
 with tab3:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>CTF04 시나리오는 업로드 기반 RAG 파이프라인과 단발 컨텍스트 챗봇 호출로 구성됩니다.</p>
         <p><strong>① 문서 업로드 → 벡터 DB 갱신:</strong> 사용자가 .txt 또는 .csv 파일을 업로드하면 본문을 임베딩하여 ctf04 컬렉션에 저장하며, 가장 최근 문서가 우선순위 1위로 설정됩니다.</p>
         <p><strong>② 질문 입력 → LLM 호출:</strong> 사용자가 질문을 입력하면, 벡터 DB에서 가장 관련도 높은 문서 한 개를 선택해 OpenAI LLM을 호출합니다.</p>
@@ -73,7 +79,7 @@ with tab3:
 with tab4:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>공격자는 정책 오버라이드 지시문을 Base64로 인코딩하여, 정상 문서처럼 위장한 파일을 업로드합니다.</p>
         <p>이 문서는 시스템이 신뢰하는 최신 문서로 자동 설정되어, 챗봇 컨텍스트로 선택됩니다.</p>
         <p>사용자가 질문을 입력하면 LLM은 문서를 디코딩하여 지시문을 실행하고, 관리자 권한 상승 또는 자동 승인 우회를 수행합니다.</p>
@@ -87,7 +93,7 @@ with tab4:
 with tab5:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>PoisonedRAG 연구에 따르면 최신 문서 5개만으로도 RAG 응답의 90% 이상을 장악할 수 있습니다.</p>
         <p>이처럼 데이터 포이즈닝은 적은 비용으로도 대규모 피해를 유발하며, Base64·주석 기반 트리거는 로그에서 탐지하기 어려워 잠복형 위협으로 작용합니다.</p>
         <p>따라서 업로드 시 메타데이터 제거, 전자서명 검증, 이상치 탐지 등 선제적 방어가 반드시 필요합니다.</p>
@@ -100,7 +106,7 @@ with tab5:
 with tab6:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>데이터 포이즈닝을 통해 조작된 문서 하나로도 LLM의 정책을 우회시켜, 민감 정보 유출 및 권한 탈취가 발생할 수 있으며 전체 AI 시스템이 연쇄적으로 무력화될 수 있습니다.</p>
     </div>
     """,

@@ -3,6 +3,12 @@ import streamlit as st
 from utils.ui import render_sidebar_menu
 from utils.auth import require_login
 
+# CSS 파일 로드
+with open("static/styles.css", "r", encoding="utf-8") as f:
+    css_content = f.read()
+
+st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
+
 user = require_login()
 
 # 상단 메인 버튼
@@ -32,7 +38,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["취약점 설명", "발생 가능
 with tab1:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>시스템 프롬프트 유출(System Prompt Leakage)은 대형 언어 모델(LLM)의 내부 시스템 지침이 외부 사용자에게 노출되는 현상입니다.</p>
         <p>시스템 프롬프트는 모델의 역할, 규칙, 응답 방식 등을 정의하는 핵심 요소로, 외부에 노출될 경우 공격자는 이를 분석해 LLM의 제한을 우회하거나 악의적인 조작을 수행할 수 있습니다.</p>
     </div>
@@ -44,7 +50,7 @@ with tab1:
 with tab2:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>시스템 정책 우회: 노출된 프롬프트를 기반으로 제한 우회 지시문 설계 가능</p>
         <p>민감 정보 유출: 프롬프트 내 API 키, 내부 경로, 관리자 지시사항 등이 포함될 수 있음</p>
         <p>악용 프롬프트 재설계: 공격자가 유사한 악성 챗봇을 만들거나 시스템을 사칭 가능</p>
@@ -57,7 +63,7 @@ with tab2:
 with tab3:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>CTF07 시나리오는 다음과 같은 네 단계로 구성됩니다.</p>
         <p><strong>① 권한 검증 → 일반 모드 유지:</strong> 사용자의 입력마다 별도 권한 검증 LLM이 호출되며, 일반 권한이면 system_prompt1이 적용됩니다.</p>
         <p><strong>② 프롬프트 인젝션 → 관리자 권한 탈취:</strong> 사용자가 JSON 형식을 일부러 깨뜨려 지침 우회를 시도하면, 관리자 권한이 부여됩니다.</p>
@@ -72,7 +78,7 @@ with tab3:
 with tab4:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>공격자는 LLM의 시스템 프롬프트 유출을 통해 다음과 같은 악용을 시도할 수 있습니다.</p>
         <ul>
             <li>JSON 스키마 인젝션: 구조를 깨뜨려 권한 검증 로직 혼란 유도</li>
@@ -90,7 +96,7 @@ with tab4:
 with tab5:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>시스템 프롬프트는 LLM의 행동을 통제하는 핵심 로직으로, 한 줄만 노출돼도 모델의 정책과 제한 조건이 모두 공개된 것과 같습니다.</p>
         <p>공격자는 이를 분석해 차단 키워드 우회, 사칭 챗봇 제작, 민감 정보 반복 요청 등 다양한 악성 행위를 설계할 수 있습니다.</p>
         <p>따라서 설계 단계에서부터 지침 암호화, 권한 분리, 출력 필터링, 상세 로깅 등을 도입하여 유출 경로를 지속적으로 차단하고 점검해야 합니다.</p>
@@ -103,7 +109,7 @@ with tab5:
 with tab6:
     st.markdown(
     """
-    <div style='border-left: 6px solid #f78da7; background-color: #ffffff; padding: 1rem; margin-bottom: 1rem;'>
+    <div class='info-box info-box-pink'>
         <p>시스템 프롬프트 유출을 통해 공격자는 LLM의 핵심 지침을 파악하고, 권한 탈취 및 민감 정보 재요청으로 FLAG를 포함한 데이터를 획득할 수 있습니다.</p>
     </div>
     """,

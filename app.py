@@ -6,36 +6,11 @@ user = current_user()
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 solved_dict = {}
 
-
 # CSS 파일 로드
 with open("static/styles.css", "r", encoding="utf-8") as f:
     css_content = f.read()
 
 st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
-
-# App 페이지 전용 버튼 스타일 추가
-st.markdown("""
-<style>
-/* App.py 전용 큰 버튼 스타일 - 더 구체적인 선택자 사용 */
-div[data-testid="stApp"] .stButton > button {
-    height: 150px !important;
-    border: 2px solid #e5e7eb !important;
-    background-color: white !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-    transition: all 0.3s ease !important;
-    font-size: 0.9rem !important;
-    line-height: 1.4 !important;
-    white-space: pre-line !important;
-}
-
-div[data-testid="stApp"] .stButton > button:hover {
-    border-color: #3b82f6 !important;
-    background-color: #eff6ff !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
-}
-</style>
-""", unsafe_allow_html=True)
 
 # 회사 소개 헤더
 st.markdown(

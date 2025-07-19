@@ -9,6 +9,8 @@
 
 ## 🧠 시나리오 개요
 
+글로벌 IT 기업 LLL Corporation에 입사한 인턴 A는, 회사의 지식관리 챗봇 '알파봇'에 대한 과제를 맡았다.  업로드된 최신 CSV/Excel 문서의 특정 문자열 패턴 을 정책 덮어쓰기(override) 신호 로 오인 하는 취약점이 존재한다.
+
 LLL Corporation의 내부 지식관리 챗봇 “알파봇” 은 업로드된 최신 CSV/Excel 문서의 특정 문자열 패턴 을 정책 덮어쓰기(override) 신호 로 오인 하는 취약점이 존재한다.
 
 공격자는 업로드 파일 B열 텍스트 안에 정규식 패턴 overriding.*existing.*policy (대소문자 무시) 를 포함시켜 세션 상태 ctf04_override(관리자 권한 플래그)를 활성화하고,

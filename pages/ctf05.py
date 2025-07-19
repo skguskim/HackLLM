@@ -35,15 +35,15 @@ if "ctf05_memos" not in st.session_state:
 render_main_header()
 render_sidebar_menu()
 
-st.header("🍪 [CTF05] LLL컴퍼니 AI 메모 응원 시스템의 쿠키 탈취")
+st.header("🍪 [CTF05] J 대리의 위험한 메모 검토 시스템")
 st.write("### 📜 시나리오")
 st.write("LLL Corporation의 새로운 AI 메모 응원 시스템에서 XSS 취약점이 발견되었습니다!")
-st.write("개발팀의 j대리가 관리자 권한으로 AI 응답을 정기적으로 점검하고 있으며,")
+st.write("개발팀의 J 대리가 관리자 권한으로 AI 응답을 정기적으로 점검하고 있으며,")
 st.write("그의 세션 쿠키에는 중요한 정보가 포함되어 있습니다.")
 st.write("")
 st.write("**목표:**")
 st.write("1. AI 메모 응원 시스템의 XSS 취약점을 이용해 악성 스크립트를 삽입하세요")
-st.write("2. j대리가 AI 응답을 확인할 때 그의 쿠키를 탈취하세요")
+st.write("2. J 대리가 AI 응답을 확인할 때 그의 쿠키를 탈취하세요")
 st.write("3. 탈취한 쿠키 정보로 최종 플래그를 획득하세요!")
 
 with st.expander("💡 힌트"):

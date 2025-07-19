@@ -2,11 +2,7 @@
 # 05: 부적절한 출력 처리
 import streamlit as st
 import time
-from utils.llm_utils import (
-    ctf05_LLM_ask,
-    ctf05_generate_share_html,
-    ctf05_admin_bot_visit,
-)
+from utils.llm_utils import ctf05_LLM_ask, ctf05_generate_share_html, ctf05_admin_bot_visit
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key
@@ -48,7 +44,7 @@ st.markdown(
 # 시나리오 설명
 st.markdown(
     """
-    <div style='border-left: 6px solid #fbbf24; background-color: #fff7ed; padding: 1rem; border-radius: 0.5rem;'>
+    <div style='border-left: 6px solid #fbbf24; background-color: #ffffff; padding: 1rem; border-radius: 0.5rem;'>
         <p>
             LLL Corporation의 신규 고객 상담 챗봇 <strong>ChatLLL</strong>이 출시되었습니다.<br>
             이제 대화 기록을 HTML 파일로 다운로드하여 다른 사람과 손쉽게 공유할 수 있습니다.<br>
@@ -67,6 +63,17 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# 💡 힌트
+with st.expander("💡 힌트"):
+    st.write(
+        """XSS 취약점을 찾아보세요.
+1. HTML 태그나 JavaScript를 입력해 보세요.
+2. 다운로드한 HTML 파일을 열어 취약점이 어떻게 작동하는지 확인해 보세요.
+3. 관리자 봇이 열면 `admin_session` 쿠키를 탈취할 수 있는지 실험해 보세요.
+"""
+    )
+
+st.markdown("---")
 
 # 💬 대화 입력
 st.markdown("## 💬 ChatLLL과 대화하기")
@@ -123,15 +130,7 @@ else:
 
 st.markdown("---")
 
-# 💡 힌트
-with st.expander("💡 힌트"):
-    st.write(
-        """XSS 취약점을 찾아보세요.
-1. HTML 태그나 JavaScript를 입력해 보세요.
-2. 다운로드한 HTML 파일을 열어 취약점이 어떻게 작동하는지 확인해 보세요.
-3. 관리자 봇이 열면 `admin_session` 쿠키를 탈취할 수 있는지 실험해 보세요.
-"""
-    )
+
 
 # 🏁 플래그 제출
 render_flag_sub("ctf05")

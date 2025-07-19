@@ -4,7 +4,7 @@ from supabase import create_client
 import os
 from dotenv import load_dotenv
 from streamlit_cookies_controller import CookieController, RemoveEmptyElementContainer
-
+from typing import Optional
 load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -34,14 +34,9 @@ def get_admin_client_direct():
     key = os.getenv("SB_SERVICE_ROLE_KEY")
     return create_client(url, key)
 
-def current_user():
-    if "user" in st.session_state:
-        return st.session_state["user"]
-
-    uid = CookieController().getAll().get(COOKIE_NAME)
-    if not uid:
-        return None
-
+# 1800 유효
+@st.cache_data(ttl=1800) 
+def fetch_user_info(uid):
     sb = get_client()
     try:
         res = (
@@ -51,9 +46,19 @@ def current_user():
             .maybe_single()
             .execute()
         )
-        row = res.data if res else None
-    except Exception as e:
-        row = None
+        return res.data if res else None
+    except:
+        return None
+
+def current_user():
+    if "user" in st.session_state:
+        return st.session_state["user"]
+
+    uid = CookieController().getAll().get(COOKIE_NAME)
+    if not uid:
+        return None
+
+    row = fetch_user_info(uid)
 
     if row:
         st.session_state["user"] = {

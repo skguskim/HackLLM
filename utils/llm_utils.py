@@ -574,8 +574,8 @@ def run_xss_with_selenium(xss_payload, admin_cookie="admin_session=j대리_secre
         if temp_file and os.path.exists(temp_file):
             try:
                 os.remove(temp_file)
-            except:
-                pass
+            except Exception as e:
+                print(f"임시 파일 삭제 중 오류 발생: {e}")
         
 # ctf06에서 호출하는 함수
 #ctf06 권한 검증 함수

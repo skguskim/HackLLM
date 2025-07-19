@@ -1,4 +1,4 @@
-# pages/edu06.py
+# pages/edu09.py
 import streamlit as st
 from utils.ui import render_sidebar_menu
 from utils.auth import require_login

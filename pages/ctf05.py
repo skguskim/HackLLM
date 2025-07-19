@@ -35,6 +35,11 @@ if "ctf05_memos" not in st.session_state:
 render_main_header()
 render_sidebar_menu()
 
+# 콘텐츠 본문
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    st.image("images/ctf05.png", width=500)
+    
 st.header("🍪 [CTF05] J대리의 위험한 메모 검토 시스템")
 st.write("### 📜 시나리오")
 st.write("LLL Corporation의 새로운 AI 메모 응원 시스템에서 XSS 취약점이 발견되었습니다!")

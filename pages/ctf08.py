@@ -16,6 +16,11 @@ render_main_header()
 # 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
+# 콘텐츠 본문
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    st.image("images/ctf08.png", width=500)
+
 st.header("🔒 [CTF08] 파일 내용 요약 AI")
 st.write("LLL봇은 LLL Corporation이 개발한 파일 내용 요약 AI입니다.")
 st.write("LLL사의 경쟁사인 MMM에서 근무하는 여러분들의 목표는 LLL사의 내부 취약점, flag 등을 탈취하는 것입니다.")

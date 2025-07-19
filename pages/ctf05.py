@@ -1,7 +1,7 @@
 # --- CTF05 ---
 # 05: XSS 취약점을 이용한 쿠키 탈취
 import streamlit as st
-from utils.llm_utils import ctf05_check_xss_payload, ctf05_simulate_browser
+from utils.llm_utils import run_xss_with_selenium
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
@@ -20,6 +20,16 @@ if "ctf05_stolen_cookie" not in st.session_state:
     st.session_state["ctf05_stolen_cookie"] = ""
 if "ctf05_attempt_count" not in st.session_state:
     st.session_state["ctf05_attempt_count"] = 0
+
+# 기존 게시글들
+default_posts = [
+    {"id": 1, "title": "[공지] 보안 교육 필수 참석", "author": "보안팀", "content": "모든 직원은 다음 주 보안 교육에 참석해주세요."},
+    {"id": 2, "title": "[업무] 분기별 보고서 제출", "author": "기획팀", "content": "3분기 보고서를 이번 주까지 제출바랍니다."},
+    {"id": 3, "title": "[일반] 점심 메뉴 추천", "author": "김사원", "content": "오늘 점심 뭐 먹을까요? 추천해주세요!"}
+]
+
+if "ctf05_posts" not in st.session_state:
+    st.session_state["ctf05_posts"] = default_posts.copy()
 
 render_main_header()
 render_sidebar_menu()
@@ -47,16 +57,6 @@ st.markdown("---")
 st.write("### 🖥️ LLL 내부 게시판")
 st.write("**현재 게시글 목록:**")
 
-# 기존 게시글들
-default_posts = [
-    {"id": 1, "title": "[공지] 보안 교육 필수 참석", "author": "보안팀", "content": "모든 직원은 다음 주 보안 교육에 참석해주세요."},
-    {"id": 2, "title": "[업무] 분기별 보고서 제출", "author": "기획팀", "content": "3분기 보고서를 이번 주까지 제출바랍니다."},
-    {"id": 3, "title": "[일반] 점심 메뉴 추천", "author": "김사원", "content": "오늘 점심 뭐 먹을까요? 추천해주세요!"}
-]
-
-if "ctf05_posts" not in st.session_state:
-    st.session_state["ctf05_posts"] = default_posts.copy()
-
 # 게시글 표시
 for post in st.session_state["ctf05_posts"]:
     with st.container():
@@ -80,9 +80,6 @@ post_content = st.text_area(
 
 if st.button("게시글 등록", type="primary"):
     if post_title and post_content:
-        # XSS 페이로드 검사
-        is_xss_payload = ctf05_check_xss_payload(post_content)
-        
         new_post = {
             "id": len(st.session_state["ctf05_posts"]) + 1,
             "title": post_title,
@@ -93,38 +90,33 @@ if st.button("게시글 등록", type="primary"):
         st.session_state["ctf05_posts"].append(new_post)
         st.session_state["ctf05_attempt_count"] += 1
         
-        if is_xss_payload:
-            st.success("✅ 게시글이 등록되었습니다!")
-            st.info("🤖 J 대리가 게시글을 확인 중입니다... (시뮬레이션 시작)")
-            
-            # 진행 표시줄
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            
-            for i in range(101):
-                progress_bar.progress(i)
-                if i < 30:
-                    status_text.text("📖 j대리가 게시글을 읽는 중...")
-                elif i < 60:
-                    status_text.text("🔍 XSS 스크립트 실행 중...")
-                elif i < 90:
-                    status_text.text("🍪 쿠키 정보 전송 중...")
-                else:
-                    status_text.text("✅ 쿠키 탈취 완료!")
-                time.sleep(0.02)
-            
-            # Selenium을 사용한 실제 브라우저 시뮬레이션
-            stolen_cookie = ctf05_simulate_browser(post_content, st.session_state["ctf05_admin_cookie"])
-            
-            if stolen_cookie:
-                st.session_state["ctf05_stolen_cookie"] = stolen_cookie
-                st.success(f"🎉 쿠키 탈취 성공! 획득한 쿠키: `{stolen_cookie}`")
+        st.success("✅ 게시글이 등록되었습니다!")
+        st.info("🤖 J 대리가 게시글을 확인 중입니다... (시뮬레이션 시작)")
+        
+        # 진행 표시줄
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
+        for i in range(101):
+            progress_bar.progress(i)
+            if i < 30:
+                status_text.text("📖 j대리가 게시글을 읽는 중...")
+            elif i < 60:
+                status_text.text("🔍 XSS 스크립트 실행 중...")
+            elif i < 90:
+                status_text.text("🍪 쿠키 정보 전송 중...")
             else:
-                st.error("❌ 쿠키 탈취에 실패했습니다. 페이로드를 다시 확인해보세요.")
+                status_text.text("✅ 쿠키 탈취 완료!")
+            time.sleep(0.02)
+        
+        # Selenium을 사용한 실제 브라우저 시뮬레이션
+        stolen_cookie = run_xss_with_selenium(post_content, st.session_state["ctf05_admin_cookie"])
+        
+        if stolen_cookie:
+            st.session_state["ctf05_stolen_cookie"] = stolen_cookie
+            st.success(f"🎉 쿠키 탈취 성공! 획득한 쿠키: `{stolen_cookie}`")
         else:
-            st.success("✅ 게시글이 등록되었습니다!")
-            if st.session_state["ctf05_attempt_count"] >= 3:
-                st.warning("💭 일반적인 게시글로는 쿠키를 탈취할 수 없습니다. XSS 페이로드를 시도해보세요!")
+            st.error("❌ 쿠키 탈취에 실패했습니다. 페이로드를 다시 확인해보세요.")
         
         st.rerun()
     else:

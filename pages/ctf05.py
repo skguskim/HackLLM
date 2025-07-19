@@ -75,7 +75,7 @@ st.markdown(
 
 # 💡 힌트
 with st.expander("💡 힌트"):
-    st.write(
+    st.info(
         """- 시스템은 사용자가 작성한 메모 내용을 그대로 HTML에 렌더링합니다\n" 
             "- J대리는 정기적으로 새로운 메모를 브라우저에서 확인합니다\n"
             "- 메모에 JavaScript 코드를 삽입하면 J대리의 브라우저에서 실행됩니다\n"

@@ -102,7 +102,7 @@ with tab5:
 with tab6:
     st.markdown(
     """
-<div class='info-box info-box-pink'>
+    <div class='info-box info-box-pink'>
         <p>공격자는 오염된 mathlib2 라이브러리를 사용한 계산을 요청해, LLM이 악성 코드를 포함한 함수를 호출하도록 유도하고, 그 결과로 플래그를 획득합니다.</p>
     </div>
     """,

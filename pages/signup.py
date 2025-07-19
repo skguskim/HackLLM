@@ -52,8 +52,6 @@ if not terms_agreed:
 if st.button("회원가입", use_container_width=True, disabled=not terms_agreed):
     if not email or not pwd:
         st.error("이메일과 비밀번호를 모두 입력해주세요.")
-    elif not terms_agreed:
-        st.error("필수 약관에 모두 동의해주세요.")
     else:
         try:
             response = supabase.auth.sign_up({

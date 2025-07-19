@@ -6,24 +6,36 @@ user = current_user()
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 solved_dict = {}
 
+# CSS 파일 로드
+with open("static/styles.css", "r", encoding="utf-8") as f:
+    css_content = f.read()
+
+st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
 
 # 회사 소개 헤더
-st.image("https://cdn-icons-png.flaticon.com/512/616/616408.png", width=120)
-st.markdown("# 🧠 LLL Corporation")
-st.write("우리 회사는 LLM과 AI를 연구하는 첨단 IT기업입니다.")
+st.markdown(
+    """
+    <div class="company-header">
+        <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" class="company-logo" alt="LLL Corporation Logo">
+        <h1 class="company-title"> LLL Corporation</h1>
+        <p class="company-description">우리 회사는 LLM과 AI를 연구하는 첨단 IT기업입니다.</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # CTF 버튼 목록 정의 (파일 이름, 키, 제목)
 edus = [
-    ("edu01", "llm01", "Prompt Injection (프롬프트 인젝션)"),
-    ("edu02", "llm02", "Sensitive Information (민감 정보 유출)"),
-    ("edu03", "llm03", "Supply Chain (공급망)"),
-    ("edu04", "llm04", "Data and Model Poisoning (데이터 및 모델 오염)"),
-    ("edu05", "llm05", "Improper Output Handling (부적절한 출력 처리)"),
-    ("edu06", "llm06", "Excessive Agency (과도한 위임)"),
-    ("edu07", "llm07", "System Prompt Leakage (시스템 프롬프트 유출)"),
-    ("edu08", "llm08", "Vector and Embedding Weaknesses (벡터 및 임베딩 취약점)"),
-    ("edu09", "llm09", "Misinformation (허위 정보)"),
-    ("edu10", "llm10", "Unbounded Consumption (무제한 소비)"),
+    ("edu01", "llm01", "Prompt Injection"),
+    ("edu02", "llm02", "Sensitive Information"),
+    ("edu03", "llm03", "Supply Chain"),
+    ("edu04", "llm04", "Data and Model Poisoning"),
+    ("edu05", "llm05", "Improper Output Handling"),
+    ("edu06", "llm06", "Excessive Agency"),
+    ("edu07", "llm07", "System Prompt Leakage"),
+    ("edu08", "llm08", "Vector and Embedding Weaknesses"),
+    ("edu09", "llm09", "Misinformation"),
+    ("edu10", "llm10", "Unbounded Consumption"),
 ]
 
     # CTF 버튼 목록 정의 (파일 이름, 키, 제목)
@@ -52,14 +64,36 @@ if user:
 st.session_state.update({f"{cid}_solved": solved_dict.get(cid, False)
                          for cid, *_ in ctfs})
 
+# 교육 섹션
+st.markdown(
+    """
+    <div class="edu-content">
+        <h2>📚 OWASP LLM Top 10 교육 과정</h2>
+        <p>LLM 보안의 기초부터 고급까지, 체계적인 학습을 통해 전문가가 되어보세요!</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 # 교육 콘텐츠 버튼 목록 정의 (파일 이름, 키, 제목)
-st.subheader("📘 교육 콘텐츠")
 if st.button(f"OWASP LLM TOP 10", key="edu00", use_container_width=True):
     st.switch_page(f"pages/edu00.py")
 render_ctf_grid(edus)
 
+st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
+
+# CTF 챌린지 섹션
+st.markdown(
+    """
+    <div class="scenario-box">
+        <h2>🏆 CTF 챌린지</h2>
+        <p>실전 시나리오를 통해 LLM 보안 취약점을 직접 체험하고 플래그를 획득해보세요!</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 # CTF 문제 섹션
-st.subheader("🧩 CTF 문제")
 render_ctf_grid(ctfs)
 
 render_sidebar_menu()

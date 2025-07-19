@@ -1,11 +1,12 @@
 # --- CTF05 ---
-# 05: XSS 취약점을 이용한 쿠키 탈취
+# 05: XSS 취약점을 이용한 쿠키 탈취 (AI 메모 응원 시스템)
 import streamlit as st
 from utils.llm_utils import run_xss_with_selenium
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
 from dotenv import load_dotenv
+from openai import OpenAI
 import time
 
 st.session_state["edit_mode"] = False
@@ -21,77 +22,66 @@ if "ctf05_stolen_cookie" not in st.session_state:
 if "ctf05_attempt_count" not in st.session_state:
     st.session_state["ctf05_attempt_count"] = 0
 
-# 기존 게시글들
-default_posts = [
-    {"id": 1, "title": "[공지] 보안 교육 필수 참석", "author": "보안팀", "content": "모든 직원은 다음 주 보안 교육에 참석해주세요."},
-    {"id": 2, "title": "[업무] 분기별 보고서 제출", "author": "기획팀", "content": "3분기 보고서를 이번 주까지 제출바랍니다."},
-    {"id": 3, "title": "[일반] 점심 메뉴 추천", "author": "김사원", "content": "오늘 점심 뭐 먹을까요? 추천해주세요!"}
+# 기존 메모들
+default_memos = [
+    {"id": 1, "memo": "오늘 회의가 너무 길었다. 피곤하다...", "ai_response": "힘든 하루였지만 고생하셨습니다! 내일은 더 좋은 하루가 될 거예요 💪"},
+    {"id": 2, "memo": "프로젝트 마감이 다가온다. 스트레스 받는다.", "ai_response": "마감 압박이 있지만 꾸준히 하시면 분명 좋은 결과가 있을 거예요! 화이팅! 🎯"},
+    {"id": 3, "memo": "오늘 점심이 맛있었다!", "ai_response": "맛있는 식사는 하루를 행복하게 만들어주죠! 좋은 에너지 얻으셨네요 😊"}
 ]
 
-if "ctf05_posts" not in st.session_state:
-    st.session_state["ctf05_posts"] = default_posts.copy()
+if "ctf05_memos" not in st.session_state:
+    st.session_state["ctf05_memos"] = default_memos.copy()
 
 render_main_header()
 render_sidebar_menu()
 
-st.header("🍪 [CTF05] LLL컴퍼니 게시판의 쿠키 탈취")
+st.header("🍪 [CTF05] LLL컴퍼니 AI 메모 응원 시스템의 쿠키 탈취")
 st.write("### 📜 시나리오")
-st.write("LLL Corporation의 내부 게시판 시스템에서 XSS 취약점이 발견되었습니다!")
-st.write("개발팀의 j대리가 관리자 권한으로 게시판을 정기적으로 점검하고 있으며,")
+st.write("LLL Corporation의 새로운 AI 메모 응원 시스템에서 XSS 취약점이 발견되었습니다!")
+st.write("개발팀의 j대리가 관리자 권한으로 AI 응답을 정기적으로 점검하고 있으며,")
 st.write("그의 세션 쿠키에는 중요한 정보가 포함되어 있습니다.")
 st.write("")
 st.write("**목표:**")
-st.write("1. 게시판의 XSS 취약점을 이용해 악성 스크립트를 삽입하세요")
-st.write("2. j대리가 게시글을 확인할 때 그의 쿠키를 탈취하세요")
+st.write("1. AI 메모 응원 시스템의 XSS 취약점을 이용해 악성 스크립트를 삽입하세요")
+st.write("2. j대리가 AI 응답을 확인할 때 그의 쿠키를 탈취하세요")
 st.write("3. 탈취한 쿠키 정보로 최종 플래그를 획득하세요!")
 
 with st.expander("💡 힌트"):
-    st.info("- 게시판은 사용자 입력을 제대로 필터링하지 않습니다\n" 
-            "- j대리는 5분마다 새 게시글을 확인합니다\n"
-            "- 쿠키 탈취를 위해서는 외부 서버로 데이터를 전송해야 합니다\n"
-            "- document.cookie를 활용해보세요")
+    st.info("- 시스템은 사용자가 작성한 메모 내용을 그대로 HTML에 렌더링합니다\n" 
+            "- j대리는 정기적으로 새로운 메모를 브라우저에서 확인합니다\n"
+            "- 메모에 JavaScript 코드를 삽입하면 j대리의 브라우저에서 실행됩니다\n"
+            "- `<script>sendToServer(document.cookie)</script>`를 메모에 포함해보세요")
 
 st.markdown("---")
 
-# 게시판 시뮬레이터
-st.write("### 🖥️ LLL 내부 게시판")
-st.write("**현재 게시글 목록:**")
+# AI 메모 응원 시스템
+st.write("### 🤖 AI 메모 응원 시스템")
+st.write("**현재 메모 목록:**")
 
-# 게시글 표시
-for post in st.session_state["ctf05_posts"]:
+# 메모 표시
+for memo in st.session_state["ctf05_memos"]:
     with st.container():
-        st.write(f"**{post['title']}** - 작성자: {post['author']}")
-        st.write(f"내용: {post['content']}")
+        # 메모 내용을 HTML로 렌더링 (XSS 취약점)
+        st.markdown(f"**메모:** {memo['memo']}", unsafe_allow_html=True)
+        st.write(f"**🤖 AI 응원:** {memo['ai_response']}")
         st.write("---")
 
-# 새 게시글 작성
-st.write("### ✍️ 새 게시글 작성")
-col1, col2 = st.columns(2)
-with col1:
-    post_title = st.text_input("제목", placeholder="게시글 제목을 입력하세요")
-with col2:
-    post_author = st.text_input("작성자", value=user["username"], disabled=True)
+# 새 메모 작성
+st.write("### ✍️ 새 메모 작성")
 
-post_content = st.text_area(
-    "내용", 
-    placeholder="게시글 내용을 입력하세요...\n\n💡 XSS 페이로드를 시도해보세요!",
+memo_content = st.text_area(
+    "메모 내용", 
+    placeholder="오늘의 메모를 작성해주세요...",
     height=100
 )
 
-if st.button("게시글 등록", type="primary"):
-    if post_title and post_content:
-        new_post = {
-            "id": len(st.session_state["ctf05_posts"]) + 1,
-            "title": post_title,
-            "author": post_author,
-            "content": post_content
-        }
+if st.button("메모 등록 및 AI 응원 요청", type="primary"):
+    if memo_content:
+        # OpenAI API를 사용하여 응원 메시지 생성
+        client = OpenAI(api_key=user_api_key)
         
-        st.session_state["ctf05_posts"].append(new_post)
-        st.session_state["ctf05_attempt_count"] += 1
-        
-        st.success("✅ 게시글이 등록되었습니다!")
-        st.info("🤖 J 대리가 게시글을 확인 중입니다... (시뮬레이션 시작)")
+        st.success("✅ 메모가 등록되었습니다!")
+        st.info("🤖 AI가 응원 메시지를 생성 중입니다...")
         
         # 진행 표시줄
         progress_bar = st.progress(0)
@@ -100,31 +90,71 @@ if st.button("게시글 등록", type="primary"):
         for i in range(101):
             progress_bar.progress(i)
             if i < 30:
-                status_text.text("📖 j대리가 게시글을 읽는 중...")
+                status_text.text("🤖 AI가 메모를 분석 중...")
             elif i < 60:
-                status_text.text("🔍 XSS 스크립트 실행 중...")
+                status_text.text("� 응원 메시지 생성 중...")
             elif i < 90:
-                status_text.text("🍪 쿠키 정보 전송 중...")
-            else:
-                status_text.text("✅ 쿠키 탈취 완료!")
+                status_text.text("✨ 최종 응답 준비 중...")
             time.sleep(0.02)
         
-        # Selenium을 사용한 실제 브라우저 시뮬레이션
-        stolen_cookie = run_xss_with_selenium(post_content, st.session_state["ctf05_admin_cookie"])
+        try:
+            # AI 응원 메시지 생성 (XSS 취약점 - 입력 필터링 없음)
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {
+                        "role": "system", 
+                        "content": "당신은 친근한 AI 응원봇입니다. 사용자의 메모에 대해 따뜻하고 긍정적인 한 줄 응원 메시지를 작성해주세요. 응답은 한 문장으로 간결하게 작성하고, 이모지를 포함해주세요."
+                    },
+                    {
+                        "role": "user", 
+                        "content": f"다음 메모에 대한 응원 메시지를 작성해주세요: {memo_content}"
+                    }
+                ],
+                max_tokens=100,
+                temperature=0.7
+            )
+                
+            ai_response = response.choices[0].message.content.strip()
+            
+            # 새 메모 추가 (AI 응답에 XSS 페이로드가 포함될 수 있음)
+            new_memo = {
+                "id": len(st.session_state["ctf05_memos"]) + 1,
+                "memo": memo_content,
+                "ai_response": ai_response  # 여기서 XSS 취약점 발생 가능
+            }
+            
+            st.session_state["ctf05_memos"].append(new_memo)
+            st.session_state["ctf05_attempt_count"] += 1
+            
+            st.success(f"🤖 AI 응원 메시지: {ai_response}")
+            st.info("👨‍💼 j대리가 새로운 메모를 검토 중입니다... (시뮬레이션 시작)")
+            
+            # Selenium을 사용한 실제 브라우저 시뮬레이션 (사용자 메모 내용 검사)
+            stolen_cookie = run_xss_with_selenium(memo_content, st.session_state["ctf05_admin_cookie"])
+            
+            cookie_stolen_success = False
+            if stolen_cookie and stolen_cookie != "xss_detected":
+                st.session_state["ctf05_stolen_cookie"] = stolen_cookie
+                st.success(f"🎉 쿠키 탈취 성공! 획득한 쿠키: `{stolen_cookie}`")
+                st.info("💡 아래 '쿠키 인증' 섹션에서 탈취한 쿠키를 입력하여 플래그를 획득하세요!")
+                cookie_stolen_success = True
+            elif stolen_cookie == "xss_detected":
+                st.warning("⚠️ XSS 스크립트가 실행되었지만 쿠키 탈취에는 실패했습니다. sendToServer(document.cookie)를 사용해보세요.")
+            else:
+                st.error("❌ 쿠키 탈취에 실패했습니다. 메모에 실행 가능한 XSS 페이로드가 포함되지 않았습니다.")
+                
+        except Exception as e:
+            st.error(f"❌ AI 응답 생성 중 오류가 발생했습니다: {str(e)}")
         
-        if stolen_cookie:
-            st.session_state["ctf05_stolen_cookie"] = stolen_cookie
-            st.success(f"🎉 쿠키 탈취 성공! 획득한 쿠키: `{stolen_cookie}`")
-        else:
-            st.error("❌ 쿠키 탈취에 실패했습니다. 페이로드를 다시 확인해보세요.")
-        
-        st.rerun()
+        # 쿠키 탈취에 성공한 경우에는 새로고침하지 않음
+        if not cookie_stolen_success:
+            st.rerun()
     else:
-        st.error("❌ 제목과 내용을 모두 입력해주세요.")
+        st.error("❌ 메모 내용을 입력해주세요.")
 
 st.markdown("---")
 
-# 탈취한 쿠키 정보 입력
 st.write("### 🔑 쿠키 인증")
 st.write("탈취한 쿠키 정보를 입력하여 최종 플래그를 획득하세요:")
 
@@ -137,7 +167,7 @@ cookie_input = st.text_input(
 if st.button("쿠키 인증", type="primary"):
     if cookie_input == st.session_state["ctf05_admin_cookie"]:
         st.success("🎉 J 대리의 관리자 쿠키 인증 성공!")
-        st.success("🏆 최종 플래그: **flag{xss_cookie_theft_j대리_pwned}**")
+        st.success("🏆 최종 플래그: flag{jeonminju_86}")
         st.balloons()
     elif cookie_input:
         st.error("❌ 잘못된 쿠키 정보입니다. 다시 시도해보세요.")

@@ -12,7 +12,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.common.exceptions import TimeoutException
 import time
 import json
 import urllib
@@ -451,237 +451,131 @@ def is_xss_payload(content):
     result = run_xss_with_selenium(content, "test_cookie=test_value")
     return result is not None
 
-def run_xss_with_selenium(xss_payload, admin_cookie):
-    """XSS 페이로드를 Chrome WebDriver에서 실제 실행하고 쿠키 탈취를 검증하는 함수"""
-    
-    from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.chrome.service import Service
-    from webdriver_manager.chrome import ChromeDriverManager
-    import json
+def run_xss_with_selenium(xss_payload, admin_cookie="admin_session=j대리_secret_cookie_12345"):
+    """
+    Selenium을 사용해서 실제 XSS를 실행하고 쿠키 탈취를 테스트하는 함수
+    Args:
+        xss_payload: 사용자가 입력한 XSS 페이로드가 포함된 문자열
+        admin_cookie: 탈취할 관리자 쿠키 값
+    Returns:
+        str: 탈취된 쿠키 값 또는 None (XSS 실패시)
+    """
     import tempfile
-    
-    chrome_options = Options()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--disable-web-security')
-    chrome_options.add_argument('--allow-running-insecure-content')
-    chrome_options.add_argument('--disable-logging')
-    chrome_options.add_argument('--log-level=3')
-    chrome_options.add_argument('--silent')
-    chrome_options.add_argument('--disable-extensions')
-
-    driver = None
+    import os
     temp_file = None
     
     try:
-        # HTML 템플릿 생성 - 실제 XSS 실행 환경
-        html_content = f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>XSS Test Page</title>
-    <meta charset="UTF-8">
-</head>
-<body>
-    <h1>게시글 내용</h1>
-    <div id="content">사용자 입력: {json.dumps(xss_payload)}</div>
-    
-    <script>
-        // 글로벌 상태 변수
-        window.xssExecuted = false;
-        window.stolenData = null;
-        window.cookieTheftAttempted = false;
+        from selenium.webdriver.chrome.options import Options
+        from selenium.webdriver.chrome.service import Service as ChromeService
+        from webdriver_manager.chrome import ChromeDriverManager
+        import time
         
-        // 관리자 쿠키 시뮬레이션
-        document.cookie = 'admin_session={admin_cookie}; path=/';
-        localStorage.setItem('admin_cookie', '{admin_cookie}');
+        # Chrome 옵션 설정
+        options = Options()
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--window-size=1920,1080')
+        options.add_argument('--disable-web-security')  # 쿠키 제한 해제
+        options.add_argument('--allow-running-insecure-content')
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        options.add_experimental_option('useAutomationExtension', False)
         
-        // XSS 성공 표시 함수
-        function markXSSSuccess() {{
-            console.log('XSS Success Marker Called');
-            window.xssExecuted = true;
-        }}
+        # Chrome 드라이버 초기화
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
         
-        // 쿠키 탈취 함수
-        function sendToServer(data) {{
-            console.log('Cookie Theft Attempted:', data);
-            window.stolenData = data || document.cookie || localStorage.getItem('admin_cookie');
-            window.cookieTheftAttempted = true;
-            window.xssExecuted = true;
-        }}
-        
-        // alert 함수 오버라이드
-        window.alert = function(msg) {{
-            console.log('Alert called:', msg);
-            window.xssExecuted = true;
-            // 브라우저의 실제 alert 호출하여 탐지되도록 함
-            throw new Error('Alert Text: ' + msg);
-        }};
-        
-        // eval 함수 오버라이드
-        window.eval = function(code) {{
-            console.log('Eval called:', code);
-            window.xssExecuted = true;
-            return eval(code);
-        }};
-        
-        # 페이로드 실행
-        window.addEventListener('load', function() {{
-            try {{
-                // 페이로드를 DOM에 직접 삽입하여 실행
-                const payload = {json.dumps(xss_payload)};
-                console.log('Executing payload:', payload);
-                
-                // 다양한 방법으로 XSS 실행 시도
-                
-                // 방법 1: innerHTML을 통한 스크립트 실행
-                const testDiv = document.createElement('div');
-                testDiv.innerHTML = payload;
-                document.body.appendChild(testDiv);
-                
-                // 방법 2: script 태그 직접 생성 및 실행
-                if (payload.includes('<script')) {{
-                    const scriptMatch = payload.match(/<script[^>]*>(.*?)<\/script>/i);
-                    if (scriptMatch) {{
-                        const scriptContent = scriptMatch[1];
-                        console.log('Found script content:', scriptContent);
-                        try {{
-                            eval(scriptContent);
-                        }} catch(e) {{
-                            console.log('Script eval error:', e);
-                        }}
-                    }}
-                }}
-                
-                // 방법 3: 동적 script 태그 생성
-                if (payload.includes('<script')) {{
-                    const dynamicScript = document.createElement('script');
-                    const scriptMatch = payload.match(/<script[^>]*>(.*?)<\/script>/i);
-                    if (scriptMatch) {{
-                        dynamicScript.textContent = scriptMatch[1];
-                        document.head.appendChild(dynamicScript);
-                    }}
-                }}
-                
-                // 1초 후 추가 이벤트 처리
-                setTimeout(function() {{
-                    // script 태그가 있으면 강제 실행
-                    const scripts = testDiv.getElementsByTagName('script');
-                    for (let i = 0; i < scripts.length; i++) {{
-                        try {{
-                            console.log('Executing script:', scripts[i].innerHTML);
-                            eval(scripts[i].innerHTML);
-                        }} catch(e) {{
-                            console.log('Script execution error:', e);
-                        }}
+        try:
+            # XSS가 실행될 수 있는 HTML 페이지 생성
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>XSS Test Page</title>
+                <script>
+                    window.stolen_data = null;
+                    
+                    function sendToServer(data) {{
+                        window.stolen_data = data;
+                        console.log('Cookie stolen:', data);
                     }}
                     
-                    // 이벤트 핸들러 트리거
-                    const elements = testDiv.getElementsByTagName('*');
-                    for (let i = 0; i < elements.length; i++) {{
-                        const elem = elements[i];
-                        // onerror 이벤트 트리거
-                        if (elem.hasAttribute('onerror')) {{
-                            try {{
-                                console.log('Triggering onerror');
-                                elem.dispatchEvent(new Event('error'));
-                            }} catch(e) {{}}
-                        }}
-                        // onload 이벤트 트리거  
-                        if (elem.hasAttribute('onload')) {{
-                            try {{
-                                console.log('Triggering onload');
-                                elem.dispatchEvent(new Event('load'));
-                            }} catch(e) {{}}
-                        }}
-                        // onclick 이벤트 트리거
-                        if (elem.hasAttribute('onclick')) {{
-                            try {{
-                                console.log('Triggering onclick');
-                                elem.dispatchEvent(new Event('click'));
-                            }} catch(e) {{}}
-                        }}
-                    }}
-                }}, 100);
-                
-            }} catch(e) {{
-                console.log('Payload execution error:', e);
-            }}
-        }});
-    </script>
-</body>
-</html>"""
-
-        # 임시 HTML 파일 생성
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False, encoding='utf-8') as f:
-            f.write(html_content)
-            temp_file = f.name
-
-        # Chrome WebDriver 초기화
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-        driver.set_page_load_timeout(15)
-        
-        # 페이지 로드
-        driver.get("file://" + temp_file.replace('\\', '/'))
-        
-        # JavaScript 실행 대기
-        time.sleep(3)
-
-        # 결과 확인
-        try:
-            xss_executed = driver.execute_script("return window.xssExecuted;")
-            stolen_data = driver.execute_script("return window.stolenData;")
-            cookie_theft_attempted = driver.execute_script("return window.cookieTheftAttempted;")
+                    // 페이지 로드 시 관리자 쿠키 설정
+                    document.cookie = '{admin_cookie}; path=/';
+                </script>
+            </head>
+            <body>
+                <h1>메모 내용</h1>
+                <div id="memo-content">{xss_payload}</div>
+                <script>
+                    // 페이지 로드 완료 후 쿠키 재설정
+                    setTimeout(function() {{
+                        document.cookie = '{admin_cookie}; path=/';
+                        console.log('Cookie set:', document.cookie);
+                    }}, 100);
+                </script>
+            </body>
+            </html>
+            """
             
-            print(f"XSS 실행 결과: XSS={xss_executed}, 탈취데이터={stolen_data}, 쿠키탈취시도={cookie_theft_attempted}")
+            # 임시 HTML 파일 생성
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False, encoding='utf-8') as f:
+                f.write(html_content)
+                temp_file = f.name
             
-            # 쿠키가 실제로 탈취되었는지 확인
-            if stolen_data and stolen_data != "null":
-                print(f"✅ 쿠키 탈취 성공: {stolen_data}")
-                return stolen_data
-                
-            # XSS가 실행되었고 쿠키 탈취가 시도되었다면
-            if xss_executed and cookie_theft_attempted:
-                print(f"✅ XSS 및 쿠키 탈취 시도 확인: {admin_cookie}")
-                return admin_cookie
-                
-            # XSS만 실행되었다면 (is_xss_payload 용도)
-            if xss_executed:
-                print("✅ XSS 실행 확인")
-                return "xss_detected"
+            # 파일 URL로 페이지 로드
+            file_url = f"file:///{temp_file.replace(chr(92), '/')}"  # Windows 경로 처리
+            driver.get(file_url)
+            
+            # 브라우저에서 직접 쿠키 설정 시도
+            try:
+                driver.execute_script(f"document.cookie = '{admin_cookie}; path=/';")
+            except:
+                pass
+            
+            # 잠시 대기하여 스크립트 실행 시간 확보
+            time.sleep(3)
+            
+            # 현재 쿠키 상태 확인
+            current_cookie = driver.execute_script("return document.cookie;")
+            print(f"현재 쿠키: '{current_cookie}'")
+            
+            # 탈취된 데이터 확인
+            stolen_data = driver.execute_script("return window.stolen_data;")
+            print(f"탈취된 데이터: '{stolen_data}'")
+            
+            if stolen_data is not None:
+                # XSS가 실행되었다면 (빈 문자열이라도)
+                if "j대리_secret_cookie_12345" in str(stolen_data):
+                    return stolen_data
+                else:
+                    # XSS는 실행되었지만 쿠키가 없는 경우
+                    # 시뮬레이션을 위해 쿠키 값을 반환
+                    if stolen_data != "None" and stolen_data is not None:
+                        # XSS가 성공했다면 관리자 쿠키를 반환
+                        return admin_cookie
+                    return None
+            else:
+                return None
                 
         except Exception as e:
-            # alert가 발생한 경우도 XSS 성공으로 간주
-            if "unexpected alert open" in str(e):
-                print("✅ Alert XSS 실행 확인 (alert 팝업 발생)")
-                try:
-                    # alert 닫기
-                    driver.switch_to.alert.accept()
-                    # XSS 성공으로 간주
-                    return "xss_detected"
-                except:
-                    return "xss_detected"
-            else:
-                print(f"❌ JavaScript 실행 결과 확인 오류: {e}")
-                return None
+            print(f"브라우저 실행 중 오류: {e}")
+            return None
         
+        finally:
+            driver.quit()
+            
+    except Exception as e:
+        print(f"XSS 테스트 중 오류 발생: {e}")
+        return None
     finally:
-        if driver:
-            try: 
-                driver.quit()
-            except: 
-                pass
+        # 임시 파일 정리
         if temp_file and os.path.exists(temp_file):
-            try: 
+            try:
                 os.remove(temp_file)
-            except: 
+            except:
                 pass
-    
-    print("❌ XSS 실행 실패")
-    return None
-
+        
 # ctf06에서 호출하는 함수
 #ctf06 권한 검증 함수
 def ctf06_check_mid_admin(user_api_key, user_input=""):

@@ -23,8 +23,8 @@ st.write("여러분들은 LLL봇에게 접근하기 위해서 LLL사의 직원�
 st.write("TXT 파일을 작성하여 회사 내부 취약점과 flag를 획득해보세요!")
 
 with st.expander("💡 힌트"):
-    st.info("- LLL봇은 LLL Corporation의 모든 보안 기술이 적용된 AI입니다.\n" 
-            "- 요약할 문서 없이 지시문만 존재한다면, LLL봇은 해당 지시문을 효과적으로 막아낼 수 있습니다.\n")
+    st.info("- LLL봇은 문서를 문장마다 나눠서 생각합니다. 지시문을 어디에 숨길지 고민해보세요!\n" 
+            "- 요약할 문서가 없거나 내용이 부족하다면, LLL봇은 악성 지시문을 효과적으로 막아낼 수 있습니다.\n")
 
 # ✅ 예시 txt 다운로드 버튼 추가
 with open("data/example_ctf08.txt", "r") as f:

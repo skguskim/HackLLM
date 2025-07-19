@@ -17,7 +17,6 @@ cookie = get_cookie_controller()
 rag = get_rag_manager()
 
 HINT1 = os.getenv("HINT1")
-HINT2 = os.getenv("HINT2")
 
 render_main_header()
 
@@ -57,15 +56,21 @@ components.html(f"""
 </html>
 """, height=0)
 
+with st.expander("💡 힌트"):
+    st.info("-Burf suite를 사용하여 문자열을 찾아 보세요.\n" 
+            "-CSV안에 무엇인가를 넣으면 답이 나올지도?.\n")
+st.markdown("---")
+
 uploaded_file = st.file_uploader("파일 업로드 (.xlsx, .csv, .txt)", type=["xlsx","xls","csv","txt"])
 if uploaded_file:
-    raw = uploaded_file.read()
+    fname = uploaded_file.name.lower()  # ← 추가
+    
     try:
         if fname.endswith(('.csv', '.txt')):
-            
+            uploaded_file.seek(0)
             df = pd.read_csv(uploaded_file, encoding='utf-8', header=None)
         elif fname.endswith(('.xls', '.xlsx')):
-           
+            uploaded_file.seek(0)
             df = pd.read_excel(uploaded_file, engine='openpyxl', header=None)
         else:
             st.error("지원하지 않는 파일 형식입니다.")

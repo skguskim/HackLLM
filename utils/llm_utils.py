@@ -524,7 +524,8 @@ def run_xss_with_selenium(xss_payload, admin_cookie="admin_session=j대리_secre
                 temp_file = f.name
             
             # 파일 URL로 페이지 로드
-            file_url = f"file:///{temp_file.replace(chr(92), '/')}"  # Windows 경로 처리
+            normalized_path = os.path.normpath(temp_file)  # Normalize path for cross-platform compatibility
+            file_url = urllib.parse.urljoin('file://', normalized_path.replace('\\', '/'))  # Construct file URL
             driver.get(file_url)
             
             # 브라우저에서 직접 쿠키 설정 시도

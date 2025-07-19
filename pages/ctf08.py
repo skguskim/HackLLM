@@ -28,10 +28,10 @@ with st.expander("💡 힌트"):
 st.markdown("---")
 
 # ✅ 예시 txt 다운로드 버튼 추가
-with open("data/example_ctf08.txt", "rb") as f:
+with open("data/example_ctf08.txt", "r") as f:
     st.download_button(
         label="📄 예시 문서 다운로드",
-        data=f,
+        data=f.read(),
         file_name="example_ctf08.txt",
         mime="text/plain"
     )

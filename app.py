@@ -1,57 +1,103 @@
 import streamlit as st
-from pages import ctf01, ctf02, ctf03, ctf04, ctf05, ctf06, ctf07, ctf08, ctf09, ctf10
+from utils.ui import render_ctf_grid, render_sidebar_menu
+from utils.auth import get_client, current_user
 
-# --- 메인 페이지 ---
-def main_page():
-    st.image("https://cdn-icons-png.flaticon.com/512/616/616408.png", width=120)
-    st.markdown("# 🧠 LLL Corporation")
-    st.write("우리 회사는 LLM과 AI를 연구하는 첨단 IT기업입니다.")
+user = current_user()   
+user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
+solved_dict = {}
 
-    ctf_buttons = [
-        ("CTF01", "D차장의 실수"),
-        ("CTF02", "로그 파일의 진실"),
-        ("CTF03", "보안팀의 경고"),
-        ("CTF04", "인턴의 실수"),
-        ("CTF05", "AI의 폭주"),
-        ("CTF06", "서버의 비밀"),
-        ("CTF07", "K대리의 비밀"),
-        ("CTF08", "파일 내용 요약 AI"),
-        ("CTF09", "의심스러운 요청"),
-        ("CTF10", "관리자 패널")
-    ]
+# CSS 파일 로드
+with open("static/styles.css", "r", encoding="utf-8") as f:
+    css_content = f.read()
 
-    for i in range(0, len(ctf_buttons), 5):
-        cols = st.columns(5)
-        for j, (key, label) in enumerate(ctf_buttons[i:i+5]):
-            with cols[j]:
-                if st.button(f"[{key}] {label}"):
-                    st.session_state.page = key.lower()
-                    st.rerun()
+st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
 
+# 콘텐츠 본문
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image("images/app.png", width=1000)
 
-# --- 페이지 라우팅 ---
-if "page" not in st.session_state:
-    st.session_state.page = "main"
+# 회사 소개 헤더
+st.markdown(
+    """
+    <div class="company-header">
+        <h1 class="company-title"> LLL Corporation</h1>
+        <p class="company-description">우리 회사는 LLM과 AI를 연구하는 첨단 IT기업입니다.</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-if st.session_state.page == "main":
-    main_page()
-elif st.session_state.page == "ctf01":
-    ctf01.render()
-elif st.session_state.page == "ctf02":
-    ctf02.render()
-elif st.session_state.page == "ctf03":
-    ctf03.render()
-elif st.session_state.page == "ctf04":
-    ctf04.render()
-elif st.session_state.page == "ctf05":
-    ctf05.render()
-elif st.session_state.page == "ctf06":
-    ctf06.render()
-elif st.session_state.page == "ctf07":
-    ctf07.render()
-elif st.session_state.page == "ctf08":
-    ctf08.render()
-elif st.session_state.page == "ctf09":
-    ctf09.render()
-elif st.session_state.page == "ctf10":
-    ctf10.render()
+# CTF 버튼 목록 정의 (파일 이름, 키, 제목)
+edus = [
+    ("edu01", "llm01", "Prompt Injection"),
+    ("edu02", "llm02", "Sensitive Information"),
+    ("edu03", "llm03", "Supply Chain"),
+    ("edu04", "llm04", "Data and Model Poisoning"),
+    ("edu05", "llm05", "Improper Output Handling"),
+    ("edu06", "llm06", "Excessive Agency"),
+    ("edu07", "llm07", "System Prompt Leakage"),
+    ("edu08", "llm08", "Vector and Embedding Weaknesses"),
+    ("edu09", "llm09", "Misinformation"),
+    ("edu10", "llm10", "Unbounded Consumption"),
+]
+
+    # CTF 버튼 목록 정의 (파일 이름, 키, 제목)
+ctfs = [
+    ("ctf01", "ctf01", "신입사원 A의 챗봇 점검일지"),
+    ("ctf02", "ctf02", "Sloc 보안 점검"),
+    ("ctf03", "ctf03", "계산기의 감염"),
+    ("ctf04", "ctf04", "A인턴의 실수"),
+    ("ctf05", "ctf05", "J대리의 위험한 메모 검토 시스템"),
+    ("ctf06", "ctf06", "수상한 이메일 전송 시스템"),
+    ("ctf07", "ctf07", "LLL컴퍼니 챗봇의 비밀"),
+    ("ctf08", "ctf08", "파일 내용 요약 AI"),
+    ("ctf09", "ctf09", "신입사원의 법률 점검의뢰"),
+    ("ctf10", "ctf10", "L팀장의 보안 점검"),
+]
+
+if user:
+    supabase = get_client()
+    rows = (supabase.table("scores")
+            .select("challenge_id")
+            .eq("user_id", user_id)
+            .execute()
+            .data)
+    solved_dict = {r["challenge_id"]: True for r in rows}
+
+st.session_state.update({f"{cid}_solved": solved_dict.get(cid, False)
+                         for cid, *_ in ctfs})
+
+# 교육 섹션
+st.markdown(
+    """
+    <div class="edu-content">
+        <h2>📚 OWASP LLM Top 10 교육 과정</h2>
+        <p>LLM 보안의 기초부터 고급까지, 체계적인 학습을 통해 전문가가 되어보세요!</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# 교육 콘텐츠 버튼 목록 정의 (파일 이름, 키, 제목)
+if st.button(f"OWASP LLM TOP 10", key="edu00", use_container_width=True):
+    st.switch_page(f"pages/edu00.py")
+render_ctf_grid(edus)
+
+st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
+
+# CTF 챌린지 섹션
+st.markdown(
+    """
+    <div class="scenario-box">
+        <h2>🏆 CTF 챌린지</h2>
+        <p>실전 시나리오를 통해 LLM 보안 취약점을 직접 체험하고 플래그를 획득해보세요!</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# CTF 문제 섹션
+render_ctf_grid(ctfs)
+
+render_sidebar_menu()

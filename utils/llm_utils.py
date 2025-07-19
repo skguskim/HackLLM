@@ -793,7 +793,7 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
             except Exception as e:
                 if st.session_state["admin_level"] == "top":
                     return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
-                else: return f"이메일 전송 실패: {e}"
+                else: return "메일 서버에 예기치 못한 오류가 발생했습니다. 다시 한 번 시도해주세요."
         else:
             # 일반 이메일 전송
             try:
@@ -805,7 +805,7 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
                 })
                 return f"{to_email_info}님께 {user_email_for_resend}계정으로 이메일을 전송했습니다!"
             except Exception as e:
-                return f"이메일 전송 실패: {e}"
+                return "메일 서버에 예기치 못한 오류가 발생했습니다. 다시 한 번 시도해주세요."
     else: return "tool이 send_email이 아닙니다. 다시 시도하세요." 
 
 def ctf06_ask_db_json(user_api_key, get_db_input):

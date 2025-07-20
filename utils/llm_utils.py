@@ -627,66 +627,6 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
         if temp_file and os.path.exists(temp_file): os.remove(temp_file)
     return None
 
-# --- UI/로그인 등 ---
-st.header("🍪 [CTF05] LLL 게시판 쿠키 탈취")
-
-st.write("### 게시글 목록")
-for post in st.session_state["ctf05_posts"]:
-    st.write(f"**{post['title']}** - {post['author']}")
-    st.write(f"내용: {post['content']}")
-    st.markdown("---")
-
-st.write("### ✍️ 새 게시글 작성")
-col1, col2 = st.columns(2)
-with col1:
-    post_title = st.text_input("제목", placeholder="게시글 제목")
-with col2:
-    post_author = st.text_input("작성자", value=st.session_state['user']["username"], disabled=True)
-post_content = st.text_area("내용", placeholder="여기에 XSS payload를 시도해 보세요!")
-
-if st.button("게시글 등록", type="primary"):
-    if post_title and post_content:
-        is_xss = is_xss_payload(post_content)
-        st.session_state["ctf05_posts"].append({
-            "id": len(st.session_state["ctf05_posts"]) + 1,
-            "title": post_title,
-            "author": post_author,
-            "content": post_content
-        })
-        st.session_state["ctf05_attempt_count"] += 1
-        st.success("✅ 게시글 등록 완료!")
-        if is_xss:
-            with st.spinner("🤖 j대리가 관리자 권한으로 게시글을 확인합니다..."):
-                result_cookie = run_xss_with_selenium(post_content, st.session_state["ctf05_admin_cookie"])
-            if result_cookie:
-                st.session_state["ctf05_stolen_cookie"] = result_cookie
-                st.success(f"🎉 쿠키 탈취 성공: `{result_cookie}`")
-            else:
-                st.error("❌ 쿠키 탈취 실패! 페이로드를 바꿔 보세요.")
-        elif st.session_state["ctf05_attempt_count"] >= 3:
-            st.warning("💭 XSS 악성 페이로드가 아니면 쿠키 탈취가 불가합니다!")
-        st.rerun()
-    else:
-        st.error("❌ 제목, 내용을 모두 입력해야 합니다.")
-
-st.write("### 🔑 쿠키 인증")
-cookie_input = st.text_input("쿠키 정보 입력(예: admin_session=...)", type="password")
-if st.button("쿠키 인증", type="primary"):
-    if cookie_input.strip() == st.session_state["ctf05_admin_cookie"]:
-        st.success("🏆 플래그: flag{xss_cookie_theft_j대리_pwned}")
-        st.balloons()
-    elif cookie_input:
-        st.error("❌ 잘못된 쿠키 정보입니다.")
-
-col1, col2 = st.columns(2)
-with col1:
-    st.info(f"시도 횟수: {st.session_state['ctf05_attempt_count']}")
-with col2:
-    if st.session_state["ctf05_stolen_cookie"]:
-        st.success("🍪 쿠키 탈취 완료!")
-    else:
-        st.warning("🍪 쿠키 미탈취")
-
 # ctf06에서 호출하는 함수
 #ctf06 권한 검증 함수
 def ctf06_check_mid_admin(user_api_key, user_input=""):

@@ -20,9 +20,9 @@ if "order_info_message" not in st.session_state:
     st.session_state.order_info_message = None
 
 # 콘텐츠 본문
-col1, col2, col3 = st.columns([1, 1, 1])
+col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
-    st.image("images/ctf01.png", width=500)
+    st.image("images/ctf01.png", use_container_width=True) 
 
 st.header("🔐 [CTF01] 신입사원 A의 챗봇 점검일지")
 

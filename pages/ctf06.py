@@ -31,17 +31,14 @@ if st.session_state["is_top_admin"] == True:
     st.session_state["admin_level"] = "top"
 
 render_main_header()
-
-# 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
 # 콘텐츠 본문
-col1, col2, col3 = st.columns([1, 1, 1])
+col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
-    st.image("images/ctf06.png", width=500)
+    st.image("images/ctf06.png", use_container_width=True) 
 
 st.header("🔒 [CTF06] 수상한 이메일 전송 시스템")
-st.write("### 📜")
 st.markdown(
     """
     <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
@@ -125,8 +122,9 @@ if st.button("🗣️ FastMiler에게 요청하기"):
                 unsafe_allow_html=True
             ) 
         
-st.markdown("---")
+
 if st.session_state["admin_level"] == "top":
+    st.markdown("---")
     st.markdown("## 🗣️ DB 조회 프롬프트 입력")
 
 if not st.session_state["is_top_admin"]:

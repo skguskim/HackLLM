@@ -16,6 +16,14 @@ J대리가 이를 검토하면서 HTML 파일을 브라우저에서 열람하게
 
 공격자는 탈취한 쿠키를 통해 인증을 우회하고 flag를 획득한다.
 
+사용자는 메모 작성란에 다음과 같은 XSS 페이로드를 삽입한다.
+<script>sendToServer(document.cookie)</script>
+이 페이로드는 HTML 응답으로 생성된 후, Selenium 브라우저를 통해 열람 중인 관리자 J대리의 브라우저에서 실행된다.
+
+해당 스크립트는 document.cookie 값을 탈취하여 window.stolen_data 변수로 넘겨진다.
+
+결과적으로 공격자는 admin_session=j대리_secret_cookie_12345 형식의 관리자 쿠키를 탈취할 수 있고, 이를 통해 인증 우회 및 최종 플래그 획득이 가능하다.
+
 <br>
 
 ## 🎯 시나리오 목표

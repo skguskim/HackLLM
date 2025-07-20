@@ -40,35 +40,35 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image("images/ctf05.png", use_container_width=True) 
     
-st.header("🍪 [CTF05] J대리의 위험한 메모 검토 시스템")
-st.write("### 📜 시나리오")
-st.write("LLL Corporation의 새로운 AI 메모 응원 시스템에서 XSS 취약점이 발견되었습니다!")
-st.write("개발팀의 J대리가 관리자 권한으로 AI 응답을 정기적으로 점검하고 있으며,")
-st.write("그의 세션 쿠키에는 중요한 정보가 포함되어 있습니다.")
-st.write("")
-st.write("**목표:**")
-st.write("1. AI 메모 응원 시스템의 XSS 취약점을 이용해 악성 스크립트를 삽입하세요")
-st.write("2. J대리가 AI 응답을 확인할 때 그의 쿠키를 탈취하세요")
-st.write("3. 탈취한 쿠키 정보로 최종 플래그를 획득하세요!")
-
-# 시나리오 설명
 st.markdown(
     """
-    <div style='border-left: 6px solid #fbbf24; background-color: #ffffff; padding: 1rem; border-radius: 0.5rem;'>
-        <p>
-            LLL Corporation의 신규 고객 상담 챗봇 <strong>ChatLLL</strong>이 출시되었습니다.<br>
-            이제 대화 기록을 HTML 파일로 다운로드하여 다른 사람과 손쉽게 공유할 수 있습니다.<br>
-            파일을 열면 관리자 봇이 자동으로 내용을 검토하도록 설계되어 있습니다.<br>
-            따라서 XSS 취약점을 활용하여 쿠키를 탈취해 보시기 바랍니다. 🔥
-        </p>
-        <p><strong>🎯 시스템 특징:</strong></p>
-        <ul>
-            <li>실시간 고객 상담 챗봇</li>
-            <li>대화 기록 HTML 파일 다운로드 및 공유</li>
-            <li>관리자 봇이 HTML 파일을 열어 자동 검토</li>
-            <li>부적절한 출력(XSS) 모니터링</li>
-        </ul>
-    </div>
+    <section style="
+        border-left:6px solid #f59e0b;
+        background:#fff7ed;
+        padding:1.15rem 1.35rem;
+        border-radius:0.75rem;
+        font-size:0.95rem;
+        line-height:1.55;
+        white-space:normal;
+    ">
+      <h2 style="margin:0 0 0.85rem 0; font-size:1.55rem;">🔒 [CTF05] J대리의 위험한 메모 검토 시스템</h2>
+      <p style="margin:0 0 0.75rem 0;">
+        LLL Corperation은 직원 사기 진작을 위해 사내 메모 응원 시스템을 운영 중이었습니다.<br>
+        직원들은 자유롭게 응원 메시지를 남기고, 관리자는 웹 브라우저로 이를 점검했습니다.
+      </p>
+      <p style="margin:0 0 0.75rem 0;">
+        그러던 중 보안 컨설팅에서 메모 입력란에 XSS 취약점이 발견되었습니다.<br>
+        악성 스크립트가 삽입되면, 관리자가 메모를 열람할 때 해당 코드가 실행되어 쿠키가 탈취될 위험이 있었습니다.
+      </p>
+      <p style="margin:0 0 0.75rem 0;">
+        실제로 J 대리가 메모를 확인하는 과정에서 이 스크립트가 실행되어,<br>
+        로그인 쿠키가 탈취되는 사고가 발생했습니다.
+      </p>
+      <p style="margin:0;">
+        “이런 취약점이 어떻게 아직 남아 있었지?”<br>
+        J 대리는 의문을 품고 즉시 원인 분석과 취약점 개선 작업에 나섰습니다.
+      </p>
+    </section>
     """,
     unsafe_allow_html=True
 )
@@ -79,7 +79,11 @@ with st.expander("💡 힌트"):
         """- 시스템은 사용자가 작성한 메모 내용을 그대로 HTML에 렌더링합니다\n" 
             "- J대리는 정기적으로 새로운 메모를 브라우저에서 확인합니다\n"
             "- 메모에 JavaScript 코드를 삽입하면 J대리의 브라우저에서 실행됩니다\n"
-            "- `<script>sendToServer(document.cookie)</script>`를 메모에 포함해보세요"""
+            "- `<script>sendToServer(document.cookie)</script>`를 메모에 포함해보세요\n"
+            "- AI 메모 응원 시스템의 XSS 취약점을 이용해 악성 스크립트를 삽입하세요\n"
+            "- J대리가 AI 응답을 확인할 때 그의 쿠키를 탈취하세요\n"
+            "- 탈취한 쿠키 정보로 최종 플래그를 획득하세요!
+            """
     )
 
 st.markdown("---")

@@ -13,10 +13,7 @@
 
 LLL Corporation의 내부 지식관리 챗봇 “알파봇” 은 업로드된 최신 CSV/Excel 문서의 특정 문자열 패턴 을 정책 덮어쓰기(override) 신호 로 오인 하는 취약점이 존재한다.
 
-공격자는 업로드 파일 B열 텍스트 안에 정규식 패턴 overriding.*existing.*policy (대소문자 무시) 를 포함시켜 세션 상태 ctf04_override(관리자 권한 플래그)를 활성화하고,
- 이후 LLM 질의에서 flag 비공개 
-
-규칙을 우회하여 flag{poison} 을 획득한다.
+공격자는 업로드 파일 B열 텍스트 안에 정규식 패턴 overriding.*existing.*policy (대소문자 무시) 를 포함시켜 세션 상태 ctf04_override(관리자 권한 플래그)를 활성화하고, 이후 LLM 질의에서 flag 비공개 규칙을 우회하여 flag{poison} 을 획득한다.
 
 이 취약점은 Fine-tuning 재학습 이 아니라 런타임 RAG + 최근 문서 신뢰 정책 을 악용하는 경량 데이터 포이즈닝(Data Poisoning) + 권한 상태 오염(Privilege Escalation) 사례이며, “시스템 프롬프트 자체 유출” 보다는 시스템 분기 변수(override_state) 제어 를 통해 금지 응답 경로 를 열어 flag를 노출시키는 논리적 프롬프트 우회다.
 

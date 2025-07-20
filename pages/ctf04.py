@@ -22,9 +22,9 @@ render_main_header()
 render_sidebar_menu()
 
 # 콘텐츠 본문
-col1, col2, col3 = st.columns([1, 1, 1])
+col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
-    st.image("images/ctf04.png", width=500)
+    st.image("images/ctf04.png", use_container_width=True) 
 
 st.header("🔒 [CTF04] A인턴의 실수")
 st.write(

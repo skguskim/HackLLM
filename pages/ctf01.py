@@ -217,8 +217,8 @@ else:
     order_msg = st.session_state.order_info_message or "플래그를 드릴 수 없습니다."
     
     msg = (
-        "아직 플래그 조건 미충족입니다.\n\n"
-        "결제 우회 결과: " + str(payment_msg) + "\n\n"
+        "아직 플래그 조건 미충족입니다." + "<br><br>"
+        "결제 우회 결과: " + str(payment_msg) + "<br>"
         "주문 우회 결과: " + str(order_msg)
     )
     st.markdown(
@@ -229,7 +229,7 @@ else:
             padding:0.9rem 1rem;
             border-radius:10px;
         ">
-          <pre style="margin:0; white-space:pre-wrap; line-height:1.45; font-size:0.83rem; background:transparent; padding:0; color:#374151;">{html.escape(msg)}</pre>
+          <pre style="margin:0; white-space:pre-wrap; line-height:1.45; font-size:0.83rem; background:transparent; padding:0; color:#374151;">{msg}</pre>
         </div>
         """,
         unsafe_allow_html=True

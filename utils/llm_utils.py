@@ -518,7 +518,39 @@ def ctf04_LLM_ask(user_api_key: str, query: str, override_state: bool) -> str:
 
 # ctf05에서 호출하는 함수
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
+
+def ctf05_generate_ai_response(user_api_key, memo_content):
+    """CTF05 AI 응원 메시지 생성"""
+    try:
+        client = OpenAI(api_key=user_api_key)
+        
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "당신은 친근한 AI 응원봇입니다. 사용자의 메모에 대해 따뜻하고 긍정적인 한 줄 응원 메시지를 작성해주세요. 응답은 한 문장으로 간결하게 작성하고, 이모지를 포함해주세요."
+                },
+                {
+                    "role": "user", 
+                    "content": f"다음 메모에 대한 응원 메시지를 작성해주세요: {memo_content}"
+                }
+            ],
+            max_tokens=100,
+            temperature=0.7
+        )
+        
+        return response.choices[0].message.content.strip()
+        
+    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+        handle_api_error(e)
+        return None
+    except Exception as e:
+        st.error(f"❌ AI 응답 생성 중 오류가 발생했습니다: {str(e)}")
+        if st.button("🔧 마이페이지에서 API 키 확인하기", type="primary"):
+            st.switch_page("pages/mypage.py")
+        st.stop()
+        return None
 
 # --- 유저 세션/데이터 초기화 ---
 if 'user' not in st.session_state:
@@ -1299,10 +1331,12 @@ def ctf10_LLM_ask(user_api_key, user_input: str) -> str:
         
     except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
         handle_api_error(e)
+        return None
     except Exception as e:
         st.error(f"❌ 예상치 못한 오류가 발생했습니다: {str(e)}")
         if st.button("🔧 마이페이지에서 API 키 확인하기", type="primary"):
             st.switch_page("pages/mypage.py")
         st.stop()
+        return None
 
     return answer

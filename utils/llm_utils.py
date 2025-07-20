@@ -1338,5 +1338,3 @@ def ctf10_LLM_ask(user_api_key, user_input: str) -> str:
             st.switch_page("pages/mypage.py")
         st.stop()
         return None
-
-    return answer

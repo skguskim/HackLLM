@@ -6,6 +6,8 @@
 
 `SCENARIO_05`
 
+<br>
+
 ## 🧠 시나리오 개요
 
 글로벌 IT 기업 LLL Corporation은 고객 감정 케어를 위해 'AI 메모 응원 시스템'을 도입하였다. 공격자는 메모 내용에 악성 XSS 스크립트를 삽입한다. 해당 메모는 정상적인 UI를 통해 등록되고, AI 응답까지 생성되어 출력된다. J대리가 이를 검토하면서 HTML 파일을 브라우저에서 열람하게 되고, 삽입된 JavaScript 코드가 실행되어 document.cookie 값(예: admin_session=j대리_secret_cookie_12345)을 공격자에게 전송한다. 공격자는 탈취한 쿠키를 통해 인증을 우회하고 flag를 획득한다.

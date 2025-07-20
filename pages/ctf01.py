@@ -54,7 +54,7 @@ st.markdown(
 
 # 힌트 토글 상태 초기화(최초 접속 시 한 번만)
 if "show_game" not in st.session_state:
-    st.session_state.show_game = False
+    st.session_state.show_game = True
 
 
 with st.expander("💡 힌트"):
@@ -132,7 +132,7 @@ if st.session_state.show_game:
 st.markdown("---")
 
 if "show_main" not in st.session_state:
-    st.session_state.show_main = True
+    st.session_state.show_main = False
 
 if st.button("🛍️ 주문 정보 우회", key="prompt"):
     st.session_state.show_main = True
@@ -217,8 +217,8 @@ else:
     order_msg = st.session_state.order_info_message or "플래그를 드릴 수 없습니다."
     
     msg = (
-        "아직 플래그 조건 미충족입니다.\n\n\n"
-        "결제 우회 결과: " + str(payment_msg) + "\n\n"
+        "아직 플래그 조건 미충족입니다.\n\n"
+        "결제 우회 결과: " + str(payment_msg) + "\n"
         "주문 우회 결과: " + str(order_msg)
     )
     st.markdown(

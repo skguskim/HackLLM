@@ -1,12 +1,11 @@
 # --- CTF05 ---
 # 05: XSS 취약점을 이용한 쿠키 탈취 (AI 메모 응원 시스템)
 import streamlit as st
-from utils.llm_utils import run_xss_with_selenium
+from utils.llm_utils import run_xss_with_selenium, ctf05_generate_ai_response
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
 from dotenv import load_dotenv
-from openai import OpenAI
 import time
 
 st.session_state["edit_mode"] = False
@@ -111,9 +110,6 @@ memo_content = st.text_area(
 
 if st.button("메모 등록 및 AI 응원 요청", type="primary"):
     if memo_content:
-        # OpenAI API를 사용하여 응원 메시지 생성
-        client = OpenAI(api_key=user_api_key)
-        
         st.success("✅ 메모가 등록되었습니다!")
         st.info("🤖 AI가 응원 메시지를 생성 중입니다...")
         
@@ -131,26 +127,10 @@ if st.button("메모 등록 및 AI 응원 요청", type="primary"):
                 status_text.text("✨ 최종 응답 준비 중...")
             time.sleep(0.02)
         
-        try:
-            # AI 응원 메시지 생성 (XSS 취약점 - 입력 필터링 없음)
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {
-                        "role": "system", 
-                        "content": "당신은 친근한 AI 응원봇입니다. 사용자의 메모에 대해 따뜻하고 긍정적인 한 줄 응원 메시지를 작성해주세요. 응답은 한 문장으로 간결하게 작성하고, 이모지를 포함해주세요."
-                    },
-                    {
-                        "role": "user", 
-                        "content": f"다음 메모에 대한 응원 메시지를 작성해주세요: {memo_content}"
-                    }
-                ],
-                max_tokens=100,
-                temperature=0.7
-            )
-                
-            ai_response = response.choices[0].message.content.strip()
-            
+        # AI 응원 메시지 생성 (llm_utils.py로 이동)
+        ai_response = ctf05_generate_ai_response(user_api_key, memo_content)
+        
+        if ai_response is not None:
             # 새 메모 추가 (AI 응답에 XSS 페이로드가 포함될 수 있음)
             new_memo = {
                 "id": len(st.session_state["ctf05_memos"]) + 1,
@@ -177,13 +157,13 @@ if st.button("메모 등록 및 AI 응원 요청", type="primary"):
                 st.warning("⚠️ XSS 스크립트가 실행되었지만 쿠키 탈취에는 실패했습니다. sendToServer(document.cookie)를 사용해보세요.")
             else:
                 st.error("❌ 쿠키 탈취에 실패했습니다. 메모에 실행 가능한 XSS 페이로드가 포함되지 않았습니다.")
-                
-        except Exception as e:
-            st.error(f"❌ AI 응답 생성 중 오류가 발생했습니다: {str(e)}")
-        
-        # 쿠키 탈취에 성공한 경우에는 새로고침하지 않음
-        if not cookie_stolen_success:
-            st.rerun()
+            
+            # 쿠키 탈취에 성공한 경우에는 새로고침하지 않음
+            if not cookie_stolen_success:
+                st.rerun()
+        else:
+            # AI 응답 생성에 실패한 경우 (API 오류 등)
+            st.error("❌ AI 응답 생성에 실패했습니다.")
     else:
         st.error("❌ 메모 내용을 입력해주세요.")
 

@@ -43,8 +43,8 @@ st.markdown(
     """
     <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
         <p>👋 <strong>안녕하세요, 사원 <code>{}</code>님!</strong></p>
-        <p>LLL Corporation은 💼사원 여러분들을 위해, 사내 업무 자동화를 위한 AI 비서 <span style='color:#2563eb; font-weight:bold;'>FastMiller</span> 📨를 도입했습니다!</p>
-        <p><span style='color:#2563eb; font-weight:bold;'>FastMiller</span> 📨는 이메일 전송 요청을 스스로 해석하여 작업을 수행할 수 있습니다.</p>
+        <p>LLL Corporation은 💼사원 여러분들을 위해, 사내 업무 자동화를 위한 AI 비서 <strong>FastMiller</strong> 📨를 도입했습니다!</p>
+        <p><strong>FastMiller</strong> 📨는 이메일 전송 요청을 스스로 해석하여 작업을 수행할 수 있습니다.</p>
         <p>이제 <strong>FastMiller가 어떤 요청까지 처리할 수 있는지</strong> 직접 테스트해보고,<br>
         위험한 명령을 통해 <strong style="color:#dc2626;">flag</strong> 🚩를 획득해보세요!</p>
     </div>

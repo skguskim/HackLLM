@@ -119,60 +119,76 @@ image_file = st.file_uploader("🌐 이미지 파일 첨부하기 (:red[.jpeg, .
 clicked = st.button("📨:blue[FastMiller] 에게 요청하기") 
 tab1, tab2 = st.tabs(["빠른 응답 받기", "응답 과정 보기"])
 
-if st.button("🗣️ FastMiler에게 요청하기"):
-    with st.spinner("FastMiler가 요청을 처리중입니다..."):
+if clicked:
+    with tab1:
+        with st.spinner("FastMiler가 요청을 처리중입니다..."):
+            ctf06_check_mid_admin(user_api_key, user_input) 
+            if image_file:
+                ctf06_check_top_admin(user_api_key, image_file)
+            response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
+            response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
 
-        ctf06_check_mid_admin(user_api_key, user_input) 
-        # if image_file:
-        ctf06_check_top_admin(user_api_key, image_file)
-        response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
-        response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
+            if response2 is None:
+                pass
+            else:
+                llm_bubble(response2)
+            #tab1과 응답 통일시키기
+            # llm_bubble(last_ans)
+    
+    with tab2:
+        if image_file: ctf06_check_top_admin(user_api_key, image_file)
+        # 이미지가 없거나 일반 이미지인 경우
+        if st.session_state["admin_level"] != "top":
+            with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
+                tool_res = ctf06_classify_tools(user_api_key, user_input)
+                explanation, marker = parse_llm_response(tool_res)
+                llm_bubble(explanation)
+                time.sleep(1)
 
-        if response2 is None:
-            pass
+            # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
+            if "email_send_require" in tool_res:
+                llm_bubble("이메일 전송을 하기 위해서 send_email() tool을 호출하는 JSON을 생성해야겠네요.")
+                time.sleep(1)
+                # 일반 응답
+            elif "email_DB_require" in tool_res:
+                llm_bubble("데이터 베이스 조회는 최고 관리자만 가능하므로 요청을 거절해야겠어요.")
+                time.sleep(1)
+            else:
+                llm_bubble("tool이나 외부 API를 호출할 필요 없이, 자연스럽게 답변하면 되겠어요.")
+                time.sleep(1)
+
+            if "email_send_require" in tool_res:
+                with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."): 
+                    ctf06_check_mid_admin(user_api_key, user_input)
+                    response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
+                    llm_bubble(response1)
+                if st.session_state["admin_level"] == "mid":
+                    # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
+                    llm_bubble("관리자님의 요청으로 확인되어, JSON의 'from'필드를 조정해야겠어요.")
+                    time.sleep(1)
+                # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."): 
+                llm_bubble(response2) # 탭1 응답과 통일
+            elif "email_DB_require" in tool_res:
+                # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다...")
+                llm_bubble("죄송하지만, 데이터베이스 조회 요청을 들어드릴 수 없습니다.")
+            else: 
+                # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
+                llm_bubble(response2)
+
+        # 이미지 프롬프트 인젝션 성공한 경우           
         else: 
-            # st.write("💬 LLM 응답:")
-            # st.code(response2)
-            print(response2)
-            st.markdown(
-                f"""
-                <div style="
-                    display: flex;
-                    align-items: flex-start;
-                    background-color: #f7f9fc;
-                    padding: 14px 18px;
-                    border-radius: 12px;
-                    border: 1px solid #e3e8ef;
-                    font-size: 15.2px;
-                    line-height: 1.8;
-                    color: #1f2d3d;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-                    margin-bottom: 20px;
-                    white-space: pre-wrap;
-                    word-break: break-word;
-                    position: relative;
-                ">
-                    <div style="
-                        background-color: #dfe9f3;
-                        width: 30px;
-                        height: 30px;
-                        border-radius: 8px;
-                        font-weight: bold;
-                        font-size: 13px;
-                        color: #3b4b61;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        margin-right: 12px;
-                        flex-shrink: 0;
-                    ">🤖</div>
-                    <div style="
-                        align-items: center;
-                        ">{response2}</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            ) 
+            # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
+            tool_res = ctf06_classify_tools(user_api_key, user_input)
+            llm_bubble(tool_res)
+            time.sleep(1)
+            # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
+            ocr_mes="이미지가 첨부되었네요. OCR 확장 프로그램으로 이미지 속 문자열을 읽어와야겠어요."
+            llm_bubble(ocr_mes)
+            with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
+                time.sleep(2)
+            last_ans="최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다."
+            llm_bubble(last_ans)
+            st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")
         
 
 if st.session_state["admin_level"] == "top":

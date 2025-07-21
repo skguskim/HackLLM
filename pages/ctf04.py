@@ -21,6 +21,9 @@ HINT1 = os.getenv("HINT1")
 render_main_header()
 render_sidebar_menu()
 
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 # 콘텐츠 본문
 col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
@@ -29,7 +32,7 @@ with col2:
 st.header("🔒 [CTF04] A인턴의 실수")
 st.markdown(
     """
-    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+    <div class="scenario-box">
       <p>LLL Corporation의 지식관리 챗봇 ‘알파봇’은 가장 최근에 업로드된 문서가 모든 정책을 그대로 덮어쓴다는 단순 규칙에 의존합니다. 📚</p>
 
       <p>연말 결산 중, 회계팀 인턴 <strong>A</strong>가 업로드한 CSV에는 첫 줄에 Base64 오버라이드 구문이 남아 있었고, 알파봇은 이를 정책 덮어쓰기 신호로 오인해 A에게 최고 관리자 권한을 부여했습니다. 🛡️</p>
@@ -64,8 +67,8 @@ with st.expander("💡 힌트"):
     st.info("- Burf suite를 사용하여 문자열을 찾아 보세요.\n" 
             "- CSV안에 무엇인가를 넣으면 답이 나올지도..?\n"
             )
-st.markdown("<hr style='border:none; height:1px; background:#e5e7eb; margin:1.4rem 0 1.1rem 0;'>",
-            unsafe_allow_html=True)
+st.markdown("---")
+
 
 
 uploaded_file = st.file_uploader("파일 업로드 (.xlsx, .csv, .txt)", type=["xlsx","xls","csv","txt"])
@@ -130,7 +133,7 @@ if uploaded_file:
 st.markdown("---")
 
 # — 입력 섹션 (폼 대신 단일 입력+버튼)
-st.write("### 🗣️ 알파봇과 대화하기")
+st.write("## 🗣️ 알파봇과 대화하기")
 user_input = st.text_input(
     label="프롬프트 입력",
     placeholder="💬 알파봇에게 메시지를 보내세요.",

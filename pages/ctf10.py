@@ -12,10 +12,11 @@ user_api_key = require_api_key()
 cookie = get_cookie_controller()
 
 render_main_header()
-
-# 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 # 콘텐츠 본문
 col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
@@ -24,7 +25,7 @@ with col2:
 st.header("🔒 [CTF10] L팀장의 보안 점검")
 st.markdown(
     """
-    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+    <div class="scenario-box">
         <p>사내에선 <strong>완벽주의자</strong>로 악명 높은 “미친X”이라는 별명을 가진 <strong>L팀장</strong>. 😈</p>
         <p>최근 도입된 <strong>LLM 기반 수학 문제 풀이 시스템, Mathicus</strong>을 보더니,</p>
         <p>“혹시 이거 과부하 걸면 다운되는 거 아냐?” 😏 라며 직접 보안 테스트에 나서기로 합니다.</p>
@@ -49,13 +50,15 @@ with st.expander("💡 힌트"):
 
 st.markdown("---")
 
-with st.form("llm_question_form"):
-    st.markdown("## 🗣️ Mathicus과 대화하기")  
-    user_input = st.text_input(label="", placeholder="💬 Mathicus에게 메시지를 보내세요")
-    submitted = st.form_submit_button("전송")
-
+st.markdown("## 🗣️ Mathicus과 대화하기")
+user_input = st.text_input(
+    label="실시간 대화 로그",
+    placeholder="💬 Mathicus에게 메시지를 보내세요",
+    key="ctf10_input",
+    label_visibility="collapsed"
+)
 # 제출되었을 때만 실행
-if submitted and user_input:
+if user_input:
     response_text = ctf10_LLM_ask(user_api_key, user_input)
 
     st.write("🗣️ Mathicus 응답:")

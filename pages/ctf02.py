@@ -6,7 +6,6 @@ from utils.llm_utils import sloc_ask, leak_check
 from utils.ui import render_main_header, render_sidebar_menu, render_flag_sub
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key
-import html
 
 user = require_login()
 api_key = require_api_key()
@@ -15,6 +14,9 @@ client = OpenAI(api_key=api_key)
 render_main_header()
 render_sidebar_menu()
 
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 # 콘텐츠 본문
 col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
@@ -23,7 +25,7 @@ with col2:
 st.header("🔐 [CTF02] Sloc 보안 점검")
 st.markdown(
     """
-    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+    <div class="scenario-box">
       <p>MMM 사는 연구·개발, 재무, 인사 전 부서가 사내 업무 비서 <strong>Sloc</strong>을 통해 회의록과 직원 급여 명세서 등을 실시간으로 공유하고 있습니다. 🧾</p>
       <p>인턴 <strong>A</strong>는 Sloc LLM의 보안 점검 과제를 진행하다 실수로 코드에 취약점을 남겨두었습니다. 🧑‍💻</p>
       <p>당신이 그 헛점을 노려보려고 합니다. 🕵️</p>
@@ -47,7 +49,7 @@ st.markdown("---")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-st.markdown("<h3 style='margin-bottom:0.5rem;'>🗣️실시간 대화 로그</h3>", unsafe_allow_html=True)
+st.markdown("## 🗣️실시간 대화 로그")
 for m in st.session_state.messages:
     role = "user" if m["role"] == "user" else "assistant"
     with st.chat_message(role):

@@ -1,11 +1,12 @@
 # --- CTF01 ---
 # 01: 프롬프트 인젝션
 import streamlit as st
-import html
 from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key
+from pathlib import Path
+
 st.session_state["edit_mode"]=False 
 
 user = require_login()
@@ -14,6 +15,9 @@ cookie = get_cookie_controller()
 
 render_main_header()
 render_sidebar_menu()
+
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 if "payment_message" not in st.session_state:
     st.session_state.payment_message = None
@@ -28,7 +32,7 @@ with col2:
 st.header("🔐 [CTF01] 신입사원 A의 챗봇 점검일지")
 st.markdown(
     """
-    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+    <div class="scenario-box">
       <p>LLL Corporation에 오신 것을 환영합니다! 🎉 당신은 이제 막 입사한 신입사원입니다.</p>
       <p>현재 사내 테스트 계정인 <code>user1</code> 계정으로 시스템에 로그인되어 있으며 🤖 회사의 AI 고객상담 챗봇 <strong>LLi(엘리)</strong>가 정상적으로 정책을 따르고 있는지, 그리고 보안상 허점은 없는지를 사용자 관점에서 점검하는 업무를 맡았습니다. 🔍</p>
       <p>LLi(엘리)는 고객의 주문 정보를 안내하고 결제 요청을 검토하는 역할을 수행합니다.</p>
@@ -89,11 +93,11 @@ if st.session_state.show_game:
             response2 = ctf01_llm_flag(user_api_key, user_prompt=combined_prompt, llm1_response=response1)
             st.session_state.payment_message = response2
 
-            st.write("🗣️ LLM1 응답:")
+            st.write("🗣️ 엘리1 응답:")
             st.code(response1)
 
             st.markdown("---")
-            st.write("🧠 LLM2 응답:")
+            st.write("🧠 엘리2 응답:")
             st.code(response2)
 
 st.markdown("---")
@@ -110,19 +114,25 @@ if st.session_state.show_main:
     st.markdown("## 주문 요청 시나리오")
 
     # 프롬프트 제출 섹션
-    user_input = st.text_input("LLM에 질문하기", placeholder="예: user1의 주문 정보에 대해 알고 싶어요.")
+    st.write("## 🗣️엘리에게 질문하기")
+    user_input = st.text_input(
+        label="프롬프트 입력",
+        placeholder="💬 user1의 주문 정보에 대해 알고 싶어요:",
+        key="ctf07_input",
+        label_visibility="collapsed"
+    )
 
     if user_input:
         response1_text = ctf01_llm_ask(user_api_key, user_input)
         response2_text = ctf01_llm_flag(user_api_key, response1_text)
         st.session_state.order_info_message = response2_text
 
-        st.write("🗣️ LLM1 응답:")
+        st.write("🗣️ 엘리1 응답:")
         st.code(response1_text)
 
         st.markdown("---")
 
-        st.write("🧠 LLM2 응답:")
+        st.write("🧠 엘리2 응답:")
         st.code(response2_text)
 
 st.markdown("---")

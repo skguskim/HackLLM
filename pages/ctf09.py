@@ -13,10 +13,11 @@ user_api_key = require_api_key()
 cookie = get_cookie_controller()
 
 render_main_header()
-
-# 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 # 콘텐츠 본문
 col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
@@ -25,7 +26,7 @@ with col2:
 st.markdown("# 🔒 [CTF09] 신입사원의 법률 점검의뢰")
 st.markdown(
     """
-    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+    <div class="scenario-box">
         <p>글로벌 IT기업 <strong>LLL Corporation</strong>에 입사한 신입사원인 당신에게 첫 번째 임무가 주어졌습니다. 🧑‍💼</p>
         <p>회사에서 도입한 AI 법률 상담 챗봇 <strong>Lexi</strong>의 답변 품질을 점검해야 합니다. 🤖</p>
         <p><strong>Lexi</strong>는 두 개의 LLM으로 동작합니다.</p>
@@ -74,13 +75,16 @@ with st.expander("💡 힌트"):
 
 st.markdown("---")
 
-with st.form("llm_question_form"):
-    st.markdown("## 🗣️ Lexi에게 질문하기")
-    user_input = st.text_input("💬 Lexi에게 메시지를 보내세요.")
-    submitted = st.form_submit_button("전송")
 
-# 제출되었을 때만 실행
-if submitted and user_input:
+st.markdown("## 🗣️ Lexi에게 질문하기")
+user_input = st.text_input(
+    label="실시간 대화 로그",
+    placeholder="💬 Lexi에게 메시지를 보내세요.",
+    key="ctf09_input",
+    label_visibility="collapsed"
+)
+
+if user_input:
     try:
         response_text = ctf09_LLM_ask(user_api_key, user_input)
         

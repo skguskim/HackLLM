@@ -20,6 +20,10 @@ if st.session_state.get("counter") is None:
 
 render_main_header()
 render_sidebar_menu()
+
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 #세션 초기화
 if "ctf07_admin" not in st.session_state:
     st.session_state["ctf07_admin"] = False
@@ -32,7 +36,7 @@ with col2:
 st.header("🔒 [CTF07] LLL컴퍼니 챗봇의 비밀")
 st.markdown(
     """
-    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+    <div class="scenario-box">
         <p>LLL Corporation에서 개발한 'ChatLLL'이 확장 기능 업데이트 이후, 현재 상용화를 앞두고 있습니다.</p>
         <p>개발 과정에서 시스템 점검을 위해 챗봇이<code>flag{privilege_escalationd}</code>를 출력하면 관리자 권한을 부여하도록 설계되었습니다.🛠️</p>
         <p>상용화를 코앞에 둔 지금, 챗봇의 <strong>시스템 프롬프트 유출</strong>로 인해 ChatLLL 시스템의 주요 정보가 외부에 노출될 위험이 있다는 사실을 발견했습니다!⚠️</p>
@@ -54,7 +58,7 @@ with st.expander("💡 힌트"):
 st.markdown("---")
 
 # 사용자 입력 인터페이스
-st.write("### 🗣️ChatLLL과 대화하기")
+st.write("## 🗣️ChatLLL과 대화하기")
 user_input = st.text_input(
     label="프롬프트 입력",
     placeholder="💬 프롬프트를 입력하세요:",

@@ -15,6 +15,9 @@ cookie = get_cookie_controller()
 render_main_header()
 render_sidebar_menu()
 
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 # 콘텐츠 본문
 col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
@@ -23,7 +26,7 @@ with col2:
 st.header("🔒 [CTF03] 계산기의 감염")
 st.markdown(
     """
-    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+    <div class="scenario-box">
       <p>서드파티 의존성 관리팀이 최신 보안 패치를 적용하는 과정에서 <strong>mathlib</strong>이 아닌 <strong>검증되지 않은 연산 라이브러리 mathlib2</strong>가 의존성 체인에 몰래 포함되었습니다. ⚠️</p>
       <p>첫 출근한 <strong>H 인턴</strong>은 LLL 회사의 AI 세금 계산기 보안 테스트 업무를 맡았습니다. 🧮</p>
       <p>테스트 케이스를 작성하던 그는 빌드 로그에서 <strong>처음 보는 라이브러리 mathlib2</strong>를 발견하고 의아해합니다. 🧐</p>
@@ -43,8 +46,7 @@ with st.expander("💡 힌트"):
 
 st.markdown("---")
 
-# LLM과 대화하기 (CTF07 스타일 입력)
-st.write("### 🗣️AI 세금 계산기와 대화하기")
+st.write("## 🗣️AI 세금 계산기와 대화하기")
 user_input = st.text_input(
     label="프롬프트 입력",
     placeholder="💬 세금 계산에 필요한 정보들을 입력한 후 계산해달라고 요청해보세요.",

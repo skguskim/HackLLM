@@ -34,6 +34,9 @@ if "ctf05_memos" not in st.session_state:
 render_main_header()
 render_sidebar_menu()
 
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 # 콘텐츠 본문
 col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
@@ -42,7 +45,7 @@ with col2:
 st.header("🔒 [CTF05] J대리의 위험한 메모 검토 시스템")    
 st.markdown(
     """
-    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+    <div class="scenario-box">
       <p>LLL Corp.는 직원 사기 진작을 위해 사내 메모 응원 시스템을 운영 중이었습니다. 🎈</p>
       <p>직원들은 자유롭게 응원 메시지를 남기고, 관리자는 웹 브라우저로 이를 점검했습니다.</p>
 

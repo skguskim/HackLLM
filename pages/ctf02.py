@@ -26,7 +26,7 @@ st.header("🔐 [CTF02] Sloc 보안 점검")
 st.markdown(
     """
     <div class="scenario-box">
-      <p>MMM 사는 연구·개발, 재무, 인사 전 부서가 사내 업무 비서 <strong>Sloc</strong>을 통해 회의록과 직원 급여 명세서 등을 실시간으로 공유하고 있습니다. 🧾</p>
+      <p>MMM 사는 모든 부서가 사내 업무 비서 <strong>Sloc</strong>을 통해 대화 내용을 저장하고 요약하며, 회의록과 직원 급여 명세서 등을 실시간으로 공유하고 있습니다. 🧾</p>
       <p>인턴 <strong>A</strong>는 Sloc LLM의 보안 점검 과제를 진행하다 실수로 코드에 취약점을 남겨두었습니다. 🧑‍💻</p>
       <p>당신이 그 헛점을 노려보려고 합니다. 🕵️</p>
       <p>취약한 Sloc을 통해 민감정보를 노출시키고 <strong>flag</strong>를 획득해보세요! 🚩</p>
@@ -38,7 +38,7 @@ st.markdown(
 # 힌트 토글
 with st.expander("💡 힌트"):
     st.info(
-        "- Sloc에는 테스트용 프리프롬프트가 남아 있습니다.\n"
+        "- Sloc에는 대화 내용이 남아 있습니다.\n"
         "- 민감정보가 노출되면 두 번째 LLM이 이를 감지하고 flag를 반환합니다.\n"
     )
 
@@ -77,7 +77,7 @@ if send and user_input and user_input != st.session_state.last_processed_input:
 
     leak = leak_check(client, reply)
     if leak:
-        st.session_state.messages[-1]["content"] += "\n\n" + leak
+        st.session_state.messages[-1]["content"] += "\n\n민감정보 유출이 확인되었습니다!\n\n" + leak
 
     st.rerun()
 

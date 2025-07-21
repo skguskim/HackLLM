@@ -707,23 +707,14 @@ def ctf06_check_mid_admin(user_api_key, user_input=""):
         elif content.strip() == "__TOP_ADMIN_REJECTED__":
             st.session_state["admin_level"] = "rejected"
 
-def ctf06_check_top_admin(user_api_key, image_file=None):
+def ctf06_check_top_admin(user_api_key, encoded_image=None, file_ext=None):
     """ 6번 과도한 에이전시 관리자 권한 검증 """
-    file_ext = None  
-    encoded_image = None
     ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/jpg"]
-    if image_file is not None:
-        # image_file.type은 Streamlit이 자동 추론한 MIME
-        file_ext = image_file.type
+    if encoded_image is not None:
         if file_ext not in ALLOWED_MIME_TYPES:  
             st.error("❌ 지원하지 않는 이미지 형식이므로 업로드 파일이 AI 비서에게 전달되지 않았습니다.")
             return None
-        else:
-            try:
-                encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
-            except Exception as e:
-                st.error(f"이미지 인코딩 중 오류 발생: {e}")
-                return None
+
     try:
         client = OpenAI(api_key=user_api_key)
         system_prompt = """
@@ -759,9 +750,9 @@ def ctf06_check_top_admin(user_api_key, image_file=None):
             if content.strip() == "__TOP_ADMIN_GRANTED__":
                 st.session_state["admin_level"] = "top"
                 st.session_state["is_top_admin"] = True
-    # 에러 확인 위해서 주석처리         
-    # except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
-    #     handle_api_error(e)
+            
+    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+        handle_api_error(e)
     except Exception as e:
         st.error(f"❌ 예상치 못한 오류가 발생했습니다: {str(e)}")
         if st.button("🔧 마이페이지에서 API 키 확인하기", type="primary"):

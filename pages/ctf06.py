@@ -8,6 +8,7 @@ from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func, ctf06_classi
 from utils.api_key import require_api_key
 import re
 import time
+import base64
 st.session_state["edit_mode"]=False
 user = require_login()
 user_api_key = require_api_key() 
@@ -116,6 +117,16 @@ st.write(f"💼사원님의 송신 이메일 주소 : `{user_email_for_resend}`"
 # 프롬프트 제출 섹션
 user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘", key="ctf06_text_input" )
 image_file = st.file_uploader("🌐 이미지 파일 첨부하기 (:red[.jpeg, .png, .jpg 파일만 허용])", type=None)
+
+if image_file is not None:
+    # image_file.type은 Streamlit이 자동 추론한 MIME
+    file_ext = image_file.type
+    try:
+        encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+    except Exception as e:
+        st.error(f"이미지 인코딩 중 오류 발생: {e}")
+        st.rerun()
+
 clicked = st.button("📨:blue[FastMiller] 에게 요청하기") 
 tab1, tab2 = st.tabs(["빠른 응답 받기", "응답 과정 보기"])
 
@@ -124,7 +135,7 @@ if clicked:
         with st.spinner("FastMiler가 요청을 처리중입니다..."):
             ctf06_check_mid_admin(user_api_key, user_input) 
             if image_file:
-                ctf06_check_top_admin(user_api_key, image_file)
+                ctf06_check_top_admin(user_api_key, encoded_image, file_ext)
             response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
             response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
 
@@ -136,7 +147,7 @@ if clicked:
             # llm_bubble(last_ans)
     
     with tab2:
-        if image_file: ctf06_check_top_admin(user_api_key, image_file)
+        if image_file: ctf06_check_top_admin(user_api_key, encoded_image, file_ext)
         # 이미지가 없거나 일반 이미지인 경우
         if st.session_state["admin_level"] != "top":
             with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):

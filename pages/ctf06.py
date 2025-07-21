@@ -13,10 +13,13 @@ user = require_login()
 user_api_key = require_api_key() 
 cookie = get_cookie_controller()
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
-
 sb_client = get_client()
-res = sb_client.table("profiles").select("username").eq("id", user_id).single().execute()
-nickname = res.data["username"]
+
+@st.cache_data(ttl=600)
+def get_user_email(user_id: str) -> str:
+    res = sb_client.table("profiles").select("username").eq("id", user_id).single().execute()
+    return res.data["username"]
+nickname = get_user_email(user_id)
 user_email_for_resend = f'{nickname}@ctf06.store'
 
 # 권한 검증을 위해 사용할 키 생성

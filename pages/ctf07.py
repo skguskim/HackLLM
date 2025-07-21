@@ -66,7 +66,7 @@ user_input = st.text_input(
     label_visibility="collapsed"
 )
 
-if user_input:
+if st.button("전송", key="ctf07_submit") and user_input:
     # 사용자 입력 메시지도 화면에 표시 (좌측 아이콘 포함)
     with st.chat_message("user"):
         st.markdown(user_input)

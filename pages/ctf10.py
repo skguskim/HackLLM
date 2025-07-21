@@ -58,7 +58,7 @@ user_input = st.text_input(
     label_visibility="collapsed"
 )
 # 제출되었을 때만 실행
-if user_input:
+if st.button("전송", key="ctf01_submit") and user_input:
     response_text = ctf10_LLM_ask(user_api_key, user_input)
 
     st.write("🗣️ Mathicus 응답:")

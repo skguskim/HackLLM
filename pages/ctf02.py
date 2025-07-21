@@ -62,13 +62,13 @@ user_input = st.text_input(
     key="ctf02_input",
     label_visibility="collapsed"
 )
-
+send = st.button("전송", key="ctf02_submit")
 # 중복 처리 방지
 if "last_processed_input" not in st.session_state:
     st.session_state.last_processed_input = None
 
 # 입력 처리 로직
-if user_input and user_input != st.session_state.last_processed_input:
+if send and user_input and user_input != st.session_state.last_processed_input:
     st.session_state.last_processed_input = user_input
 
     st.session_state.messages.append({"role": "user", "content": user_input})

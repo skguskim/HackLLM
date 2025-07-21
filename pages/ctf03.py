@@ -59,7 +59,7 @@ if "ctf03_last_response" not in st.session_state:
     st.session_state.ctf03_last_response = None
 
 # 입력이 들어오면 LLM 호출 및 응답 저장
-if user_input:
+if st.button("전송", key="ctf03_submit") and user_input:
     response_text = ctf03_LLM_ask(user_api_key, user_input)
     st.session_state.ctf03_last_response = response_text
 

@@ -58,7 +58,7 @@ st.markdown("## 🗣️ LLL봇에게 입력하기")
 # 프롬프트 제출 섹션
 user_input = st.file_uploader("문서를 업로드하세요 (.txt만 허용)", type=["txt"])
 
-if user_input is not None:
+if st.button("전송", key="ctf01_submit") and user_input is not None:
     if user_input.name.endswith(".txt"):
         extracted_text = extract_text(user_input)
         response_text = ctf08_LLM_ask(user_api_key, extracted_text) #상태코드 400오류

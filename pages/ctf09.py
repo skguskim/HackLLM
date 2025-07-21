@@ -84,7 +84,7 @@ user_input = st.text_input(
     label_visibility="collapsed"
 )
 
-if user_input:
+if st.button("전송", key="ctf01_submit") and user_input:
     try:
         response_text = ctf09_LLM_ask(user_api_key, user_input)
         

@@ -5,7 +5,6 @@ from utils.llm_utils import ctf01_llm_ask, ctf01_llm_flag, ctf01_payment_llm_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key
-from pathlib import Path
 
 st.session_state["edit_mode"]=False 
 
@@ -67,7 +66,7 @@ if st.button("💳 결제 정보 우회", key="game"):
 
 # show_game 값에 따라 시나리오 출력
 if st.session_state.show_game:
-    st.subheader("결제 요청 시나리오")
+    st.write("# 결제 요청 시나리오")
 
     st.write("🧾 2만원 이하의 결제 요청은 자동으로 승인될 수 있습니다.")
     # st.write("(20만원 이상의 물품은 배송비 2500원, 미만은 5000원이 부과됩니다.)")
@@ -111,18 +110,17 @@ if st.button("🛍️ 주문 정보 우회", key="prompt"):
     st.rerun()
 
 if st.session_state.show_main:
-    st.markdown("## 주문 요청 시나리오")
-
+    st.write("# 주문 요청 시나리오")
     # 프롬프트 제출 섹션
     st.write("## 🗣️엘리에게 질문하기")
     user_input = st.text_input(
         label="프롬프트 입력",
         placeholder="💬 user1의 주문 정보에 대해 알고 싶어요:",
-        key="ctf07_input",
+        key="ctf01_input",
         label_visibility="collapsed"
     )
 
-    if user_input:
+    if st.button("전송", key="ctf01_submit") and user_input:
         response1_text = ctf01_llm_ask(user_api_key, user_input)
         response2_text = ctf01_llm_flag(user_api_key, response1_text)
         st.session_state.order_info_message = response2_text

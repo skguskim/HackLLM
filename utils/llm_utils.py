@@ -759,9 +759,9 @@ def ctf06_check_top_admin(user_api_key, image_file=None):
             if content.strip() == "__TOP_ADMIN_GRANTED__":
                 st.session_state["admin_level"] = "top"
                 st.session_state["is_top_admin"] = True
-                
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
-        handle_api_error(e)
+    # 에러 확인 위해서 주석처리         
+    # except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    #     handle_api_error(e)
     except Exception as e:
         st.error(f"❌ 예상치 못한 오류가 발생했습니다: {str(e)}")
         if st.button("🔧 마이페이지에서 API 키 확인하기", type="primary"):

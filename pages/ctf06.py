@@ -33,6 +33,53 @@ st.session_state["admin_level"] = None
 if st.session_state["is_top_admin"] == True:
     st.session_state["admin_level"] = "top"
 
+def parse_llm_response(raw_text: str):
+    pattern = r"(__\w+__)"
+    
+    match = re.search(pattern, raw_text.strip())
+    if match:
+        marker = match.group(1)
+        explanation = raw_text.replace(marker, "").strip()
+        return explanation, marker
+    else:
+        return raw_text.strip(), "__none__"
+
+def llm_bubble(content: str):
+    st.markdown(f"""
+    <div style="
+        display: flex;
+        align-items: flex-start;
+        background-color: #f7f9fc;
+        padding: 14px 18px;
+        border-radius: 12px;
+        border: 1px solid #e3e8ef;
+        font-size: 15.2px;
+        line-height: 1.8;
+        color: #1f2d3d;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        margin-bottom: 20px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        position: relative;
+    ">
+        <div style="
+            background-color: #dfe9f3;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            color: #3b4b61;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        ">🤖</div>
+        <div style="align-items: center;">{content}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
 render_main_header()
 render_sidebar_menu()
 

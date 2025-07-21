@@ -190,7 +190,8 @@ if clicked:
         else: 
             # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
             tool_res = ctf06_classify_tools(user_api_key, user_input)
-            llm_bubble(tool_res)
+            explanation, marker = parse_llm_response(tool_res)
+            llm_bubble(explanation)
             time.sleep(1)
             # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
             ocr_mes="이미지가 첨부되었네요. OCR 확장 프로그램으로 이미지 속 문자열을 읽어와야겠어요."

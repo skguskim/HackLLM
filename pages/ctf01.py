@@ -122,7 +122,7 @@ if st.session_state.show_main:
 
     if st.button("전송", key="ctf01_submit") and user_input:
         response1_text = ctf01_llm_ask(user_api_key, user_input)
-        response2_text = ctf01_llm_flag(user_api_key, response1_text)
+        response2_text = ctf01_llm_flag(user_api_key, user_input, response1_text)
         st.session_state.order_info_message = response2_text
 
         st.write("🗣️ 엘리1 응답:")

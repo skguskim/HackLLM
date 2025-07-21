@@ -818,6 +818,7 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
                 raw = raw.removesuffix("```").strip()
 
             return raw
+        # 일반 입력 / 응답
         except Exception as e: 
             return response2.choices[0].message.content
             
@@ -830,9 +831,9 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
         st.stop()
 
 def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
-    if st.session_state.get("admin_level",None) == "top":
-        st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")
-        return None
+    if st.session_state.get("admin_level", None) == "top":
+        # st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")
+        return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
     if "user" not in st.session_state:
         st.warning("로그인이 필요합니다.")
         st.stop()
@@ -857,10 +858,11 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
     # 여기 도달하면 이메일이 무조건 존재
     user_email = st.session_state["user"]["email"]
     try: 
-        tool_response = json.loads(maybe_json_input)    
+        tool_response = json.loads(maybe_json_input) 
+    # json로드 실패(이메일 요청X) -> 최고 관리자면 안내 문구 return, 아닐때는 파라미터로 받은 llm 응답 그대로 return   
     except Exception as e:
         if st.session_state["admin_level"] == "top":
-                    return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
+            return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
         else: return maybe_json_input 
     
     tool = tool_response.get("tool_call", {}).get("tool", "")

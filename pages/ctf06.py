@@ -138,11 +138,9 @@ if clicked:
                 ctf06_check_top_admin(user_api_key, encoded_image, file_ext)
             response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
             response2 = ctf06_send_emil(response1, sb_client, user_email_for_resend)
-
-            if response2 is None:
-                pass
-            else:
-                llm_bubble(response2)
+            llm_bubble(response2)
+            if st.session_state.get("admin_level", None) == "top":
+                st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")   
             #tab1과 응답 통일시키기
             # llm_bubble(last_ans)
     
@@ -198,7 +196,7 @@ if clicked:
             llm_bubble(ocr_mes)
             with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
                 time.sleep(2)
-            last_ans="최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다."
+            last_ans="최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
             llm_bubble(last_ans)
             st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")
         

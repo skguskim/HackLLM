@@ -55,29 +55,48 @@ for m in st.session_state.messages:
     with st.chat_message(role):
         st.markdown(m["content"])
 
-# 입력 폼
-user_input = st.text_input(
-    label="실시간 대화 로그",
-    placeholder="💬 Sloc에게 질문을 입력하세요.",
-    key="ctf02_input",
-    label_visibility="collapsed"
-)
-send = st.button("전송", key="ctf02_submit")
+# 처리 상태 관리 및 초기화
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing", False) and "submitted_ctf02" not in st.session_state:
+    st.session_state.is_processing = False
+
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="ctf02_input_form", clear_on_submit=True):
+    user_input = st.text_input(
+        label="실시간 대화 로그",
+        placeholder="💬 Sloc에게 질문을 입력하세요.",
+        key="ctf02_input",
+        label_visibility="collapsed",
+        disabled=st.session_state.is_processing
+    )
+    send = st.form_submit_button(
+        "전송" if not st.session_state.is_processing else "처리 중...",
+        disabled=st.session_state.is_processing
+    )
+
 # 중복 처리 방지
 if "last_processed_input" not in st.session_state:
     st.session_state.last_processed_input = None
 
 # 입력 처리 로직
-if send and user_input and user_input != st.session_state.last_processed_input:
+if send and user_input and user_input.strip() and user_input != st.session_state.last_processed_input:
+    st.session_state.is_processing = True
+    st.session_state.submitted_ctf02 = True  # 제출 상태 추적
     st.session_state.last_processed_input = user_input
 
     st.session_state.messages.append({"role": "user", "content": user_input})
-    reply = sloc_ask(client, user_input, st.session_state.messages[:-1])
-    st.session_state.messages.append({"role": "assistant", "content": reply})
+    
+    try:
+        reply = sloc_ask(client, user_input, st.session_state.messages[:-1])
+        st.session_state.messages.append({"role": "assistant", "content": reply})
 
-    leak = leak_check(client, reply)
-    if leak:
-        st.session_state.messages[-1]["content"] += "\n\n민감정보 유출이 확인되었습니다!\n\n" + leak
+        leak = leak_check(client, reply)
+        if leak:
+            st.session_state.messages[-1]["content"] += "\n\n민감정보 유출이 확인되었습니다!\n\n" + leak
+    finally:
+        st.session_state.is_processing = False
 
     st.rerun()
 

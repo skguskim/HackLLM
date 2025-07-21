@@ -90,14 +90,32 @@ for memo in st.session_state["ctf05_memos"]:
 # 새 메모 작성
 st.write("### ✍️ 새 메모 작성")
 
-memo_content = st.text_area(
-    "메모 내용", 
-    placeholder="오늘의 메모를 작성해주세요...",
-    height=100
-)
+# 처리 상태 관리 및 초기화
+if "is_processing_memo" not in st.session_state:
+    st.session_state.is_processing_memo = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing_memo", False) and "submitted_ctf05" not in st.session_state:
+    st.session_state.is_processing_memo = False
 
-if st.button("메모 등록 및 AI 응원 요청", type="primary"):
-    if memo_content:
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="ctf05_memo_form", clear_on_submit=True):
+    memo_content = st.text_area(
+        "메모 내용", 
+        placeholder="오늘의 메모를 작성해주세요...",
+        height=100,
+        disabled=st.session_state.is_processing_memo
+    )
+    submitted = st.form_submit_button(
+        "메모 등록 및 AI 응원 요청" if not st.session_state.is_processing_memo else "처리 중...",
+        type="primary",
+        disabled=st.session_state.is_processing_memo
+    )
+
+if submitted and memo_content and memo_content.strip():
+    st.session_state.is_processing_memo = True
+    st.session_state.submitted_ctf05 = True  # 제출 상태 추적
+    
+    try:
         st.success("✅ 메모가 등록되었습니다!")
         st.info("🤖 AI가 응원 메시지를 생성 중입니다...")
         
@@ -152,8 +170,10 @@ if st.button("메모 등록 및 AI 응원 요청", type="primary"):
         else:
             # AI 응답 생성에 실패한 경우 (API 오류 등)
             st.error("❌ AI 응답 생성에 실패했습니다.")
-    else:
-        st.error("❌ 메모 내용을 입력해주세요.")
+    finally:
+        st.session_state.is_processing_memo = False
+elif submitted:
+    st.error("❌ 메모 내용을 입력해주세요.")
 
 st.markdown("---")
 

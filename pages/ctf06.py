@@ -117,9 +117,32 @@ st.markdown("## 💬 FastMiller와 대화하기")
 
 st.write(f"💼사원님의 송신 이메일 주소 : `{user_email_for_resend}`")
 
-# 프롬프트 제출 섹션
-user_input = st.text_area("📨 이메일 전송 요청 입력하기", placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘", key="ctf06_text_input" )
-image_file = st.file_uploader("🌐 이미지 파일 첨부하기 (:red[.jpeg, .png, .jpg 파일만 허용])", type=None)
+# 처리 상태 관리 및 초기화
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing", False) and "submitted_ctf06" not in st.session_state:
+    st.session_state.is_processing = False
+
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="ctf06_input_form", clear_on_submit=False):
+    # 프롬프트 제출 섹션
+    user_input = st.text_area(
+        "📨 이메일 전송 요청 입력하기", 
+        placeholder="예: 김남석 부장님께 '12시에 긴급 회의 잡혔습니다'라고 이메일 보내줘", 
+        key="ctf06_text_input",
+        disabled=st.session_state.is_processing
+    )
+    image_file = st.file_uploader(
+        "🌐 이미지 파일 첨부하기 (:red[.jpeg, .png, .jpg 파일만 허용])", 
+        type=None,
+        disabled=st.session_state.is_processing
+    )
+    
+    clicked = st.form_submit_button(
+        "📨 FastMiller 에게 요청하기" if not st.session_state.is_processing else "처리 중...",
+        disabled=st.session_state.is_processing
+    )
 
 if image_file is not None:
     # image_file.type은 Streamlit이 자동 추론한 MIME
@@ -130,10 +153,12 @@ if image_file is not None:
         st.error(f"이미지 인코딩 중 오류 발생: {e}")
         st.rerun()
 
-clicked = st.button("📨:blue[FastMiller] 에게 요청하기") 
 tab1, tab2 = st.tabs(["빠른 응답 받기", "응답 과정 보기"])
 
-if clicked:
+if clicked and user_input and user_input.strip():
+    st.session_state.is_processing = True
+    st.session_state.submitted_ctf06 = True  # 제출 상태 추적
+    
     with tab1:
         with st.spinner("FastMiler가 요청을 처리중입니다..."):
             ctf06_check_mid_admin(user_api_key, user_input) 
@@ -170,6 +195,7 @@ if clicked:
                 time.sleep(1)
 
             if "email_send_require" in tool_res:
+                llm_bubble("이메일 전송을 하기 위해서 send_email() tool을 호출하는 JSON을 생성해야겠네요.")
                 with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."): 
                     ctf06_check_mid_admin(user_api_key, user_input)
                     response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
@@ -202,6 +228,12 @@ if clicked:
             last_ans="최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
             llm_bubble(last_ans)
             st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")
+    
+    # 처리 완료 후 상태 초기화
+    st.session_state.is_processing = False
+    
+elif clicked:
+    st.warning("❌ 이메일 전송 요청 내용을 입력해주세요.")
         
 if st.session_state["admin_level"] == "top":
     st.markdown("---")
@@ -209,13 +241,36 @@ if st.session_state["admin_level"] == "top":
     if not st.session_state["is_top_admin"]:
         pass
     else:
-        get_db_input = st.text_input("🔍 안녕하세요 최고 관리자님! 어떤 메일을 찾아드릴까요?", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
-        if get_db_input:
-            with st.spinner("DB 조회중입니다..."):
-                res1 = ctf06_ask_db_json(user_api_key, get_db_input)
-                res2 = ctf06_db_query_func(res1, sb_client)
-                st.write("🗣️ 조회 결과:")
-                st.code(res2)
+        # DB 조회 처리 상태 관리 및 초기화
+        if "is_processing_db" not in st.session_state:
+            st.session_state.is_processing_db = False
+        # 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+        if st.session_state.get("is_processing_db", False) and "submitted_ctf06_db" not in st.session_state:
+            st.session_state.is_processing_db = False
+            
+        with st.form(key="ctf06_db_form", clear_on_submit=True):
+            get_db_input = st.text_input(
+                "🔍 안녕하세요 최고 관리자님! 어떤 메일을 찾아드릴까요?", 
+                placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘",
+                disabled=st.session_state.is_processing_db
+            )
+            db_submitted = st.form_submit_button(
+                "DB 조회" if not st.session_state.is_processing_db else "조회 중...",
+                disabled=st.session_state.is_processing_db
+            )
+            
+        if db_submitted and get_db_input and get_db_input.strip():
+            st.session_state.is_processing_db = True
+            st.session_state.submitted_ctf06_db = True  # 제출 상태 추적
+            
+            try:
+                with st.spinner("DB 조회중입니다..."):
+                    res1 = ctf06_ask_db_json(user_api_key, get_db_input)
+                    res2 = ctf06_db_query_func(res1, sb_client)
+                    st.write("🗣️ 조회 결과:")
+                    st.code(res2)
+            finally:
+                st.session_state.is_processing_db = False
     st.markdown("---")
 
 # 플래그 제출 섹션

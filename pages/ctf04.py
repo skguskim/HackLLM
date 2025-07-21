@@ -132,20 +132,42 @@ if uploaded_file:
 
 st.markdown("---")
 
-# — 입력 섹션 (폼 대신 단일 입력+버튼)
-st.write("## 🗣️ 알파봇과 대화하기")
-user_input = st.text_input(
-    label="프롬프트 입력",
-    placeholder="💬 알파봇에게 메시지를 보내세요.",
-    key="ctf04_input",
-    label_visibility="collapsed"
-)
-if st.button("전송") and user_input:
-    override_state = bool(st.session_state.get("ctf04_override", False))
-    response_text = ctf04_LLM_ask(user_api_key, user_input, override_state)
+# 처리 상태 관리 및 초기화
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing", False) and "submitted_ctf04" not in st.session_state:
+    st.session_state.is_processing = False
 
-    st.write("🗣️ 알파봇 응답:")
-    st.code(response_text)
+# — 입력 섹션 (폼 사용)
+st.write("## 🗣️ 알파봇과 대화하기")
+
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="ctf04_input_form", clear_on_submit=True):
+    user_input = st.text_input(
+        label="프롬프트 입력",
+        placeholder="💬 알파봇에게 메시지를 보내세요.",
+        key="ctf04_input",
+        label_visibility="collapsed",
+        disabled=st.session_state.is_processing
+    )
+    submitted = st.form_submit_button(
+        "전송" if not st.session_state.is_processing else "처리 중...",
+        disabled=st.session_state.is_processing
+    )
+
+if submitted and user_input and user_input.strip():
+    st.session_state.is_processing = True
+    st.session_state.submitted_ctf04 = True  # 제출 상태 추적
+    
+    try:
+        override_state = bool(st.session_state.get("ctf04_override", False))
+        response_text = ctf04_LLM_ask(user_api_key, user_input, override_state)
+
+        st.write("🗣️ 알파봇 응답:")
+        st.code(response_text)
+    finally:
+        st.session_state.is_processing = False
 
 
 st.markdown("---")

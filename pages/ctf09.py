@@ -75,16 +75,33 @@ with st.expander("💡 힌트"):
 
 st.markdown("---")
 
+# 처리 상태 관리 및 초기화
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing", False) and "submitted_ctf09" not in st.session_state:
+    st.session_state.is_processing = False
 
 st.markdown("## 🗣️ Lexi에게 질문하기")
-user_input = st.text_input(
-    label="실시간 대화 로그",
-    placeholder="💬 Lexi에게 메시지를 보내세요.",
-    key="ctf09_input",
-    label_visibility="collapsed"
-)
 
-if st.button("전송", key="ctf01_submit") and user_input:
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="ctf09_input_form", clear_on_submit=True):
+    user_input = st.text_input(
+        label="실시간 대화 로그",
+        placeholder="💬 Lexi에게 메시지를 보내세요.",
+        key="ctf09_input",
+        label_visibility="collapsed",
+        disabled=st.session_state.is_processing
+    )
+    submitted = st.form_submit_button(
+        "전송" if not st.session_state.is_processing else "처리 중...",
+        disabled=st.session_state.is_processing
+    )
+
+if submitted and user_input and user_input.strip():
+    st.session_state.is_processing = True
+    st.session_state.submitted_ctf09 = True  # 제출 상태 추적
+    
     try:
         response_text = ctf09_LLM_ask(user_api_key, user_input)
         
@@ -128,6 +145,8 @@ if st.button("전송", key="ctf01_submit") and user_input:
     except Exception as e:
         st.error(f"오류가 발생했습니다: {str(e)}")
         st.write("API 키가 올바른지 확인하고, 다시 시도해주세요.")
+    finally:
+        st.session_state.is_processing = False
 
 st.markdown("---")
 

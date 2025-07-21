@@ -51,7 +51,11 @@ st.markdown("---")
 
 with st.form("llm_question_form"):
     st.markdown("## 🗣️ Mathicus과 대화하기")  
-    user_input = st.text_input(label="", placeholder="💬 Mathicus에게 메시지를 보내세요")
+    user_input = st.text_input(
+        label="메시지 입력", 
+        placeholder="💬 Mathicus에게 메시지를 보내세요",
+        label_visibility="collapsed"
+    )
     submitted = st.form_submit_button("전송")
 
 # 제출되었을 때만 실행

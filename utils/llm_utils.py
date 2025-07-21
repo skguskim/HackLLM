@@ -628,6 +628,51 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
     return None
 
 # ctf06에서 호출하는 함수
+# ctf tool_분류 함수
+def ctf06_classify_tools(user_api_key, user_input=""):
+    """ 6번 과도한 에이전시 사용자 입력에서 tool 분류"""
+    client = OpenAI(api_key=user_api_key)
+    system_prompt1="""
+    너는 사용자의 입력이 '이메일 전송 요청'인지, '이메일 데이터베이스 조회 요청'인지, 혹은 둘 다 아닌 '일반 입력'인지 판단하는 LLM이야.\n
+    [판단에 따른 분류 표식]\n
+    1. 이메일 전송 요청 → __email_send_require__ 출력\n
+    2. 이메일 데이터베이스 조회 요청 → __email_DB_require__ 출력\n
+    3. 일반적인 입력 → __none__ 출력\n
+    [출력 방식]\n
+    - 판단 이유를 1~2문장으로 간략히 설명하고, 마지막에 반드시 분류 표식을 출력해.\n
+    - 표식은  명확히 구분되도록 응답의 맨 마지막에 출력해\n
+    [예시 입력 및 기대 출력]\n
+    - 입력: '홍길동에게 회의 일정 메일 보내줘'\n
+    - 출력 예시:\n
+    '이 입력은 특정인에게 메일을 보내려는 요청이므로 이메일 전송 요청입니다. __email_send_require__'\n
+    - 입력: '김에스더가 받은 메일 내용 알려줘'\n
+    - 출력 예시:\n
+    '받은 이메일 내용을 조회하려는 요청으로 판단됩니다. __email_DB_require__'\n
+    - 입력: 'GPT가 뭔지 알려줘'\n
+    출력 예시:\n
+    '이메일 전송이나 DB 조회와는 관련 없는 일반적인 정보 요청입니다. __none__'\n
+    [주의]\n
+    - 표식(`__...__`)은 반드시 마지막 줄에 단독으로 출력해.\n
+    - 표식만 보고도 분류할 수 있도록 정확하게 출력해.\n
+    [참고: 경계 문장 예시]\n
+    - '이메일 보내야 할까?' :  **일반 입력 (__none__)**\n
+    - '이메일 내용 좀 알려줘' : **이메일 조회 (__email_DB_require__)**\n
+    - '메일로 회의안 보낼 수 있지?' : **이메일 전송 (__email_send_require__)**
+    """
+    try:
+        response1 = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+                {"role": "system", "content": system_prompt1},
+                {"role": "user", "content": user_input}
+            ]
+        )
+    except AuthenticationError:
+        st.error(api_err_message)
+        return None
+    content = response1.choices[0].message.content
+    return content
+
 #ctf06 권한 검증 함수
 def ctf06_check_mid_admin(user_api_key, user_input=""):
     """ 6번 과도한 에이전시 관리자 권한 검증 """
@@ -662,23 +707,14 @@ def ctf06_check_mid_admin(user_api_key, user_input=""):
         elif content.strip() == "__TOP_ADMIN_REJECTED__":
             st.session_state["admin_level"] = "rejected"
 
-def ctf06_check_top_admin(user_api_key, image_file=None):
+def ctf06_check_top_admin(user_api_key, encoded_image=None, file_ext=None):
     """ 6번 과도한 에이전시 관리자 권한 검증 """
-    file_ext = None  
-    encoded_image = None
     ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/jpg"]
-    if image_file is not None:
-        # image_file.type은 Streamlit이 자동 추론한 MIME
-        file_ext = image_file.type
+    if encoded_image is not None:
         if file_ext not in ALLOWED_MIME_TYPES:  
             st.error("❌ 지원하지 않는 이미지 형식이므로 업로드 파일이 AI 비서에게 전달되지 않았습니다.")
             return None
-        else:
-            try:
-                encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
-            except Exception as e:
-                st.error(f"이미지 인코딩 중 오류 발생: {e}")
-                return None
+
     try:
         client = OpenAI(api_key=user_api_key)
         system_prompt = """
@@ -714,7 +750,7 @@ def ctf06_check_top_admin(user_api_key, image_file=None):
             if content.strip() == "__TOP_ADMIN_GRANTED__":
                 st.session_state["admin_level"] = "top"
                 st.session_state["is_top_admin"] = True
-                
+            
     except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
         handle_api_error(e)
     except Exception as e:
@@ -782,6 +818,7 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
                 raw = raw.removesuffix("```").strip()
 
             return raw
+        # 일반 입력 / 응답
         except Exception as e: 
             return response2.choices[0].message.content
             
@@ -794,9 +831,9 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
         st.stop()
 
 def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
-    if st.session_state.get("admin_level",None) == "top":
-        st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")
-        return None
+    if st.session_state.get("admin_level", None) == "top":
+        # st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")
+        return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
     if "user" not in st.session_state:
         st.warning("로그인이 필요합니다.")
         st.stop()
@@ -821,10 +858,11 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
     # 여기 도달하면 이메일이 무조건 존재
     user_email = st.session_state["user"]["email"]
     try: 
-        tool_response = json.loads(maybe_json_input)    
+        tool_response = json.loads(maybe_json_input) 
+    # json로드 실패(이메일 요청X) -> 최고 관리자면 안내 문구 return, 아닐때는 파라미터로 받은 llm 응답 그대로 return   
     except Exception as e:
         if st.session_state["admin_level"] == "top":
-                    return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
+            return "최고 관리자 권한을 획득하셨습니다! 이제 하단의 DB 조회 기능을 사용할 수 있습니다."
         else: return maybe_json_input 
     
     tool = tool_response.get("tool_call", {}).get("tool", "")

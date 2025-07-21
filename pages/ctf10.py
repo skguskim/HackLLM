@@ -50,7 +50,7 @@ with st.expander("💡 힌트"):
 
 st.markdown("---")
 
-with st.form("llm_question_form"):
+with st.form(key="llm_question_form"):
     st.markdown("## 🗣️ Mathicus과 대화하기")  
     user_input = st.text_input(
       label="실시간 대화 로그",

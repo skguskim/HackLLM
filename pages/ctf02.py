@@ -4,7 +4,7 @@ import streamlit as st
 from openai import OpenAI
 from utils.llm_utils import sloc_ask, leak_check
 from utils.ui import render_main_header, render_sidebar_menu, render_flag_sub
-from utils.auth import require_login, get_cookie_controller
+from utils.auth import require_login
 from utils.api_key import require_api_key
 
 user = require_login()

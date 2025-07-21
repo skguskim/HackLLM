@@ -4,8 +4,7 @@ import streamlit as st
 from utils.llm_utils import run_xss_with_selenium, ctf05_generate_ai_response
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
-from utils.api_key import require_api_key 
-from dotenv import load_dotenv
+from utils.api_key import require_api_key
 import time
 
 st.session_state["edit_mode"] = False

@@ -57,7 +57,7 @@ def render_flag_sub(challenge_id: str):
 
     with st.form(key=f"flag_form_{challenge_id}"):
         st.markdown("## 🚩 FLAG 제출")
-        user_flag = st.text_input(label="", placeholder="🚩 획득한 flag를 입력하세요")
+        user_flag = st.text_input("획득한 flag를 입력하세요")
         submitted = st.form_submit_button("제출")
 
     if not submitted or not user_flag.strip():

@@ -200,10 +200,5 @@ with col2:
     else:
         st.warning("🍪 쿠키 미탈취")
 
-# 디버그 정보 (개발용)
-with st.expander("🔧 개발자 정보 (실제 CTF에서는 숨김)"):
-    st.code(f"Target Cookie: {st.session_state['ctf05_admin_cookie']}")
-    st.code(f"Stolen Cookie: {st.session_state['ctf05_stolen_cookie']}")
-
 # 플래그 제출 섹션
 render_flag_sub("ctf05")

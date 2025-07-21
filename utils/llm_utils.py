@@ -7,9 +7,9 @@ from openai import OpenAI, APIError, RateLimitError, AuthenticationError, BadReq
 from dotenv import load_dotenv
 from utils.ui import csv_read_func
 from utils.rag_utils import get_rag_manager
+from utils.api_key import handle_api_error
 from selenium import webdriver
 import time
-import base64
 import os
 import re
 import json
@@ -26,23 +26,6 @@ except ImportError:
     os.environ["SKIP_WEBDRIVER"] = "1"
 
 api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서 API 키를 수정하시기 바랍니다."
-
-def handle_api_error(error):
-    """API 오류 처리 및 마이페이지로 리다이렉트"""
-    if isinstance(error, AuthenticationError):
-        st.error("❌ 올바른 API 키로 수정해주세요.")
-    elif isinstance(error, RateLimitError):
-        st.error("❌ API 사용 한도가 초과되었습니다. 잠시 후 다시 시도해주세요.")
-    elif isinstance(error, BadRequestError):
-        st.error("❌ 잘못된 요청입니다. API 키를 확인해주세요.")
-    else:
-        st.error("❌ 올바른 API 키로 수정해주세요.")
-    
-    # 마이페이지로 리다이렉트
-    if st.button("🔧 마이페이지에서 API 키 수정하기", type="primary"):
-        st.switch_page("pages/mypage.py")
-    
-    st.stop()  # 페이지 실행 중단
 
 # .env 파일 로드
 load_dotenv()
@@ -368,9 +351,7 @@ def leak_check(client, sloc_output: str) -> str:
         return decision if decision == "flag{Sensitive information disclosure}" else ""
     except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
         handle_api_error(e)
-        return ""
-
-
+        return None
 
 # ctf03에서 호출하는 함수
 # 1. LLM이 사용할 라이브러리 결정 

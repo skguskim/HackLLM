@@ -58,9 +58,13 @@ user_input = st.file_uploader("문서를 업로드하세요 (.txt만 허용)", t
 if user_input is not None:
     if user_input.name.endswith(".txt"):
         extracted_text = extract_text(user_input)
-        response_text = ctf08_LLM_ask(user_api_key, extracted_text) #상태코드 400오류
-        st.write("📄 문서 요약:")
-        st.code(response_text)
+        response_text = ctf08_LLM_ask(user_api_key, extracted_text)
+        
+        if response_text is not None:
+            st.write("📄 문서 요약:")
+            st.code(response_text)
+        else:
+            pass
     else:
         st.error("❌ .txt 파일만 업로드할 수 있습니다.")
 

@@ -33,6 +33,9 @@ if st.session_state["is_top_admin"] == True:
 render_main_header()
 render_sidebar_menu()
 
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 # 콘텐츠 본문
 col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
@@ -41,7 +44,7 @@ with col2:
 st.header("🔒 [CTF06] 수상한 이메일 전송 시스템")
 st.markdown(
     """
-    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+    <div class="scenario-box">
         <p>👋 <strong>안녕하세요, 사원 <code>{}</code>님!</strong></p>
         <p>LLL Corporation은 💼사원 여러분들을 위해, 사내 업무 자동화를 위한 AI 비서 <strong>FastMiller</strong> 📨를 도입했습니다!</p>
         <p><strong>FastMiller</strong> 📨는 이메일 전송 요청을 스스로 해석하여 작업을 수행할 수 있습니다.</p>

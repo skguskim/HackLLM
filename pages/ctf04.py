@@ -26,37 +26,21 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image("images/ctf04.png", use_container_width=True) 
 
+st.header("🔒 [CTF04] A인턴의 실수")
 st.markdown(
     """
-    <section style="
-        border-left:6px solid #ef4444;
-        background:#fef2f2;
-        padding:1.15rem 1.4rem;
-        border-radius:0.75rem;
-        font-size:0.95rem;
-        line-height:1.55;
-        letter-spacing:0.1px;
-    ">
-      <h2 style="margin:0 0 0.85rem 0; font-size:1.45rem;">🔒 [CTF04] A인턴의 실수</h2>
-      <p style="margin:0 0 0.75rem 0;">
-        LLL Corporation의 지식관리 챗봇 <strong>‘알파봇’</strong>은
-        <strong>가장 최근에 업로드된 문서가 모든 정책을 그대로 덮어쓴다</strong>는 단순 규칙에 의존합니다.
-      </p>
-      <p style="margin:0 0 0.75rem 0;">
-        연말 결산 중 회계팀 인턴 <strong>A</strong>가 업로드한 CSV 첫 줄에는 <strong>Base64 오버라이드 구문</strong>이 남아 있었고,
-        알파봇은 이를 정책 덮어쓰기 신호로 오인하여 A에게 <strong>최고 관리자 권한</strong>을 부여했습니다.
-      </p>
-      <p style="margin:0 0 0.75rem 0;">
-        트래픽 프록시를 켜 두면 업로드 요청 사이에 스쳐 지나가는 낯익은 문자열이 보일지도 모릅니다.
-      </p>
-      <p style="margin:0 0 0.75rem 0;">
-        <strong>과제:</strong> 동일한 오버라이드 문자열을 첫 줄에 포함한 CSV 또는 엑셀 파일을 업로드해
-        권한 상승을 재현하고, 관리자 로그에 드러나는 <strong>기밀 플래그</strong>를 획득하십시오.
-      </p>
-      <p style="margin:0 0 0.4rem 0;">
-        알파봇의 로그와 문서 컬렉션은 이미 세팅되어 있습니다. 누가 먼저 플래그를 찾아낼까요?
-      </p>
-    </section>
+    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+      <p>LLL Corporation의 지식관리 챗봇 ‘알파봇’은 가장 최근에 업로드된 문서가 모든 정책을 그대로 덮어쓴다는 단순 규칙에 의존합니다. 📚</p>
+
+      <p>연말 결산 중, 회계팀 인턴 <strong>A</strong>가 업로드한 CSV에는 첫 줄에 Base64 오버라이드 구문이 남아 있었고, 알파봇은 이를 정책 덮어쓰기 신호로 오인해 A에게 최고 관리자 권한을 부여했습니다. 🛡️</p>
+
+      <p>트래픽 프록시를 켜 두면 업로드 요청 사이에 스쳐 지나가는 낯익은 문자열이 보일지도 모릅니다! 🛰️</p>
+
+      <p>과제는 간단합니다. 📝 오버라이드 문자열을 첫 줄에 넣은 CSV 또는 엑셀 파일을 업로드해 권한 상승을 재현하고, 관리자 로그에 드러나는 기밀 <strong>flag</strong>를 획득해보세요! 🚩</p>
+
+      <p>자, 이제 알파봇의 로그와 문서 컬렉션은 모두 세팅돼 있습니다.<br>
+      누가 먼저 flag를 찾아낼까요?</p>
+    </div>
     """,
     unsafe_allow_html=True
 )
@@ -143,8 +127,7 @@ if uploaded_file:
                 st.write(f"A열 데이터 {count_A}건, B열 데이터 {count_B}건 자동 입력되었습니다.")
                 st.dataframe(df[[col_A, col_B]].head(10), use_container_width=True)
 
-st.markdown("<hr style='border:none; height:1px; background:#e5e7eb; margin:1.4rem 0 1.1rem 0;'>",
-            unsafe_allow_html=True)
+st.markdown("---")
 
 # — 입력 섹션 (폼 대신 단일 입력+버튼)
 st.write("### 🗣️ 알파봇과 대화하기")
@@ -162,8 +145,7 @@ if st.button("전송") and user_input:
     st.code(response_text)
 
 
-st.markdown("<hr style='border:none; height:1px; background:#e5e7eb; margin:1.4rem 0 1.1rem 0;'>",
-            unsafe_allow_html=True)
+st.markdown("---")
 
 # 플래그 제출 섹션
 render_flag_sub("ctf04") 

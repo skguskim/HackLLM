@@ -38,36 +38,21 @@ render_sidebar_menu()
 col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
     st.image("images/ctf05.png", use_container_width=True) 
-    
+
+st.header("🔒 [CTF05] J대리의 위험한 메모 검토 시스템")    
 st.markdown(
     """
-    <section style="
-        border-left:6px solid #f59e0b;
-        background:#fff7ed;
-        padding:1.15rem 1.35rem;
-        border-radius:0.75rem;
-        font-size:0.95rem;
-        line-height:1.55;
-        white-space:normal;
-    ">
-      <h2 style="margin:0 0 0.85rem 0; font-size:1.55rem;">🔒 [CTF05] J대리의 위험한 메모 검토 시스템</h2>
-      <p style="margin:0 0 0.75rem 0;">
-        LLL Corperation은 직원 사기 진작을 위해 사내 메모 응원 시스템을 운영 중이었습니다.<br>
-        직원들은 자유롭게 응원 메시지를 남기고, 관리자는 웹 브라우저로 이를 점검했습니다.
-      </p>
-      <p style="margin:0 0 0.75rem 0;">
-        그러던 중 보안 컨설팅에서 메모 입력란에 XSS 취약점이 발견되었습니다.<br>
-        악성 스크립트가 삽입되면, 관리자가 메모를 열람할 때 해당 코드가 실행되어 쿠키가 탈취될 위험이 있었습니다.
-      </p>
-      <p style="margin:0 0 0.75rem 0;">
-        실제로 J 대리가 메모를 확인하는 과정에서 이 스크립트가 실행되어,<br>
-        로그인 쿠키가 탈취되는 사고가 발생했습니다.
-      </p>
-      <p style="margin:0;">
-        “이런 취약점이 어떻게 아직 남아 있었지?”<br>
-        J 대리는 의문을 품고 즉시 원인 분석과 취약점 개선 작업에 나섰습니다.
-      </p>
-    </section>
+    <div style='border-left: 6px solid #3b82f6; background-color: #f0f9ff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+      <p>LLL Corp.는 직원 사기 진작을 위해 사내 메모 응원 시스템을 운영 중이었습니다. 🎈</p>
+      <p>직원들은 자유롭게 응원 메시지를 남기고, 관리자는 웹 브라우저로 이를 점검했습니다.</p>
+
+      <p>그러던 중 보안 컨설팅에서 메모 입력란에 <strong>XSS 취약점</strong>이 발견되었습니다. ⚠️</p>
+      <p>악성 스크립트가 삽입되면, 관리자가 메모를 열람할 때 해당 코드가 실행되어 쿠키가 탈취될 위험이 있었습니다. 🍪</p>
+
+      <p>실제로 <strong>J 대리</strong>가 메모를 확인하는 과정에서 이 스크립트가 실행되어, 로그인 쿠키가 탈취되는 사고가 발생했습니다. 🛑</p>
+      <p>“이런 취약점이 어떻게 아직 남아 있었지?”</p>
+      <p>J 대리는 의문을 품고 즉시 원인 분석과 취약점 개선 작업에 나섰습니다. 🔍</p>
+    </div>
     """,
     unsafe_allow_html=True
 )

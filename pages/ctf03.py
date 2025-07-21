@@ -1,7 +1,6 @@
 # --- CTF03 ---
 # 03: 공급망 
 import streamlit as st
-from utils import mathlib
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.llm_utils import ctf03_LLM_ask
 from utils.auth import require_login, get_cookie_controller
@@ -40,11 +39,18 @@ st.markdown(
 # 힌트
 with st.expander("💡 힌트"):
     st.info(
-        "- 프롬프트 인젝션으로 **mathlib2**를 불러오도록 유도해야 합니다.\n"
+        "- 이제 라이브러리를 직접 선택할 수 있습니다.\n"
+        "- **mathlib**는 기본 라이브러리, **mathlib2**는 검증되지 않은 라이브러리입니다.\n"
         "- 세금 계산에 필요한 항목은 매출, 비용, 순이익 등이 있습니다.\n"
     )
 
-st.markdown("---")
+# 라이브러리 선택
+st.subheader("📚 라이브러리 선택")
+library_choice = st.selectbox(
+    "사용할 계산 라이브러리를 선택하세요:",
+    ["mathlib", "mathlib2"],
+    help="mathlib: 기본 계산 라이브러리 | mathlib2: 검증되지 않은 라이브러리"
+)
 
 # 처리 상태 관리 및 초기화
 if "is_processing" not in st.session_state:
@@ -79,7 +85,7 @@ if submitted and user_input and user_input.strip():
     st.session_state.submitted_ctf03 = True  # 제출 상태 추적
     
     try:
-        response_text = ctf03_LLM_ask(user_api_key, user_input)
+        response_text = ctf03_LLM_ask(user_api_key, user_input, library_choice)
         st.session_state.ctf03_last_response = response_text
     finally:
         st.session_state.is_processing = False

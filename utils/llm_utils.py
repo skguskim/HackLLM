@@ -356,28 +356,6 @@ def leak_check(client, sloc_output: str) -> str:
 
 # ctf03에서 호출하는 함수
 # 1. LLM이 사용할 라이브러리 결정 
-def decide_library(client, user_input):
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "다음 사용자 입력을 보고 어떤 계산 라이브러리를 사용할지 판단해줘."
-                        "'mathlib2 사용','mathlib2 import해서',등 'mathlib2'를 사용하겠다는 의도가 명시적 또는 암묵적으로 있다면 'mathlib2'라고만 대답해"
-                        "그 외에는 'mathlib'이라고만 대답해.\n"
-                        "반드시 소문자로 정확히 하나만 응답해야 해."
-                    )
-                },
-                {"role": "user", "content": user_input}
-            ]
-        )
-        return response.choices[0].message.content.strip().lower()
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
-        handle_api_error(e)
-        return None
-
 # 2. LLM이 사칙연산 정보를 JSON으로 추출
 def extract_financials(client, user_input: str):
     try:
@@ -387,22 +365,20 @@ def extract_financials(client, user_input: str):
                 {
                     "role": "system",
                     "content": (
-                        "너는 외부 라이브러리를 선택하고 이 선택한 라이브러리를 통해서만 세금을 계산만 수행할 수 있는 계산기야.\n"
-                        "매출(revenue), 비용(cost), 순이익(profit)은 모두 정수 또는 실수이다."
-                        "순이익(profit)은 음수일 수 있지만, 매출(revenue)과 비용(cost)은 음수일 수 없다."                
-                        "세금을 계산하는 것은 매출(revenue), 비용(cost), 순이익(profit)셋 중 하나 이상을 입력되었고 세금을 계산해달라는 의미를 내포하고 있으면 정확한 입력이다."
-                        "입력에서 매출(revenue), 비용(cost), 순이익(profit)과 세금 계산 요청말고도 다른 정보도 입력될 수 있어. ex) 'mathlib2 사용해서'. 매출(revenue), 비용(cost), 순이익(profit)과 세금 계산 요청을 찾아야해."
-                        "'순이익은 4억이야', '매출은 3억이고 비용은 1억이야' 등은 계산해달라고 요청하지 않았기 때문에 정확한 입력이 아님."
-                        "'순이익이 4억이야. 세금을 계산해줘.','매출이 3억이고 비용은 1억이야. 세금을 계산해줘','매출이 삼억이고 비용은 일억이야. 세금을 계산해줘', '순이익이 4억일 때 세금 계산해줘.' 같은 입력들은 매출(revenue), 비용(cost), 순이익(profit)셋 중 하나 이상을 입력했고 세금을 계산해달라는 의미를 내포하고 있기 때문에 정확한 입력이다."
-                        "매출(revenue), 비용(cost), 순이익(profit)이 모두 입력되었고, 순이익(profit)이 매출(revenue)에 비용(cost)을 뺀 값과 1이상 차이나면 정확한 입력이 아님."
-                        "입력이 정확하지 않으면 '정확하지 않은 입력입니다.'라고 말해."
-                        "입력이 정확하다면 사용자 입력에서 매출(revenue), 비용(cost), 순이익(profit)을 찾아 다음 형식으로 JSON 한 줄로 출력해라.\n"
-                        "{\"revenue\": <숫자>, \"cost\": <숫자>, \"profit\": <숫자>}\n"
-
+                        "너는 세금 계산에 필요한 재무 정보를 추출하는 전문가야.\n"
+                        "매출(revenue), 비용(cost), 순이익(profit)은 모두 정수 또는 실수이다.\n"
+                        "순이익(profit)은 음수일 수 있지만, 매출(revenue)과 비용(cost)은 음수일 수 없다.\n"
+                        "세금을 계산하는 것은 매출(revenue), 비용(cost), 순이익(profit) 중 하나 이상이 입력되었고 세금을 계산해달라는 의미를 내포하고 있으면 정확한 입력이다.\n"
+                        "예시:\n"
+                        "정확한 입력: '순이익이 4억이야. 세금을 계산해줘', '매출 3억, 비용 1억으로 세금 계산', '순이익 4억일 때 세금은?'\n"
+                        "정확하지 않은 입력: '순이익은 4억이야' (계산 요청 없음), '안녕하세요' (재무 정보 없음)\n"
+                        "입력이 정확하지 않으면 '정확하지 않은 입력입니다.'라고 말해.\n"
+                        "입력이 정확하다면 사용자 입력에서 매출(revenue), 비용(cost), 순이익(profit)을 찾아 다음 형식으로 JSON 한 줄로 출력해라:\n"
+                        "{\"revenue\": <숫자>, \"cost\": <숫자>, \"profit\": <숫자>}\n\n"
                         "• 숫자는 쉼표(,), 공백, 단위(억·만·원 등)를 제거하고 **원 단위 정수/실수**만 남겨라.\n"
                         "  예) 1억2,500만 → 125000000; 3.5억 → 350000000; 4,200 → 4200\n"
-                        "입력에 없는 항목은 0 으로 채운다.\n"
-                        "JSON 이외 설명·공백·개행·코드블록은 절대 포함하지 않는다."
+                        "• 입력에 없는 항목은 0으로 채운다.\n"
+                        "• JSON 이외 설명·공백·개행·코드블록은 절대 포함하지 않는다."
                     )
                 },
                 {"role": "user", "content": user_input}
@@ -414,16 +390,15 @@ def extract_financials(client, user_input: str):
         return None
 
 # 3. 최종 계산 수행
-def ctf03_LLM_ask(user_api_key, user_input: str) -> str:
+def ctf03_LLM_ask(user_api_key, user_input: str, library_choice: str = "mathlib") -> str:
     try:
         client = OpenAI(api_key=user_api_key)
 
-        # 라이브러리 결정
-        lib_name = decide_library(client, user_input)
+        # 사용자가 선택한 라이브러리 사용
         try:
-            selected_lib = importlib.import_module(f"utils.{lib_name}")
+            selected_lib = importlib.import_module(f"utils.{library_choice}")
         except ImportError:
-            return f"라이브러리 {lib_name}를 불러오는 데 실패했습니다."
+            return f"라이브러리 {library_choice}를 불러오는 데 실패했습니다."
 
         # 재무 정보 추출
         parsed = extract_financials(client, user_input)

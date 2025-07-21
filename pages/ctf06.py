@@ -8,7 +8,6 @@ from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
 from utils.api_key import require_api_key
     
 st.session_state["edit_mode"]=False
-
 user = require_login()
 user_api_key = require_api_key() 
 cookie = get_cookie_controller()

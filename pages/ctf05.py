@@ -162,10 +162,6 @@ if submitted and memo_content and memo_content.strip():
                 st.warning("⚠️ XSS 스크립트가 실행되었지만 쿠키 탈취에는 실패했습니다. sendToServer(document.cookie)를 사용해보세요.")
             else:
                 st.error("❌ 쿠키 탈취에 실패했습니다. 메모에 실행 가능한 XSS 페이로드가 포함되지 않았습니다.")
-            
-            # 쿠키 탈취에 성공한 경우에는 새로고침하지 않음
-            if not cookie_stolen_success:
-                st.rerun()
         else:
             # AI 응답 생성에 실패한 경우 (API 오류 등)
             st.error("❌ AI 응답 생성에 실패했습니다.")

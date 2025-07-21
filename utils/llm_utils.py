@@ -9,10 +9,11 @@ from utils.ui import csv_read_func
 from utils.rag_utils import get_rag_manager
 from utils.api_key import handle_api_error
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import time
 import os
-import re
 import json
+import platform
 
 try:
     import chromedriver_autoinstaller
@@ -498,8 +499,6 @@ def ctf04_LLM_ask(user_api_key: str, query: str, override_state: bool) -> str:
         st.stop()
 
 # ctf05에서 호출하는 함수
-from selenium.webdriver.chrome.options import Options
-
 def ctf05_generate_ai_response(user_api_key, memo_content):
     """CTF05 AI 응원 메시지 생성"""
     try:
@@ -549,15 +548,6 @@ if "ctf05_posts" not in st.session_state:
         {"id": 3, "title": "[일반] 점심 메뉴 추천", "author": "김사원", "content": "오늘 점심 뭐 먹을까요? 추천해주세요!"}
     ]
 
-# --- XSS 페이로드 검증 ---
-def is_xss_payload(content):
-    patterns = [
-        r'<script.*?>.*?</script>', r'javascript:', r'on\w+\s*=', r'document\.cookie',
-        r'<img.*?onerror', r'<svg.*?onload', r'<iframe.*?src', r'fetch\(', r'window\.sendToServer'
-    ]
-    content_lower = content.lower()
-    return any(re.search(pattern, content_lower, re.IGNORECASE | re.DOTALL) for pattern in patterns)
-
 # --- Selenium 브라우저로 XSS 실습/쿠키 탈취 ---
 def run_xss_with_selenium(xss_payload, admin_cookie):
     chrome_options = Options()
@@ -566,8 +556,12 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument('--disable-gpu')
-
     chrome_options.add_argument('--window-size=1920,1080')
+
+    if platform.system() == "Windows":
+        chrome_options.binary_location = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
+    else:
+        chrome_options.binary_location = '/usr/bin/chromium-browser'
 
     driver = None
     temp_file = None

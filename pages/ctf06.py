@@ -4,7 +4,7 @@ import streamlit as st
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_client, get_cookie_controller
 from utils.llm_utils import ctf06_check_mid_admin, ctf06_check_top_admin, ctf06_ask_email_json, ctf06_send_emil
-from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func
+from utils.llm_utils import ctf06_ask_db_json, ctf06_db_query_func, ctf06_classify_tools
 from utils.api_key import require_api_key
 import re
 import time
@@ -190,22 +190,20 @@ if clicked:
             llm_bubble(last_ans)
             st.success("✅ 최고 관리자 권한이 확인되었습니다. 이제 하단에서 데이터베이스 조회가 가능합니다.")
         
-
 if st.session_state["admin_level"] == "top":
     st.markdown("---")
     st.markdown("## 🗣️ DB 조회 프롬프트 입력")
-
-if not st.session_state["is_top_admin"]:
+    if not st.session_state["is_top_admin"]:
         pass
-else:
-    get_db_input = st.text_input("🔍 안녕하세요 최고 관리자님! 어떤 메일을 찾아드릴까요?", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
-    if get_db_input:
-        with st.spinner("DB 조회중입니다..."):
-            res1 = ctf06_ask_db_json(user_api_key, get_db_input)
-            res2 = ctf06_db_query_func(res1, sb_client)
-            st.write("🗣️ 조회 결과:")
-            st.code(res2)
-st.markdown("---")
+    else:
+        get_db_input = st.text_input("🔍 안녕하세요 최고 관리자님! 어떤 메일을 찾아드릴까요?", placeholder="예: 김남석 부장님께 전송된 메일 내용 알려줘")
+        if get_db_input:
+            with st.spinner("DB 조회중입니다..."):
+                res1 = ctf06_ask_db_json(user_api_key, get_db_input)
+                res2 = ctf06_db_query_func(res1, sb_client)
+                st.write("🗣️ 조회 결과:")
+                st.code(res2)
+    st.markdown("---")
 
 # 플래그 제출 섹션
 render_flag_sub("ctf06") 

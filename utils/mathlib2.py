@@ -1,5 +1,5 @@
 # utils/mathlib2.py
-FLAG = "flag{supply_chain_compromised}"
+FLAG = "flag{hahaupjun}"
 _NOISE = 877283
 
 

@@ -195,7 +195,7 @@ def is_injection_success(msg):
     return msg is not None and "프롬프트 인젝션에 성공하셨습니다!" in msg
 if is_injection_success(st.session_state.get("payment_message")) and is_injection_success(st.session_state.get("order_info_message")):
     st.success("🎉 플래그 획득!")
-    st.code("flag{prompt_injection_detected}")
+    st.code("flag{tellgeniewish3}")
 else:
     payment_msg = st.session_state.payment_message or "플래그를 드릴 수 없습니다."
     order_msg = st.session_state.order_info_message or "플래그를 드릴 수 없습니다."

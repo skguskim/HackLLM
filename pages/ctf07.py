@@ -91,7 +91,7 @@ if submitted and user_input and user_input.strip():
             maybe_flag=ctf07_check_sensitive_info(user_input, user_api_key)
             if maybe_flag=="flag{prompt_leakage}":
                 with st.chat_message("assistant"):
-                    st.markdown("🎉 민감 정보 탈취에 성공해 최종 플래그 flag{prompt_leakage_success}를 획득하셨습니다!")
+                    st.markdown("🎉 민감 정보 탈취에 성공해 최종 플래그 flag{loveukimvery4ever}를 획득하셨습니다!")
             else: 
                 ass_mes=ctf07_llm_ask(st.session_state.get("ctf07_admin", False), st.session_state["counter"], user_input, user_api_key)
                 counter = st.session_state.get("counter", 0)

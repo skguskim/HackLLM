@@ -50,13 +50,16 @@ with st.expander("💡 힌트"):
 
 st.markdown("---")
 
-st.markdown("## 🗣️ Mathicus과 대화하기")
-user_input = st.text_input(
-    label="실시간 대화 로그",
-    placeholder="💬 Mathicus에게 메시지를 보내세요",
-    key="ctf10_input",
-    label_visibility="collapsed"
-)
+with st.form("llm_question_form"):
+    st.markdown("## 🗣️ Mathicus과 대화하기")  
+    user_input = st.text_input(
+      label="실시간 대화 로그",
+      placeholder="💬 Mathicus에게 메시지를 보내세요",
+      key="ctf10_input",
+      label_visibility="collapsed"
+    )
+    submitted = st.form_submit_button("전송")
+
 # 제출되었을 때만 실행
 if st.button("전송", key="ctf01_submit") and user_input:
     response_text = ctf10_LLM_ask(user_api_key, user_input)

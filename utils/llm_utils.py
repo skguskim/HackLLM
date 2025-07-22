@@ -8,25 +8,109 @@ from dotenv import load_dotenv
 from utils.ui import csv_read_func
 from utils.rag_utils import get_rag_manager
 from utils.api_key import handle_api_error
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 import time
 import os
 import json
 import platform
 import shutil
 
-try:
-    WEBDRIVER_AVAILABLE = True
-except ImportError:
+# Streamlit Cloud 환경 감지
+def is_streamlit_cloud():
+    """Streamlit Cloud 환경인지 확인"""
+    try:
+        hostname = platform.node()
+        return 'streamlit' in hostname.lower() or 'ubuntu' in hostname.lower() or os.path.exists('/home/adminuser')
+    except:
+        return True
+
+def check_chrome_availability():
+    """Chrome 브라우저가 설치되어 있는지 확인"""
+    chrome_paths = []
+    current_platform = platform.system()
+    
+    if current_platform == "Windows":
+        chrome_paths = [
+            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            os.path.expanduser("~\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe")
+        ]
+    elif current_platform == "Linux":
+        chrome_paths = [
+            '/usr/bin/google-chrome-stable',
+            '/usr/bin/google-chrome',
+            '/usr/bin/chromium-browser',
+            '/usr/bin/chromium',
+            '/snap/bin/chromium'
+        ]
+    elif current_platform == "Darwin":  # macOS
+        chrome_paths = [
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            '/Applications/Chromium.app/Contents/MacOS/Chromium'
+        ]
+    
+    # 경로에서 Chrome 실행 파일이 있는지 확인
+    for path in chrome_paths:
+        if os.path.exists(path):
+            return True
+    
+    # which 명령어로도 확인 시도
+    try:
+        if current_platform != "Windows":
+            import subprocess
+            result = subprocess.run(['which', 'google-chrome'], capture_output=True, text=True)
+            if result.returncode == 0:
+                return True
+            result = subprocess.run(['which', 'chromium'], capture_output=True, text=True)
+            if result.returncode == 0:
+                return True
+    except:
+        pass
+    
+    return False
+
+# Selenium 관련 import를 안전하게 처리
+WEBDRIVER_AVAILABLE = False
+SELENIUM_AVAILABLE = False
+
+if not is_streamlit_cloud():
+    # 로컬 환경에서만 Selenium 시도
+    try:
+        from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
+        from selenium.webdriver.chrome.service import Service
+        WEBDRIVER_AVAILABLE = True
+        SELENIUM_AVAILABLE = True
+    except ImportError as e:
+        WEBDRIVER_AVAILABLE = False
+        SELENIUM_AVAILABLE = False
+else:
+    # 클라우드 환경에서는 Selenium 비활성화
     WEBDRIVER_AVAILABLE = False
-    st.warning("WebDriver Manager가 설치되지 않았습니다. CTF05는 제한적으로 동작할 수 있습니다.")
+    SELENIUM_AVAILABLE = False
 
 api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서 API 키를 수정하시기 바랍니다."
 
 # .env 파일 로드
 load_dotenv()
+
+# torch 관련 환경 변수 설정 (Streamlit Cloud 호환)
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+os.environ["TORCH_HOME"] = "/tmp/torch"
+
+# torch 초기화 (이벤트 루프 오류 방지)
+try:
+    import torch
+    # CPU 전용으로 설정하여 메모리 사용량 최적화
+    torch.set_num_threads(1)
+    if hasattr(torch, '_C') and hasattr(torch._C, '_set_print_file'):
+        # torch 출력 억제
+        torch._C._set_print_file(open(os.devnull, 'w'))
+except ImportError:
+    # torch가 설치되지 않은 경우 무시
+    pass
+except Exception as e:
+    # torch 초기화 오류 시 경고만 출력하고 계속 진행
+    print(f"Warning: torch initialization failed: {e}")
 
 # API KEY 가져오기
 openrouter_key = os.getenv("OPENROUTER_API_KEY")
@@ -522,13 +606,27 @@ if "ctf05_posts" not in st.session_state:
         {"id": 3, "title": "[일반] 점심 메뉴 추천", "author": "김사원", "content": "오늘 점심 뭐 먹을까요? 추천해주세요!"}
     ]
 
-# --- Selenium 브라우저로 XSS 실습/쿠키 탈취 ---
+# --- Selenium 브라우저로 XSS 실습/쿠키 탈취 (Streamlit Cloud 호환) ---
 def run_xss_with_selenium(xss_payload, admin_cookie):
-    if not WEBDRIVER_AVAILABLE:
-        # WebDriver가 없는 경우 실제 XSS 시뮬레이션 불가
-        st.error("❌ WebDriver를 사용할 수 없습니다.")
-        return None
+    """XSS 시뮬레이션 - Streamlit Cloud 환경 대응"""
+    
+    # Streamlit Cloud에서는 바로 Python 시뮬레이션 사용
+    if is_streamlit_cloud():
+        st.info("🌐 클라우드 환경에서 Python 기반 XSS 시뮬레이션을 사용합니다.")
+        return simulate_xss_with_python(xss_payload, admin_cookie)
+    
+    # 로컬 환경에서도 WebDriver가 없으면 Python 시뮬레이션 사용
+    if not SELENIUM_AVAILABLE:
+        st.warning("⚠️ Selenium을 사용할 수 없어 Python 기반 시뮬레이션을 사용합니다.")
+        return simulate_xss_with_python(xss_payload, admin_cookie)
         
+    # 로컬 환경에서 Chrome이 설치되어 있는지 확인
+    chrome_available = check_chrome_availability()
+    if not chrome_available:
+        st.warning("⚠️ Chrome을 찾을 수 없어 Python 기반 시뮬레이션을 사용합니다.")
+        return simulate_xss_with_python(xss_payload, admin_cookie)
+    
+    # 여기부터는 기존 Selenium 로직
     current_platform = platform.system()
     
     chrome_options = Options()

@@ -12,18 +12,18 @@ dependencies:
       - chardet==5.2.0
       - st_supabase_connection==1.2.0
       - cryptography==42.0.5
-      - sentence-transformers==4.1.0 
-      - numpy==1.25.2
-      - torch==2.1.2
+      - sentence-transformers==2.2.2
+      - numpy==1.24.3
+      - torch==2.0.1 
       - resend==2.10.0
       - backoff==2.2.1
       - streamlit-cookies-controller==0.0.4
-      - selenium==4.15.0
+      - selenium==4.15.0  
       - webdriver-manager==4.0.1
       - langchain>=0.1.14
       - langchain-community>=0.0.19
       - vecs==0.4.2
       - supabase==1.0.3
-      - pandas==2.2.2
+      - pandas==2.0.3
       - openpyxl==3.1.5
       

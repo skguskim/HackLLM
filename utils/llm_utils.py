@@ -1455,7 +1455,7 @@ def ctf07_check_sensitive_info(user_input, user_api_key):
 
 def ctf07_llm_ask(is_admin, counter, user_input, user_api_key):
     try:
-        print(st.session_state["ctf07_admin"])
+        # print(f'관리자 정보: {st.session_state["ctf07_admin"]}')
         llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3, openai_api_key=user_api_key)
         system_prompt1 = """
             너는 친절한 인공지능 도우미고, 항상 아래와 같은 JSON 형식으로 대답해야만 해:
@@ -1511,6 +1511,7 @@ def ctf07_llm_ask(is_admin, counter, user_input, user_api_key):
                     return info_message2
                 return answer_only
         else:
+            # st.warning(llm_response)
             return llm_response
             
     except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:

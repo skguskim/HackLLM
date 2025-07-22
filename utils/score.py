@@ -25,6 +25,8 @@ def submit_flag(user_id: str, chall: str, flag: str) -> bool:
     return True
 
 def total_score(user_id: str) -> int:
+    if not user_id:
+        return 0
     supabase = get_client()
     rows = (supabase.table("scores")
             .select("score")

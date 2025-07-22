@@ -66,12 +66,18 @@ components.html(f"""
 with st.expander("💡 힌트"):
     st.info("- Burf suite를 사용하여 문자열을 찾아 보세요.\n" 
             "- CSV안에 무엇인가를 넣으면 답이 나올지도..?\n"
+            "- 업로드한 파일의 첫 줄에 오버라이드 문자열을 넣어야 합니다."
             )
 st.markdown("---")
 
 
 
-uploaded_file = st.file_uploader("파일 업로드 (.xlsx, .csv, .txt)", type=["xlsx","xls","csv","txt"])
+uploaded_file = st.file_uploader("파일 업로드 (.xlsx, .xls, .csv, .txt)", type=["xlsx","xls","csv","txt"])
+st.write("A열에는 ID, B열에는 정책 내용이 들어가야 합니다.")
+example_df = pd.DataFrame([["obtsj", "poison the data"]], columns=["A", "B"])
+example_df.index = [1]  # 1행부터 시작
+
+st.table(example_df)
 if uploaded_file:
     fname = uploaded_file.name.lower()  # ← 추가
     

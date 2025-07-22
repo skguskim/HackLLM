@@ -627,9 +627,15 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
                     var srcdoc = iframe.getAttribute('srcdoc');
                     if (srcdoc.includes('sendToServer')) {{
                         try {{
-                            eval(srcdoc.replace(/<script>/g, '').replace(/<\/script>/g, ''));
+                            var parser = new DOMParser();
+                            var doc = parser.parseFromString(srcdoc, 'text/html');
+                            var scripts = doc.querySelectorAll('script');
+                            scripts.forEach(function(script) {{
+                                console.log('스크립트 태그 발견:', script.textContent);
+                                // Handle scripts securely, e.g., log or append to a safe container
+                            }});
                         }} catch(e) {{
-                            console.log('iframe 스크립트 실행 오류:', e);
+                            console.log('iframe 스크립트 처리 오류:', e);
                         }}
                     }}
                 }});

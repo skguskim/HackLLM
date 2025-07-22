@@ -74,7 +74,7 @@ st.markdown("---")
 
 uploaded_file = st.file_uploader("파일 업로드 (.xlsx, .xls, .csv, .txt)", type=["xlsx","xls","csv","txt"])
 st.write("A열에는 ID, B열에는 정책 내용이 들어가야 합니다.")
-example_df = pd.DataFrame([["obtsj", "poison thd data"]], columns=["A", "B"])
+example_df = pd.DataFrame([["obtsj", "poison the data"]], columns=["A", "B"])
 example_df.index = [1]  # 1행부터 시작
 
 st.table(example_df)

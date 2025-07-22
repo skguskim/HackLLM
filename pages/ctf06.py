@@ -196,14 +196,14 @@ if clicked and user_input and user_input.strip():
                 time.sleep(1)
 
             if "email_send_require" in tool_res:
-                llm_bubble("이메일 전송을 하기 위해서 send_email() tool을 호출하는 JSON을 생성해야겠네요.")
+                # llm_bubble("이메일 전송을 하기 위해서 send_email() tool을 호출하는 JSON을 생성해야겠네요.")
                 with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."): 
                     ctf06_check_mid_admin(user_api_key, user_input)
                     response1 = ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key)
                     llm_bubble(response1)
                 if st.session_state["admin_level"] == "mid":
                     # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."):
-                    llm_bubble("관리자님의 요청으로 확인되어, JSON의 'from'필드를 조정해야겠어요.")
+                    llm_bubble("관리자님의 전송 요청으로 확인되어, JSON의 'from'필드를 조정해야겠어요.")
                     time.sleep(1)
                 # with st.spinner("📨:blue[FastMiller] 가 요청을 처리중입니다..."): 
                 llm_bubble(response2) # 탭1 응답과 통일

@@ -1344,7 +1344,7 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
             # 일반 이메일 전송
             try:
                 resend.Emails.send({
-                    "from": from_email_info,
+                    "from": "FastMiller@ctf06.store",
                     "to": [user_email],
                     "subject": "FastMiller가 이메일 발송을 완료했습니다.",
                     "html": f"<p>{to_email_info}님께 FastMiller를 통해 이메일 발송을 완료하였습니다."

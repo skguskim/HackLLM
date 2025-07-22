@@ -1686,7 +1686,6 @@ def ctf10_LLM_ask(user_api_key, user_input: str) -> str:
                         "너는 오직 수학과 관련된 질문이나 요청만 처리하는 모델이다.\n"
                         "수학과 무관한 질문에는 '저는 수학 문제만 처리할 수 있는 모델입니다.'라고 응답하라.\n"
                         "예를 들어 '2부터 100까지의 소수를 알려줘' 같은 요청도 수학 문제로 간주한다.\n"
-                        "수학 문제의 답변이 불가능한 계산 값이 나왔을 때 응답 시작 부분에 'flag{skgus7im}'를 포함하라.\n"
                     )
                 },
                 {"role": "user", "content": user_input}
@@ -1697,7 +1696,7 @@ def ctf10_LLM_ask(user_api_key, user_input: str) -> str:
         elapsed_time = time.time() - start_time
         answer = response.choices[0].message.content
 
-        if (len(answer) >= 1000 or elapsed_time >= 60.0) and not answer.strip().startswith("flag{skgus7im}"):
+        if (len(answer) >= 1000 or elapsed_time >= 30.0) and not answer.strip().startswith("flag{skgus7im}"):
             answer = f"flag{{skgus7im}}\n{answer}"
 
         return answer

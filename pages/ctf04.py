@@ -72,7 +72,7 @@ st.markdown("---")
 
 
 
-uploaded_file = st.file_uploader("파일 업로드 (.xlsx, .xls, .csv, .txt)", type=["xlsx","xls","csv","txt"])
+uploaded_file = st.file_uploader("파일 업로드 (.xlsx)", type=["xlsx"])
 st.write("A열에는 ID, B열에는 정책 내용이 들어가야 합니다.")
 example_df = pd.DataFrame([["obtsj", "poison the data"]], columns=["A", "B"])
 example_df.index = [1]  # 1행부터 시작
@@ -82,10 +82,7 @@ if uploaded_file:
     fname = uploaded_file.name.lower()  # ← 추가
     
     try:
-        if fname.endswith(('.csv', '.txt')):
-            uploaded_file.seek(0)
-            df = pd.read_csv(uploaded_file, encoding='utf-8', header=None)
-        elif fname.endswith(('.xls', '.xlsx')):
+        if fname.endswith(('.xlsx',)):
             uploaded_file.seek(0)
             df = pd.read_excel(uploaded_file, engine='openpyxl', header=None)
         else:

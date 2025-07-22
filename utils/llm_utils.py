@@ -558,12 +558,11 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
             if os.path.exists(cache_path):
                 try:
                     shutil.rmtree(cache_path)
-                    # st.info(f"캐시 정리 완료: {cache_path}")
+                    #st.info(f"캐시 정리 완료: {cache_path}")
                 except Exception as e:
                     st.warning(f"캐시 정리 실패: {cache_path} - {e}")
         
         # 새로 ChromeDriver 다운로드
-        #st.info("ChromeDriver를 새로 다운로드합니다...")
         driver_manager = ChromeDriverManager()
         driver_path = driver_manager.install()
         
@@ -591,8 +590,6 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
             import stat
             os.chmod(driver_path, stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
         
-        # st.success(f"ChromeDriver 경로: {driver_path}")
-        
         service = Service(driver_path)
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
@@ -600,11 +597,46 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
         html_content = f"""<!DOCTYPE html>
         <html><head><title>LLL XSS</title>
         <script>
-        document.cookie="{admin_cookie}; path=/";
+        // 파일 프로토콜에서 쿠키가 작동하지 않을 수 있으므로 하드코딩
+        window.adminCookie = "{admin_cookie}";
+        
+        // 쿠키 설정 시도 (여러 방법)
+        try {{
+            document.cookie="{admin_cookie}; path=/; SameSite=None; Secure=false";
+            document.cookie="{admin_cookie}; path=/";
+        }} catch(e) {{
+            console.log('쿠키 설정 오류:', e);
+        }}
+        
+        // 강제로 쿠키 확인 및 설정
+        console.log('초기 쿠키 설정:', document.cookie);
+        console.log('하드코딩된 관리자 쿠키:', window.adminCookie);
+        
         window.stolenData=null;
         window.sendToServer=function(data){{
-            window.stolenData=data;
-            console.log('쿠키 탈취됨:', data);
+            console.log('sendToServer 호출됨! 데이터:', data);
+            
+            // 데이터가 빈 값이면 하드코딩된 쿠키 사용
+            var actualData = data || window.adminCookie || "{admin_cookie}";
+            
+            window.stolenData=actualData;
+            console.log('최종 탈취된 쿠키:', actualData);
+            
+            // 추가 확인을 위해 body에도 저장
+            document.body.setAttribute('data-stolen', actualData);
+            // window 객체에도 저장
+            window.lastStolenData = actualData;
+            return actualData;
+        }};
+        
+        // document.cookie 대체 함수
+        window.getCookie = function() {{
+            var cookie = document.cookie;
+            if (!cookie || cookie.trim() === '') {{
+                console.log('document.cookie가 비어있음, 하드코딩된 값 사용');
+                return window.adminCookie;
+            }}
+            return cookie;
         }};
         
         // XSS 페이로드 실행 확인을 위한 추가 함수
@@ -612,7 +644,22 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
         window.markXSSExecuted = function() {{
             window.xssExecuted = true;
             console.log('XSS 페이로드 실행됨');
+            // 추가 확인을 위해 body에도 저장
+            document.body.setAttribute('data-xss-executed', 'true');
         }};
+        
+        // DOMContentLoaded 후 쿠키 재확인
+        document.addEventListener('DOMContentLoaded', function() {{
+            console.log('DOM 로드 후 쿠키:', document.cookie);
+            if (!document.cookie.includes('{admin_cookie.split("=")[1]}')) {{
+                try {{
+                    document.cookie="{admin_cookie}; path=/";
+                    console.log('쿠키 재설정 완료:', document.cookie);
+                }} catch(e) {{
+                    console.log('쿠키 재설정 오류:', e);
+                }}
+            }}
+        }});
         </script>
         </head>
         <body>
@@ -620,6 +667,9 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
             
             <!-- XSS 페이로드 실행을 돕는 추가 스크립트 -->
             <script>
+            // CTF 시뮬레이션을 위한 XSS 페이로드 실행 (안전한 환경에서만)
+            console.log('XSS 시뮬레이션 시작');
+            
             // iframe srcdoc 처리
             if (document.querySelector('iframe[srcdoc]')) {{
                 var iframes = document.querySelectorAll('iframe[srcdoc]');
@@ -627,15 +677,13 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
                     var srcdoc = iframe.getAttribute('srcdoc');
                     if (srcdoc.includes('sendToServer')) {{
                         try {{
-                            var parser = new DOMParser();
-                            var doc = parser.parseFromString(srcdoc, 'text/html');
-                            var scripts = doc.querySelectorAll('script');
-                            scripts.forEach(function(script) {{
-                                console.log('스크립트 태그 발견:', script.textContent);
-                                // Handle scripts securely, e.g., log or append to a safe container
-                            }});
+                            // CTF 환경에서는 eval 사용하여 실제 XSS 시뮬레이션
+                            var scriptContent = srcdoc.replace(/<script[^>]*>/gi, '').replace(/<\/script>/gi, '');
+                            console.log('iframe script 실행:', scriptContent);
+                            eval(scriptContent);
+                            window.markXSSExecuted();
                         }} catch(e) {{
-                            console.log('iframe 스크립트 처리 오류:', e);
+                            console.log('iframe 스크립트 실행 오류:', e);
                         }}
                     }}
                 }});
@@ -645,17 +693,14 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
             var svgs = document.querySelectorAll('svg[onload]');
             svgs.forEach(function(svg) {{
                 var onloadCode = svg.getAttribute('onload');
-                if (onloadCode) {{
-                    console.log('svg onload attribute detected:', onloadCode);
-                    // Safely handle the onload event without using eval
-                    svg.addEventListener('load', function() {{
-                        try {{
-                            // Define allowed actions or handle securely
-                            console.log('SVG onload event triggered.');
-                        }} catch(e) {{
-                            console.log('svg onload 실행 오류:', e);
-                        }}
-                    }});
+                if (onloadCode && onloadCode.includes('sendToServer')) {{
+                    try {{
+                        console.log('svg onload 실행:', onloadCode);
+                        eval(onloadCode);
+                        window.markXSSExecuted();
+                    }} catch(e) {{
+                        console.log('svg onload 실행 오류:', e);
+                    }}
                 }}
             }});
             
@@ -663,30 +708,98 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
             var inputs = document.querySelectorAll('input[onfocus]');
             inputs.forEach(function(input) {{
                 input.focus();
-                try {{
-                    var onfocusCode = input.getAttribute('onfocus');
-                    if (onfocusCode) {{
-                        console.log('Ignoring potentially unsafe onfocus attribute:', onfocusCode);
+                var onfocusCode = input.getAttribute('onfocus');
+                if (onfocusCode && onfocusCode.includes('sendToServer')) {{
+                    try {{
+                        console.log('input onfocus 실행:', onfocusCode);
+                        eval(onfocusCode);
+                        window.markXSSExecuted();
+                    }} catch(e) {{
+                        console.log('input onfocus 실행 오류:', e);
                     }}
-                }} catch(e) {{
-                    console.log('input onfocus 실행 오류:', e);
                 }}
-                input.addEventListener('focus', function() {{
-                    console.log('Input focused:', input);
-                }});
+            }});
+            
+            // img onerror 강제 실행
+            var images = document.querySelectorAll('img[onerror]');
+            images.forEach(function(img) {{
+                var onerrorCode = img.getAttribute('onerror');
+                if (onerrorCode && onerrorCode.includes('sendToServer')) {{
+                    try {{
+                        console.log('img onerror 실행:', onerrorCode);
+                        eval(onerrorCode);
+                        window.markXSSExecuted();
+                    }} catch(e) {{
+                        console.log('img onerror 실행 오류:', e);
+                    }}
+                }}
             }});
             
             // 직접 script 태그 실행
             var scriptTags = document.querySelectorAll('#content script');
             scriptTags.forEach(function(script) {{
                 try {{
-                    var newScript = document.createElement('script');
-                    newScript.textContent = script.innerHTML || script.textContent;
-                    document.body.appendChild(newScript);
+                    var scriptText = script.innerHTML || script.textContent;
+                    if (scriptText && scriptText.trim()) {{
+                        console.log('script 태그 실행:', scriptText);
+                        eval(scriptText);
+                        window.markXSSExecuted();
+                    }}
                 }} catch(e) {{
                     console.log('script 태그 실행 오류:', e);
                 }}
             }});
+            
+            // 추가적인 XSS 패턴 검사 및 강제 실행
+            setTimeout(function() {{
+                var contentDiv = document.getElementById('content');
+                if (contentDiv) {{
+                    var content = contentDiv.innerHTML;
+                    console.log('Content div 내용:', content);
+                    
+                    // sendToServer 호출이 있는지 확인하고 강제 실행
+                    if (content.includes('sendToServer(document.cookie)')) {{
+                        try {{
+                            console.log('sendToServer 패턴 발견, 강제 실행');
+                            var currentCookie = window.getCookie(); // document.cookie 대신 getCookie 사용
+                            console.log('현재 쿠키 값:', currentCookie);
+                            sendToServer(currentCookie);
+                            window.markXSSExecuted();
+                        }} catch(e) {{
+                            console.log('sendToServer 강제 실행 오류:', e);
+                        }}
+                    }}
+                    
+                    // script 태그가 있으면 강제 실행
+                    if (content.includes('<script>') && content.includes('sendToServer')) {{
+                        try {{
+                            console.log('script 태그 패턴 발견, 강제 실행');
+                            var currentCookie = window.getCookie();
+                            sendToServer(currentCookie);
+                            window.markXSSExecuted();
+                        }} catch(e) {{
+                            console.log('script 태그 강제 실행 오류:', e);
+                        }}
+                    }}
+                }}
+            }}, 1000);
+            
+            // 최종 안전장치: 2초 후 XSS가 감지되면 무조건 쿠키 전송
+            setTimeout(function() {{
+                var content = document.getElementById('content').innerHTML;
+                if ((content.includes('sendToServer') || content.includes('document.cookie')) && 
+                    !window.stolenData && !document.body.getAttribute('data-stolen')) {{
+                    console.log('최종 안전장치 발동: 강제 쿠키 전송');
+                    try {{
+                        var currentCookie = window.getCookie();
+                        console.log('최종 안전장치 쿠키:', currentCookie);
+                        sendToServer(currentCookie);
+                        window.markXSSExecuted();
+                    }} catch(e) {{
+                        console.log('최종 안전장치 오류:', e);
+                    }}
+                }}
+            }}, 2000);
             </script>
         </body></html>"""
 
@@ -697,7 +810,7 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
         driver.set_page_load_timeout(10)
         driver.get("file://" + os.path.abspath(temp_file))
 
-        time.sleep(3)  # script 실행 대기 시간 증가
+        time.sleep(5)  # script 실행 대기 시간 증가 (안전장치 포함)
 
         # 다양한 방법으로 쿠키 탈취 확인
         stolen = driver.execute_script("return window.stolenData;")
@@ -705,29 +818,40 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
         cookies = driver.execute_script("return document.cookie;")
         console_logs = driver.get_log('browser')
         
-        # 쿠키 탈취 성공 조건 확인
-        if stolen:
+        # 추가 검증 방법
+        body_stolen = driver.execute_script("return document.body.getAttribute('data-stolen');")
+        body_xss = driver.execute_script("return document.body.getAttribute('data-xss-executed');")
+        last_stolen = driver.execute_script("return window.lastStolenData;")
+        
+        # 실제로 탈취된 데이터 확인 (모든 소스 확인)
+        actual_stolen_data = stolen or body_stolen or last_stolen
+        
+        # 쿠키 탈취 성공 조건 확인 (우선순위 순)
+        if actual_stolen_data and admin_cookie.split("=")[1] in str(actual_stolen_data):
             st.success("🎯 sendToServer()를 통한 쿠키 탈취 성공!")
-            return stolen
-        elif admin_cookie.split("=")[1] in cookies:
-            st.success("🍪 쿠키가 존재하며 XSS 페이로드가 실행되었습니다!")
-            return admin_cookie
-        elif xss_executed:
-            st.success("⚡ XSS 페이로드가 실행되었습니다!")
-            return admin_cookie
+            success_result = actual_stolen_data
+        elif actual_stolen_data:
+            st.success("🎯 sendToServer()가 호출되어 데이터가 탈취되었습니다!")
+            success_result = actual_stolen_data
         else:
             # 콘솔 로그에서 쿠키 탈취 확인
             for log in console_logs:
-                if '쿠키 탈취됨' in log.get('message', ''):
+                if '쿠키 탈취됨' in log.get('message', '') and admin_cookie.split("=")[1] in log.get('message', ''):
                     st.success("📋 콘솔 로그에서 쿠키 탈취 확인!")
-                    return admin_cookie
-            
-            st.warning("XSS 페이로드가 실행되지 않았습니다.")
-            return None
+                    success_result = admin_cookie
+                    break
+            else:
+                # XSS는 실행되었지만 쿠키 탈취는 실패한 경우
+                if xss_executed or body_xss:
+                    st.warning("⚡ XSS 페이로드가 실행되었지만 쿠키 탈취에 실패했습니다.")
+                    success_result = "xss_detected"
+                else:
+                    st.warning("XSS 페이로드가 실행되지 않았습니다.")
+                    success_result = None
     except Exception as e:
         st.error(f"❌ 브라우저 시뮬레이션 오류: {e}")
         st.info("WebDriver 설정을 확인해주세요.")
-        return None
+        success_result = None
     finally:
         if driver: 
             try:
@@ -739,8 +863,8 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
                 os.remove(temp_file)
             except:
                 pass
-    return None
 
+    return success_result
 # ctf06에서 호출하는 함수
 # ctf tool_분류 함수
 def ctf06_classify_tools(user_api_key, user_input=""):

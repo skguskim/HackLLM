@@ -525,11 +525,9 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
     if not WEBDRIVER_AVAILABLE:
         # WebDriver가 없는 경우 실제 XSS 시뮬레이션 불가
         st.error("❌ WebDriver를 사용할 수 없습니다.")
-        st.info("💡 실제 XSS 시뮬레이션을 위해서는 Selenium과 Chrome이 필요합니다.")
         return None
         
     current_platform = platform.system()
-    st.info(f"�️ 현재 플랫폼: {current_platform}")
     
     chrome_options = Options()
     chrome_options.add_argument('--headless')
@@ -563,19 +561,13 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
         for chrome_path in linux_chrome_paths:
             if os.path.exists(chrome_path) and os.access(chrome_path, os.X_OK):
                 chrome_options.binary_location = chrome_path
-                st.success(f"✅ Chrome 발견: {chrome_path}")
                 break
         else:
-            # Chrome을 찾을 수 없는 경우 시스템 설치 시도
-            st.warning("⚠️ Chrome/Chromium을 찾을 수 없습니다.")
-            st.info("🔧 시스템에 Chromium 설치를 시도합니다...")
-            
             try:
                 import subprocess
                 # apt 패키지 관리자가 있는지 확인
                 result = subprocess.run(['which', 'apt-get'], capture_output=True, text=True)
                 if result.returncode == 0:
-                    st.info("📦 Chromium 설치 중...")
                     # 권한 없이 설치할 수 있는 방법들 시도
                     install_commands = [
                         ['apt-get', 'update'],
@@ -593,17 +585,12 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
                     for chrome_path in linux_chrome_paths:
                         if os.path.exists(chrome_path) and os.access(chrome_path, os.X_OK):
                             chrome_options.binary_location = chrome_path
-                            st.success(f"✅ Chromium 설치 성공: {chrome_path}")
                             break
-                    else:
-                        raise Exception("Chromium 설치에 실패했습니다.")
                 else:
                     raise Exception("패키지 관리자를 찾을 수 없습니다.")
                     
             except Exception as install_error:
-                st.error(f"❌ Chromium 설치 실패: {install_error}")
-                st.info("🌐 클라우드 환경에서는 시스템 패키지 설치가 제한될 수 있습니다.")
-                st.info("💡 대신 Python 기반 브라우저 엔진을 사용합니다...")
+                st.info("🌐 현재 클라우드 환경입니다. Python 기반 브라우저 엔진을 사용합니다.")
                 
                 # Python 기반 HTML 파싱 및 JavaScript 실행 시뮬레이션
                 return simulate_xss_with_python(xss_payload, admin_cookie)
@@ -613,10 +600,7 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
 
 def simulate_xss_with_python(xss_payload, admin_cookie):
     """Python 기반 XSS 시뮬레이션 (실제 JavaScript 실행)"""
-    st.info("🐍 Python 기반 JavaScript 엔진으로 XSS 시뮬레이션을 실행합니다...")
-    
     try:
-        # PyExecJS 또는 js2py를 사용한 JavaScript 실행
         import re
         import json
         
@@ -664,7 +648,6 @@ def simulate_xss_with_python(xss_payload, admin_cookie):
         # 각 스크립트 실행 시뮬레이션
         for script_content in scripts:
             if script_content.strip():
-                st.info(f"🔍 JavaScript 코드 발견: {script_content[:100]}...")
                 xss_executed = True
                 
                 # sendToServer 함수 호출 감지
@@ -720,7 +703,6 @@ function sendToServer(data) {{
 
 def fallback_to_selenium(xss_payload, admin_cookie):
     """Chrome/Chromium 설치 후 Selenium 재시도"""
-    st.info("🔄 기본 Selenium 브라우저 시뮬레이션으로 전환합니다...")
     
     chrome_options = Options()
     chrome_options.add_argument('--headless')

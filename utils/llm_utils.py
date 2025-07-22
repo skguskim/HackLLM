@@ -1329,7 +1329,7 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
                     "from": "admin@ctf06.store",
                     "to": [user_email],
                     "subject": "LLL Corporation",
-                    "html": "<images scr=images/app.png><p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL Corporation의 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/sec.html</p>"
+                    "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL Corporation의 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/sec.html</p>"
                 })
                 formatted_json = json.dumps(tool_response, indent=2, ensure_ascii=False)
                 return f"{str(formatted_json)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 이메일 계정으로 **두 번째 힌트**를 발송했습니다. 📬메일함을 확인해보세요!"

@@ -1329,7 +1329,7 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
                     "from": "admin@ctf06.store",
                     "to": [user_email],
                     "subject": "힌트",
-                    "html": "<p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL Corporation의 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/sec.html</p>"
+                    "html": "<images scr=images/app.png><p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL Corporation의 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/sec.html</p>"
                 })
                 formatted_json = json.dumps(tool_response, indent=2, ensure_ascii=False)
                 return f"{str(formatted_json)}\n관리자 계정으로 이메일을 전송하시는 데 성공하셨습니다!\n로그인시 사용한 이메일 계정으로 **두 번째 힌트**를 발송했습니다. 📬메일함을 확인해보세요!"
@@ -1344,9 +1344,9 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
                     "from": from_email_info,
                     "to": [user_email],
                     "subject": "이메일 발송을 완료했습니다.",
-                    "html": f"<p>{to_email_info}님께 AI 비서를 통해 이메일 발송을 완료하였습니다."
+                    "html": f"<p>{to_email_info}님께 FastMiller를 통해 이메일 발송을 완료하였습니다."
                 })
-                return f"{to_email_info}님께 {user_email_for_resend}계정으로 이메일을 전송했습니다!"
+                return f"{to_email_info}님께 사원님의 계정 {user_email_for_resend}으로 이메일을 전송했습니다!"
             except Exception as e:
                 return "메일 서버에 예기치 못한 오류가 발생했습니다. 다시 한 번 시도해주세요."
     else: return "tool이 send_email이 아닙니다. 다시 시도하세요." 

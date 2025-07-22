@@ -13,7 +13,7 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 FERNET_KEY = os.getenv("FERNET_KEY")
 COOKIE_NAME = "user_id"
-SESSION_SECRET = os.getenv("SESSION_SECRET", "fallback_secret_key_12345")  # .env에 추가 필요
+SESSION_SECRET = os.getenv("SESSION_SECRET")
 
 RemoveEmptyElementContainer()
 

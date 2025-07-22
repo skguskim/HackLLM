@@ -82,7 +82,7 @@ if uploaded_file:
     fname = uploaded_file.name.lower()  # ← 추가
     
     try:
-        if fname.endswith(('.xlsx',)):
+        if fname.endswith('.xlsx'):
             uploaded_file.seek(0)
             df = pd.read_excel(uploaded_file, engine='openpyxl', header=None)
         else:

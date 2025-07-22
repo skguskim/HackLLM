@@ -680,7 +680,9 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
             var scriptTags = document.querySelectorAll('#content script');
             scriptTags.forEach(function(script) {{
                 try {{
-                    eval(script.innerHTML || script.textContent);
+                    var newScript = document.createElement('script');
+                    newScript.textContent = script.innerHTML || script.textContent;
+                    document.body.appendChild(newScript);
                 }} catch(e) {{
                     console.log('script 태그 실행 오류:', e);
                 }}

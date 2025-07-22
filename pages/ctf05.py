@@ -76,7 +76,6 @@ st.markdown("---")
 
 # AI 메모 응원 시스템
 st.write("### 🤖 AI 메모 응원 시스템")
-st.write("**현재 메모 목록:**")
 
 # 메모 표시
 for memo in st.session_state["ctf05_memos"]:

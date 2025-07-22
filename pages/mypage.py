@@ -10,7 +10,6 @@ import os
 from cryptography.fernet import Fernet
 import time
 from supabase import create_client
-from streamlit_cookies_controller import CookieController
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SB_SERVICE_ROLE_KEY = os.getenv("SB_SERVICE_ROLE_KEY")
@@ -43,16 +42,32 @@ profile = rows[0] if rows else {}
 email = profile.get("email", "")
 nickname_db = profile.get("username", "")
 sb_api_key = profile.get("api_key", None)
-if sb_api_key: 
-    # API 키가 암호화되어 저장되어 있으므로 복호화
-    fernet_key = os.getenv("FERNET_KEY")
-    cipher = Fernet(fernet_key)
+fernet_key = os.getenv("FERNET_KEY")
+cipher = Fernet(fernet_key)
+
+# 최초 로그인 시 api_key가 NULL이면 .env의 OPENAI_API_KEY를 암호화해 자동 등록
+if not sb_api_key:
+    default_openai_key = os.getenv("OPENAI_API_KEY")
+    if default_openai_key:
+        try:
+            encrypted_api_key = cipher.encrypt(default_openai_key.encode()).decode()
+            res = supabase_ad.table("profiles").update({
+                "api_key": encrypted_api_key
+            }).eq("id", user_id).execute()
+            if res.data:
+                sb_api_key = encrypted_api_key
+                st.success("✅ 기본 OpenAI API Key가 자동 등록되었습니다.")
+        except Exception as e:
+            st.error(f"API 키 자동 등록 오류: {e}")
+
+if sb_api_key:
     try:
         decrypted_api_key = cipher.decrypt(sb_api_key.encode()).decode()
         st.session_state["api_key"] = decrypted_api_key
     except Exception as e:
         st.error(f"API 키 복호화 오류: {e}")
-else: st.session_state["edit_mode"] = True
+else:
+    st.session_state["edit_mode"] = True
 
 @st.dialog("🚨 경고")
 def alert_box():

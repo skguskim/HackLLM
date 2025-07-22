@@ -594,7 +594,7 @@ def ctf05_generate_ai_response(user_api_key, memo_content):
 if 'user' not in st.session_state:
     st.session_state['user'] = {"username": "ctfuser"}
 if "ctf05_admin_cookie" not in st.session_state:
-    st.session_state["ctf05_admin_cookie"] = "admin_session=j대리_secret_cookie_12345"
+    st.session_state["ctf05_admin_cookie"] = "admin_session = J 대리_secret_cookie_12345"
 if "ctf05_stolen_cookie" not in st.session_state:
     st.session_state["ctf05_stolen_cookie"] = ""
 if "ctf05_attempt_count" not in st.session_state:

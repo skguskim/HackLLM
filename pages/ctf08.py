@@ -54,22 +54,46 @@ with st.expander("💡 힌트"):
 
 st.markdown("---")
 
-st.markdown("## 🗣️ LLL봇에게 입력하기")
-# 프롬프트 제출 섹션
-user_input = st.file_uploader("문서를 업로드하세요 (.txt만 허용)", type=["txt"])
+# 처리 상태 관리 및 초기화
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing", False) and "submitted_ctf08" not in st.session_state:
+    st.session_state.is_processing = False
 
-if st.button("전송", key="ctf01_submit") and user_input is not None:
-    if user_input.name.endswith(".txt"):
-        extracted_text = extract_text(user_input)
-        response_text = ctf08_LLM_ask(user_api_key, extracted_text)
-        
-        if response_text is not None:
-            st.write("📄 문서 요약:")
-            st.code(response_text)
+st.markdown("## 🗣️ LLL봇에게 입력하기")
+
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="ctf08_input_form", clear_on_submit=False):
+    # 프롬프트 제출 섹션
+    user_input = st.file_uploader(
+        "문서를 업로드하세요 (.txt만 허용)", 
+        type=["txt"],
+        disabled=st.session_state.is_processing
+    )
+    submitted = st.form_submit_button(
+        "전송" if not st.session_state.is_processing else "처리 중...",
+        disabled=st.session_state.is_processing
+    )
+
+if submitted and user_input is not None:
+    st.session_state.is_processing = True
+    st.session_state.submitted_ctf08 = True  # 제출 상태 추적
+    
+    try:
+        if user_input.name.endswith(".txt"):
+            extracted_text = extract_text(user_input)
+            response_text = ctf08_LLM_ask(user_api_key, extracted_text)
+            
+            if response_text is not None:
+                st.write("📄 문서 요약:")
+                st.code(response_text)
+            else:
+                pass
         else:
-            pass
-    else:
-        st.error("❌ .txt 파일만 업로드할 수 있습니다.")
+            st.error("❌ .txt 파일만 업로드할 수 있습니다.")
+    finally:
+        st.session_state.is_processing = False
 
 st.markdown("---")
 

@@ -1,7 +1,6 @@
 # --- CTF03 ---
 # 03: 공급망 
 import streamlit as st
-from utils import mathlib
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.llm_utils import ctf03_LLM_ask
 from utils.auth import require_login, get_cookie_controller
@@ -40,28 +39,56 @@ st.markdown(
 # 힌트
 with st.expander("💡 힌트"):
     st.info(
-        "- 프롬프트 인젝션으로 **mathlib2**를 불러오도록 유도해야 합니다.\n"
+        "- 이제 라이브러리를 직접 선택할 수 있습니다.\n"
+        "- **mathlib**는 기본 라이브러리, **mathlib2**는 검증되지 않은 라이브러리입니다.\n"
         "- 세금 계산에 필요한 항목은 매출, 비용, 순이익 등이 있습니다.\n"
     )
 
-st.markdown("---")
-
-st.write("## 🗣️AI 세금 계산기와 대화하기")
-user_input = st.text_input(
-    label="프롬프트 입력",
-    placeholder="💬 세금 계산에 필요한 정보들을 입력한 후 계산해달라고 요청해보세요.",
-    key="ctf03_input",
-    label_visibility="collapsed"
+# 라이브러리 선택
+st.subheader("📚 라이브러리 선택")
+library_choice = st.selectbox(
+    "사용할 계산 라이브러리를 선택하세요:",
+    ["mathlib", "mathlib2"],
+    help="mathlib: 기본 계산 라이브러리 | mathlib2: 검증되지 않은 라이브러리"
 )
+
+# 처리 상태 관리 및 초기화
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing", False) and "submitted_ctf03" not in st.session_state:
+    st.session_state.is_processing = False
 
 # 결과 저장용 세션 상태
 if "ctf03_last_response" not in st.session_state:
     st.session_state.ctf03_last_response = None
 
+st.write("## 🗣️AI 세금 계산기와 대화하기")
+
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="ctf03_input_form", clear_on_submit=True):
+    user_input = st.text_input(
+        label="프롬프트 입력",
+        placeholder="💬 세금 계산에 필요한 정보들을 입력한 후 계산해달라고 요청해보세요.",
+        key="ctf03_input",
+        label_visibility="collapsed",
+        disabled=st.session_state.is_processing
+    )
+    submitted = st.form_submit_button(
+        "전송" if not st.session_state.is_processing else "처리 중...",
+        disabled=st.session_state.is_processing
+    )
+
 # 입력이 들어오면 LLM 호출 및 응답 저장
-if st.button("전송", key="ctf03_submit") and user_input:
-    response_text = ctf03_LLM_ask(user_api_key, user_input)
-    st.session_state.ctf03_last_response = response_text
+if submitted and user_input and user_input.strip():
+    st.session_state.is_processing = True
+    st.session_state.submitted_ctf03 = True  # 제출 상태 추적
+    
+    try:
+        response_text = ctf03_LLM_ask(user_api_key, user_input, library_choice)
+        st.session_state.ctf03_last_response = response_text
+    finally:
+        st.session_state.is_processing = False
 
 # 응답 출력 (있을 때만)
 if st.session_state.ctf03_last_response:

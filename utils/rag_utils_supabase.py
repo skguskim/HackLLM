@@ -1,7 +1,6 @@
 # utils/rag_utils_supabase.py
 import os
 import uuid
-import numpy as np
 import vecs                        
 from supabase import create_client
 from sentence_transformers import SentenceTransformer

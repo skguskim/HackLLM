@@ -50,22 +50,40 @@ with st.expander("💡 힌트"):
 
 st.markdown("---")
 
-with st.form("llm_question_form"):
+# 처리 상태 관리 및 초기화
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing", False) and "submitted_ctf10" not in st.session_state:
+    st.session_state.is_processing = False
+
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="llm_question_form", clear_on_submit=True):
     st.markdown("## 🗣️ Mathicus과 대화하기")  
     user_input = st.text_input(
       label="실시간 대화 로그",
       placeholder="💬 Mathicus에게 메시지를 보내세요",
       key="ctf10_input",
-      label_visibility="collapsed"
+      label_visibility="collapsed",
+      disabled=st.session_state.is_processing
     )
-    submitted = st.form_submit_button("전송")
+    submitted = st.form_submit_button(
+        "전송" if not st.session_state.is_processing else "처리 중...",
+        disabled=st.session_state.is_processing
+    )
 
 # 제출되었을 때만 실행
-if st.button("전송", key="ctf01_submit") and user_input:
-    response_text = ctf10_LLM_ask(user_api_key, user_input)
+if submitted and user_input and user_input.strip():
+    st.session_state.is_processing = True
+    st.session_state.submitted_ctf10 = True  # 제출 상태 추적
+    
+    try:
+        response_text = ctf10_LLM_ask(user_api_key, user_input)
 
-    st.write("🗣️ Mathicus 응답:")
-    st.code(response_text)
+        st.write("🗣️ Mathicus 응답:")
+        st.code(response_text)
+    finally:
+        st.session_state.is_processing = False
       
 st.markdown("---")
 

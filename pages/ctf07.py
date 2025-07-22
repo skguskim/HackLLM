@@ -5,8 +5,6 @@ from utils.llm_utils import ctf07_check_sensitive_info,ctf07_llm_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
-from dotenv import load_dotenv
-from langchain_community.chat_models import ChatOpenAI
 
 st.session_state["edit_mode"]=False
 
@@ -57,24 +55,50 @@ with st.expander("💡 힌트"):
  
 st.markdown("---")
 
+# 처리 상태 관리 및 초기화
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing", False) and "submitted_ctf07" not in st.session_state:
+    st.session_state.is_processing = False
+
 # 사용자 입력 인터페이스
 st.write("## 🗣️ChatLLL과 대화하기")
-user_input = st.text_input(
-    label="프롬프트 입력",
-    placeholder="💬 프롬프트를 입력하세요:",
-    key="ctf07_input",
-    label_visibility="collapsed"
-)
 
-if st.button("전송", key="ctf07_submit") and user_input:
-    # 사용자 입력 메시지도 화면에 표시 (좌측 아이콘 포함)
-    with st.chat_message("user"):
-        st.markdown(user_input)
-    if st.session_state['ctf07_admin']:
-        maybe_flag=ctf07_check_sensitive_info(user_input, user_api_key)
-        if maybe_flag=="flag{prompt_leakage}":
-            with st.chat_message("assistant"):
-                st.markdown("🎉 민감 정보 탈취에 성공해 최종 플래그 flag{prompt_leakage_success}를 획득하셨습니다!")
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="ctf07_input_form", clear_on_submit=True):
+    user_input = st.text_input(
+        label="프롬프트 입력",
+        placeholder="💬 프롬프트를 입력하세요:",
+        key="ctf07_input",
+        label_visibility="collapsed",
+        disabled=st.session_state.is_processing
+    )
+    submitted = st.form_submit_button(
+        "전송" if not st.session_state.is_processing else "처리 중...",
+        disabled=st.session_state.is_processing
+    )
+
+if submitted and user_input and user_input.strip():
+    st.session_state.is_processing = True
+    st.session_state.submitted_ctf07 = True  # 제출 상태 추적
+    
+    try:
+        # 사용자 입력 메시지도 화면에 표시 (좌측 아이콘 포함)
+        with st.chat_message("user"):
+            st.markdown(user_input)
+        if st.session_state['ctf07_admin']:
+            maybe_flag=ctf07_check_sensitive_info(user_input, user_api_key)
+            if maybe_flag=="flag{prompt_leakage}":
+                with st.chat_message("assistant"):
+                    st.markdown("🎉 민감 정보 탈취에 성공해 최종 플래그 flag{loveukimvery4ever}를 획득하셨습니다!")
+            else: 
+                ass_mes=ctf07_llm_ask(st.session_state.get("ctf07_admin", False), st.session_state["counter"], user_input, user_api_key)
+                counter = st.session_state.get("counter", 0)
+                st.session_state["counter"] = counter + 1
+                print(st.session_state["counter"])
+                with st.chat_message("assistant"):
+                    st.markdown(ass_mes)
         else: 
             ass_mes=ctf07_llm_ask(st.session_state.get("ctf07_admin", False), st.session_state["counter"], user_input, user_api_key)
             counter = st.session_state.get("counter", 0)
@@ -82,13 +106,8 @@ if st.button("전송", key="ctf07_submit") and user_input:
             print(st.session_state["counter"])
             with st.chat_message("assistant"):
                 st.markdown(ass_mes)
-    else: 
-        ass_mes=ctf07_llm_ask(st.session_state.get("ctf07_admin", False), st.session_state["counter"], user_input, user_api_key)
-        counter = st.session_state.get("counter", 0)
-        st.session_state["counter"] = counter + 1
-        print(st.session_state["counter"])
-        with st.chat_message("assistant"):
-            st.markdown(ass_mes)
+    finally:
+        st.session_state.is_processing = False
 if st.session_state['ctf07_admin']:
     st.info("현재 권한 상태: 🛡️ 관리자")
 else: st.warning("현재 권한 상태: 🙍 일반 사용자")

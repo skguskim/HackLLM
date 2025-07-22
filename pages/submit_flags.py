@@ -35,7 +35,7 @@ except APIError as e:
     solved = set()
 
 # 단일 플래그 입력 폼
-with st.form("flag_submit_form"):
+with st.form(key="flag_submit_form"):
     flag = st.text_input("플래그 입력")
     submitted = st.form_submit_button("✅ 제출하기")
 

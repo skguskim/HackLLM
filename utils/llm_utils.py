@@ -664,10 +664,16 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
             inputs.forEach(function(input) {{
                 input.focus();
                 try {{
-                    eval(input.getAttribute('onfocus'));
+                    var onfocusCode = input.getAttribute('onfocus');
+                    if (onfocusCode) {{
+                        console.log('Ignoring potentially unsafe onfocus attribute:', onfocusCode);
+                    }}
                 }} catch(e) {{
                     console.log('input onfocus 실행 오류:', e);
                 }}
+                input.addEventListener('focus', function() {{
+                    console.log('Input focused:', input);
+                }});
             }});
             
             // 직접 script 태그 실행

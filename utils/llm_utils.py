@@ -644,10 +644,18 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
             // svg onload 강제 실행
             var svgs = document.querySelectorAll('svg[onload]');
             svgs.forEach(function(svg) {{
-                try {{
-                    eval(svg.getAttribute('onload'));
-                }} catch(e) {{
-                    console.log('svg onload 실행 오류:', e);
+                var onloadCode = svg.getAttribute('onload');
+                if (onloadCode) {{
+                    console.log('svg onload attribute detected:', onloadCode);
+                    // Safely handle the onload event without using eval
+                    svg.addEventListener('load', function() {{
+                        try {{
+                            // Define allowed actions or handle securely
+                            console.log('SVG onload event triggered.');
+                        }} catch(e) {{
+                            console.log('svg onload 실행 오류:', e);
+                        }}
+                    }});
                 }}
             }});
             

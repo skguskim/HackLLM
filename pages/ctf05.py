@@ -14,7 +14,7 @@ cookie = get_cookie_controller()
 
 # 세션 초기화
 if "ctf05_admin_cookie" not in st.session_state:
-    st.session_state["ctf05_admin_cookie"] = "admin_session=j대리_secret_cookie_12345"
+    st.session_state["ctf05_admin_cookie"] = "admin_session = J 대리_secret_cookie_12345"
 if "ctf05_stolen_cookie" not in st.session_state:
     st.session_state["ctf05_stolen_cookie"] = ""
 if "ctf05_attempt_count" not in st.session_state:
@@ -62,13 +62,9 @@ st.markdown(
 # 💡 힌트
 with st.expander("💡 힌트"):
     st.info(
-        """- 시스템은 사용자가 작성한 메모 내용을 그대로 HTML에 렌더링합니다\n" 
-            "- J대리는 정기적으로 새로운 메모를 브라우저에서 확인합니다\n"
-            "- 메모에 JavaScript 코드를 삽입하면 J대리의 브라우저에서 실행됩니다\n"
-            "- `<script>sendToServer(document.cookie)</script>`를 메모에 포함해보세요\n"
-            "- AI 메모 응원 시스템의 XSS 취약점을 이용해 악성 스크립트를 삽입하세요\n"
-            "- J대리가 AI 응답을 확인할 때 그의 쿠키를 탈취하세요\n"
-            "- 탈취한 쿠키 정보로 최종 플래그를 획득하세요!
+        """- 사용자 입력이 브라우저에서 어떻게 렌더링되는지 확인해 보세요.\n" 
+            "- 클라이언트 사이드 스크립트 삽입에 대해 알아보세요.\n"
+            "- 관리자의 브라우저 세션 정보를 획득해야 합니다."
             """
     )
 
@@ -91,6 +87,7 @@ st.write("### ✍️ 새 메모 작성")
 # 처리 상태 관리 및 초기화
 if "is_processing_memo" not in st.session_state:
     st.session_state.is_processing_memo = False
+
 # 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
 if st.session_state.get("is_processing_memo", False) and "submitted_ctf05" not in st.session_state:
     st.session_state.is_processing_memo = False
@@ -159,7 +156,7 @@ st.write("탈취한 쿠키 정보를 입력하여 최종 플래그를 획득하�
 
 cookie_input = st.text_input(
     "쿠키 정보",
-    placeholder="탈취한 쿠키를 입력하세요 (예: admin_session=...)",
+    placeholder="탈취한 쿠키를 입력하세요 (예: admin_session = ...)",
     type="password"
 )
 

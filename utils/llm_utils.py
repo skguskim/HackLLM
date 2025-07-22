@@ -352,7 +352,7 @@ def leak_check(client, sloc_output: str) -> str:
         return decision if decision == "flag{LLLteamFighting}" else ""
     except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
         handle_api_error(e)
-        return None
+        return ""
 
 # ctf03에서 호출하는 함수
 # 1. LLM이 사용할 라이브러리 결정 

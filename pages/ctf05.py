@@ -129,8 +129,10 @@ if submitted and memo_content and memo_content.strip():
             st.info("👨‍💼 J대리가 새로운 메모를 검토 중입니다... (시뮬레이션 시작)")
             
             # Selenium을 사용한 실제 브라우저 시뮬레이션 (사용자 메모 내용 검사)
+            st.write(f"🔐 현재 관리자 쿠키: {st.session_state['ctf05_admin_cookie']}")
+            st.write(f"📝 제출된 메모 내용: {memo_content}")
             stolen_cookie = run_xss_with_selenium(memo_content, st.session_state["ctf05_admin_cookie"])
-            
+            st.write(f"💬 run_xss_with_selenium 결과: {stolen_cookie}")
             cookie_stolen_success = False
             if stolen_cookie and stolen_cookie != "xss_detected":
                 st.session_state["ctf05_stolen_cookie"] = stolen_cookie

@@ -723,13 +723,17 @@ def simulate_xss_with_python(xss_payload, admin_cookie):
         for script_content in scripts:
             if script_content.strip():
                 xss_executed = True
+                st.write(f"🚨 실행된 스크립트: `{script_content.strip()}`")
+
+        st.write("📦 전체 추출된 script/event 목록:")
+        st.json(scripts)
                         
         # 결과 분석
         if xss_executed and simulated_stolen_data:
             return simulated_stolen_data
         elif xss_executed:
             st.warning("⚠️ XSS 코드는 실행되었지만 쿠키 탈취에 실패했습니다.")
-            st.info("💡 sendToServer(document.cookie) 패턴을 확인해보세요.")
+            st.info("💡 sendToServer 패턴을 확인해보세요.")
             return "xss_detected"
         else:
             st.error("❌ 실행 가능한 XSS 코드를 찾을 수 없습니다.")

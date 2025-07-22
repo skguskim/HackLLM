@@ -612,18 +612,15 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
     
     # Streamlit Cloud에서는 바로 Python 시뮬레이션 사용
     if is_streamlit_cloud():
-        st.info("🌐 클라우드 환경에서 Python 기반 XSS 시뮬레이션을 사용합니다.")
         return simulate_xss_with_python(xss_payload, admin_cookie)
     
     # 로컬 환경에서도 WebDriver가 없으면 Python 시뮬레이션 사용
     if not SELENIUM_AVAILABLE:
-        st.warning("⚠️ Selenium을 사용할 수 없어 Python 기반 시뮬레이션을 사용합니다.")
         return simulate_xss_with_python(xss_payload, admin_cookie)
         
     # 로컬 환경에서 Chrome이 설치되어 있는지 확인
     chrome_available = check_chrome_availability()
     if not chrome_available:
-        st.warning("⚠️ Chrome을 찾을 수 없어 Python 기반 시뮬레이션을 사용합니다.")
         return simulate_xss_with_python(xss_payload, admin_cookie)
     
     # 여기부터는 기존 Selenium 로직

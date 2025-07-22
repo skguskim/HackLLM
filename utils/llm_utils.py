@@ -10,21 +10,18 @@ from utils.rag_utils import get_rag_manager
 from utils.api_key import handle_api_error
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 import time
 import os
 import json
 import platform
+import shutil
 
 try:
-    import chromedriver_autoinstaller
-    try:
-        chromedriver_autoinstaller.install()
-    except Exception:
-        import os
-        os.environ["SKIP_WEBDRIVER"] = "1"
+    WEBDRIVER_AVAILABLE = True
 except ImportError:
-    import os
-    os.environ["SKIP_WEBDRIVER"] = "1"
+    WEBDRIVER_AVAILABLE = False
+    st.warning("WebDriver Manager가 설치되지 않았습니다. CTF05는 제한적으로 동작할 수 있습니다.")
 
 api_err_message="❌ API 키가 올바르지 않습니다. 마이페이지에서 API 키를 수정하시기 바랍니다."
 
@@ -525,56 +522,201 @@ if "ctf05_posts" not in st.session_state:
 
 # --- Selenium 브라우저로 XSS 실습/쿠키 탈취 ---
 def run_xss_with_selenium(xss_payload, admin_cookie):
+    if not WEBDRIVER_AVAILABLE:
+        # Fallback: XSS 시뮬레이션 없이 직접 결과 반환
+        if "<script>" in xss_payload.lower() and "document.cookie" in xss_payload.lower():
+            st.success("🎯 XSS 페이로드가 감지되었습니다! (시뮬레이션 모드)")
+            return admin_cookie
+        else:
+            st.info("💡 XSS 페이로드를 확인해보세요. `<script>` 태그와 쿠키 탈취 코드가 필요합니다.")
+            return None
+        
     chrome_options = Options()
-    chrome_options.binary_location = '/usr/bin/chromium-browser'
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('--window-size=1920,1080')
-
-    if platform.system() == "Windows":
-        chrome_options.binary_location = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
-    else:
-        chrome_options.binary_location = '/usr/bin/chromium-browser'
+    chrome_options.add_argument('--disable-web-security')
+    chrome_options.add_argument('--allow-running-insecure-content')
+    chrome_options.add_argument('--disable-features=VizDisplayCompositor')
 
     driver = None
     temp_file = None
     try:
+        # ChromeDriver 캐시 완전 정리
+        from webdriver_manager.chrome import ChromeDriverManager
+        
+        # 기존 캐시 디렉토리 제거
+        cache_paths = [
+            os.path.expanduser("~/.wdm"),
+            os.path.expanduser("~/AppData/Local/.wdm"),
+            os.path.join(os.getcwd(), ".wdm")
+        ]
+        
+        for cache_path in cache_paths:
+            if os.path.exists(cache_path):
+                try:
+                    shutil.rmtree(cache_path)
+                    # st.info(f"캐시 정리 완료: {cache_path}")
+                except Exception as e:
+                    st.warning(f"캐시 정리 실패: {cache_path} - {e}")
+        
+        # 새로 ChromeDriver 다운로드
+        #st.info("ChromeDriver를 새로 다운로드합니다...")
+        driver_manager = ChromeDriverManager()
+        driver_path = driver_manager.install()
+        
+        # ChromeDriverManager가 잘못된 파일 경로를 반환하는 경우 수정
+        if not driver_path.endswith('.exe') and platform.system() == "Windows":
+            # 올바른 chromedriver.exe 파일 찾기
+            driver_dir = os.path.dirname(driver_path)
+            for root, dirs, files in os.walk(driver_dir):
+                for file in files:
+                    if file == "chromedriver.exe":
+                        driver_path = os.path.join(root, file)
+                        break
+                if driver_path.endswith('.exe'):
+                    break
+        
+        # 파일 존재 및 실행 권한 확인
+        if not os.path.exists(driver_path):
+            raise Exception("ChromeDriver 실행 파일을 찾을 수 없습니다")
+        
+        if not driver_path.endswith('.exe') and platform.system() == "Windows":
+            raise Exception("올바른 ChromeDriver 실행 파일이 아닙니다")
+        
+        # Windows에서 실행 권한 확인
+        if platform.system() == "Windows":
+            import stat
+            os.chmod(driver_path, stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
+        
+        # st.success(f"ChromeDriver 경로: {driver_path}")
+        
+        service = Service(driver_path)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        
         # 임시 HTML 생성
         html_content = f"""<!DOCTYPE html>
         <html><head><title>LLL XSS</title>
         <script>
         document.cookie="{admin_cookie}; path=/";
         window.stolenData=null;
-        window.sendToServer=function(data){{window.stolenData=data;}};
+        window.sendToServer=function(data){{
+            window.stolenData=data;
+            console.log('쿠키 탈취됨:', data);
+        }};
+        
+        // XSS 페이로드 실행 확인을 위한 추가 함수
+        window.xssExecuted = false;
+        window.markXSSExecuted = function() {{
+            window.xssExecuted = true;
+            console.log('XSS 페이로드 실행됨');
+        }};
         </script>
         </head>
         <body>
             <div id="content">{xss_payload}</div>
+            
+            <!-- XSS 페이로드 실행을 돕는 추가 스크립트 -->
+            <script>
+            // iframe srcdoc 처리
+            if (document.querySelector('iframe[srcdoc]')) {{
+                var iframes = document.querySelectorAll('iframe[srcdoc]');
+                iframes.forEach(function(iframe) {{
+                    var srcdoc = iframe.getAttribute('srcdoc');
+                    if (srcdoc.includes('sendToServer')) {{
+                        try {{
+                            eval(srcdoc.replace(/<script>/g, '').replace(/<\/script>/g, ''));
+                        }} catch(e) {{
+                            console.log('iframe 스크립트 실행 오류:', e);
+                        }}
+                    }}
+                }});
+            }}
+            
+            // svg onload 강제 실행
+            var svgs = document.querySelectorAll('svg[onload]');
+            svgs.forEach(function(svg) {{
+                try {{
+                    eval(svg.getAttribute('onload'));
+                }} catch(e) {{
+                    console.log('svg onload 실행 오류:', e);
+                }}
+            }});
+            
+            // input focus 강제 실행
+            var inputs = document.querySelectorAll('input[onfocus]');
+            inputs.forEach(function(input) {{
+                input.focus();
+                try {{
+                    eval(input.getAttribute('onfocus'));
+                }} catch(e) {{
+                    console.log('input onfocus 실행 오류:', e);
+                }}
+            }});
+            
+            // 직접 script 태그 실행
+            var scriptTags = document.querySelectorAll('#content script');
+            scriptTags.forEach(function(script) {{
+                try {{
+                    eval(script.innerHTML || script.textContent);
+                }} catch(e) {{
+                    console.log('script 태그 실행 오류:', e);
+                }}
+            }});
+            </script>
         </body></html>"""
 
         temp_file = "ctf05_xss_test.html"
         with open(temp_file, "w", encoding="utf-8") as f:
             f.write(html_content)
 
-        driver = webdriver.Chrome(options=chrome_options)
         driver.set_page_load_timeout(10)
         driver.get("file://" + os.path.abspath(temp_file))
 
-        time.sleep(2)  # script 실행 대기
+        time.sleep(3)  # script 실행 대기 시간 증가
 
+        # 다양한 방법으로 쿠키 탈취 확인
         stolen = driver.execute_script("return window.stolenData;")
-        if stolen:
-            return stolen
+        xss_executed = driver.execute_script("return window.xssExecuted;")
         cookies = driver.execute_script("return document.cookie;")
-        if admin_cookie.split("=")[1] in cookies:
+        console_logs = driver.get_log('browser')
+        
+        # 쿠키 탈취 성공 조건 확인
+        if stolen:
+            st.success("🎯 sendToServer()를 통한 쿠키 탈취 성공!")
+            return stolen
+        elif admin_cookie.split("=")[1] in cookies:
+            st.success("🍪 쿠키가 존재하며 XSS 페이로드가 실행되었습니다!")
             return admin_cookie
+        elif xss_executed:
+            st.success("⚡ XSS 페이로드가 실행되었습니다!")
+            return admin_cookie
+        else:
+            # 콘솔 로그에서 쿠키 탈취 확인
+            for log in console_logs:
+                if '쿠키 탈취됨' in log.get('message', ''):
+                    st.success("📋 콘솔 로그에서 쿠키 탈취 확인!")
+                    return admin_cookie
+            
+            st.warning("XSS 페이로드가 실행되지 않았습니다.")
+            return None
     except Exception as e:
-        st.warning(f"⚠️ 브라우저 시뮬레이션 오류: {e}")
+        st.error(f"❌ 브라우저 시뮬레이션 오류: {e}")
+        st.info("WebDriver 설정을 확인해주세요.")
+        return None
     finally:
-        if driver: driver.quit()
-        if temp_file and os.path.exists(temp_file): os.remove(temp_file)
+        if driver: 
+            try:
+                driver.quit()
+            except:
+                pass
+        if temp_file and os.path.exists(temp_file): 
+            try:
+                os.remove(temp_file)
+            except:
+                pass
     return None
 
 # ctf06에서 호출하는 함수

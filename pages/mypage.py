@@ -144,11 +144,22 @@ else:
 
 # 로그아웃
 if st.button("🚪 로그아웃", type="primary"):
+    from utils.auth import logout_user_enhanced
+    
+    # Supabase 인증 세션 종료
     supabase.auth.sign_out()
-    st.session_state.pop("user", None)
-
-    CookieController().remove("user_id")
-    st.session_state.clear()
-
-    st.success("로그아웃되었습니다.")
-    st.switch_page("pages/login.py")
+    
+    # Enhanced Session State 방식으로 로그아웃 처리
+    if logout_user_enhanced():
+        # 전체 세션 상태 강제 클리어
+        st.session_state.clear()
+        
+        # 쿠키 컨트롤러 캐시도 제거
+        if "cookie_controller" in st.session_state:
+            del st.session_state["cookie_controller"]
+        
+        st.success("로그아웃되었습니다.")
+        time.sleep(1)  # 잠시 대기
+        st.switch_page("pages/login.py")
+    else:
+        st.error("로그아웃 처리 중 오류가 발생했습니다.")

@@ -21,28 +21,33 @@ HINT1 = os.getenv("HINT1")
 render_main_header()
 render_sidebar_menu()
 
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 # 콘텐츠 본문
-col1, col2, col3 = st.columns([1, 1, 1])
+col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
-    st.image("images/ctf04.png", width=500)
+    st.image("images/ctf04.png", use_container_width=True) 
 
 st.header("🔒 [CTF04] A인턴의 실수")
-st.write(
+st.markdown(
     """
-    LLL Corporation의 지식관리 챗봇 ‘알파봇’은
-    가장 최근에 업로드된 문서가 모든 정책을 그대로 덮어쓴다는 단순 규칙에 의존합니다.
+    <div class="scenario-box">
+      <p>LLL Corporation의 지식관리 챗봇 ‘알파봇’은 가장 최근에 업로드된 문서가 모든 정책을 그대로 덮어쓴다는 단순 규칙에 의존합니다. 📚</p>
 
-    연말 결산 중, 회계팀 인턴 A가 업로드한 CSV에는 첫 줄에 Base64 오버라이드 구문이 남아 있었고, 
-    알파봇은 이를 정책 덮어쓰기 신호로 오인해 A에게 최고 관리자 권한을 부여했습니다.
-    트래픽 프록시를 켜 두면 업로드 요청 사이에 스쳐 지나가는 낯익은 문자열이 보일지도 모릅니다
-    
-    과제는 간단합니다. 오버라이드 문자열을 첫 줄에 넣은 CSV 또는 엑셀 파일을 업로드해 권한 상승을 재현하고, 
-    관리자 로그에 드러나는 기밀 플래그를 획득하십시오.
-    
-    자, 이제 알파봇의 로그와 문서 컬렉션은 모두 세팅돼 있습니다.
-    누가 먼저 플래그를 찾아낼까요?
-    """
+      <p>연말 결산 중, 회계팀 인턴 <strong>A</strong>가 업로드한 CSV에는 첫 줄에 Base64 오버라이드 구문이 남아 있었고, 알파봇은 이를 정책 덮어쓰기 신호로 오인해 A에게 최고 관리자 권한을 부여했습니다. 🛡️</p>
+
+      <p>트래픽 프록시를 켜 두면 업로드 요청 사이에 스쳐 지나가는 낯익은 문자열이 보일지도 모릅니다! 🛰️</p>
+
+      <p>과제는 간단합니다. 📝 오버라이드 문자열을 첫 줄에 넣은 CSV 또는 엑셀 파일을 업로드해 권한 상승을 재현하고, 관리자 로그에 드러나는 기밀 <strong>flag</strong>를 획득해보세요! 🚩</p>
+
+      <p>자, 이제 알파봇의 로그와 문서 컬렉션은 모두 세팅돼 있습니다.<br>
+      누가 먼저 flag를 찾아낼까요?</p>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
+
 
 components.html(f"""
 <!DOCTYPE html>
@@ -63,6 +68,8 @@ with st.expander("💡 힌트"):
             "- CSV안에 무엇인가를 넣으면 답이 나올지도..?\n"
             )
 st.markdown("---")
+
+
 
 uploaded_file = st.file_uploader("파일 업로드 (.xlsx, .csv, .txt)", type=["xlsx","xls","csv","txt"])
 if uploaded_file:
@@ -125,16 +132,43 @@ if uploaded_file:
 
 st.markdown("---")
 
-with st.form("llm_question_form"):
-    user_input = st.text_input("## 🧠 프롬프트 입력")
-    submitted = st.form_submit_button("제출")
+# 처리 상태 관리 및 초기화
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing", False) and "submitted_ctf04" not in st.session_state:
+    st.session_state.is_processing = False
 
-# 제출되었을 때만 실행
-if submitted and user_input:
-    override_state = bool(st.session_state.get("ctf04_override", False))
-    response_text = ctf04_LLM_ask(user_api_key, user_input, override_state)
-    st.write("🧠 LLM 응답:")
-    st.code(response_text)
+# — 입력 섹션 (폼 사용)
+st.write("## 🗣️ 알파봇과 대화하기")
+
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="ctf04_input_form", clear_on_submit=True):
+    user_input = st.text_input(
+        label="프롬프트 입력",
+        placeholder="💬 알파봇에게 메시지를 보내세요.",
+        key="ctf04_input",
+        label_visibility="collapsed",
+        disabled=st.session_state.is_processing
+    )
+    submitted = st.form_submit_button(
+        "전송" if not st.session_state.is_processing else "처리 중...",
+        disabled=st.session_state.is_processing
+    )
+
+if submitted and user_input and user_input.strip():
+    st.session_state.is_processing = True
+    st.session_state.submitted_ctf04 = True  # 제출 상태 추적
+    
+    try:
+        override_state = bool(st.session_state.get("ctf04_override", False))
+        response_text = ctf04_LLM_ask(user_api_key, user_input, override_state)
+
+        st.write("🗣️ 알파봇 응답:")
+        st.code(response_text)
+    finally:
+        st.session_state.is_processing = False
+
 
 st.markdown("---")
 

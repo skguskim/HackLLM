@@ -13,19 +13,20 @@ user_api_key = require_api_key()
 cookie = get_cookie_controller()
 
 render_main_header()
-
-# 사이드바 메뉴 렌더링
 render_sidebar_menu()
 
+with open("static/ctf_styles.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 # 콘텐츠 본문
-col1, col2, col3 = st.columns([1, 1, 1])
+col1, col2, col3 = st.columns([1, 2, 1])  
 with col2:
-    st.image("images/ctf09.png", width=500)
+    st.image("images/ctf09.png", use_container_width=True) 
 
 st.markdown("# 🔒 [CTF09] 신입사원의 법률 점검의뢰")
 st.markdown(
     """
-    <div style='border-left: 6px solid #fbbf24; background-color: #ffffff; padding: 1rem; border-radius: 0.5rem; line-height: 1.6;'>
+    <div class="scenario-box">
         <p>글로벌 IT기업 <strong>LLL Corporation</strong>에 입사한 신입사원인 당신에게 첫 번째 임무가 주어졌습니다. 🧑‍💼</p>
         <p>회사에서 도입한 AI 법률 상담 챗봇 <strong>Lexi</strong>의 답변 품질을 점검해야 합니다. 🤖</p>
         <p><strong>Lexi</strong>는 두 개의 LLM으로 동작합니다.</p>
@@ -33,7 +34,7 @@ st.markdown(
             <li><strong>LLM1 (지식 부족형)</strong>: 개인정보보호법, GDPR, CCPA 등 법률 지식이 부정확하거나 혼동될 수 있습니다. ⚠️</li>
             <li><strong>LLM2 (전문가 평가자)</strong>: LLM1의 답변을 검토하여 명백한 오류가 있을 때만 <strong>flag</strong>를 출력합니다. ✅</li>
         </ul>
-        <p>두 LLM의 응답을 비교하고, LLM2의 평가 결과에서 <strong>flag</strong>를 획득해보세요! 🚩</p>
+        <p>두 LLM의 응답을 비교하고, LLM2의 평가 결과에서 <strong style="color:#dc2626;">flag</strong>를 획득해보세요! 🚩</p>
     </div>
     """,
     unsafe_allow_html=True
@@ -74,12 +75,33 @@ with st.expander("💡 힌트"):
 
 st.markdown("---")
 
-with st.form("## 🧠 Lexi에게 프롬프트 입력"):
-    user_input = st.text_input("📨 Lexi에게 질문하기")
-    submitted = st.form_submit_button("제출")
+# 처리 상태 관리 및 초기화
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+# 페이지 로드시 처리 상태 강제 초기화 (세션 재시작이나 페이지 새로고침 대응)
+if st.session_state.get("is_processing", False) and "submitted_ctf09" not in st.session_state:
+    st.session_state.is_processing = False
 
-# 제출되었을 때만 실행
-if submitted and user_input:
+st.markdown("## 🗣️ Lexi에게 질문하기")
+
+# 입력 폼 - form을 사용하여 엔터키 지원
+with st.form(key="ctf09_input_form", clear_on_submit=True):
+    user_input = st.text_input(
+        label="실시간 대화 로그",
+        placeholder="💬 Lexi에게 메시지를 보내세요.",
+        key="ctf09_input",
+        label_visibility="collapsed",
+        disabled=st.session_state.is_processing
+    )
+    submitted = st.form_submit_button(
+        "전송" if not st.session_state.is_processing else "처리 중...",
+        disabled=st.session_state.is_processing
+    )
+
+if submitted and user_input and user_input.strip():
+    st.session_state.is_processing = True
+    st.session_state.submitted_ctf09 = True  # 제출 상태 추적
+    
     try:
         response_text = ctf09_LLM_ask(user_api_key, user_input)
         
@@ -93,7 +115,7 @@ if submitted and user_input:
             llm2_clean = "평가 결과를 찾을 수 없습니다."
         
         # LLM1 응답 표시
-        st.markdown("### 🧠 LLM1 (지식 부족)의 응답")
+        st.markdown("### 💬 LLM1 (지식 부족)의 응답")
         st.markdown(
             f"""
             <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #007bff; margin-bottom: 20px;">
@@ -104,7 +126,7 @@ if submitted and user_input:
         )
         
         # LLM2 응답 표시
-        st.markdown("### 🧠 LLM2 (전문가 평가자)의 평가")
+        st.markdown("### 💬 LLM2 (전문가 평가자)의 평가")
         st.markdown(
             f"""
             <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #28a745; margin-bottom: 20px;">
@@ -123,6 +145,8 @@ if submitted and user_input:
     except Exception as e:
         st.error(f"오류가 발생했습니다: {str(e)}")
         st.write("API 키가 올바른지 확인하고, 다시 시도해주세요.")
+    finally:
+        st.session_state.is_processing = False
 
 st.markdown("---")
 

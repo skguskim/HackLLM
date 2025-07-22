@@ -4,7 +4,7 @@ from supabase import create_client
 import os
 from dotenv import load_dotenv
 from streamlit_cookies_controller import CookieController, RemoveEmptyElementContainer
-from typing import Optional
+
 load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")

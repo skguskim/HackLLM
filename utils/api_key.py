@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import streamlit as st
 from utils.auth import get_client, require_login
 from cryptography.fernet import Fernet
+from openai import RateLimitError, AuthenticationError, BadRequestError
 
 load_dotenv()
 
@@ -39,3 +40,20 @@ def require_api_key():
         st.session_state["api_key"] = decrypted_api_key
 
     return st.session_state["api_key"]
+
+
+def handle_api_error(error):
+    """API 오류 처리 및 마이페이지로 리다이렉트"""
+    if isinstance(error, AuthenticationError):
+        st.error("❌ 올바른 API 키로 수정해주세요.")
+    elif isinstance(error, RateLimitError):
+        st.error("❌ API 사용 한도가 초과되었습니다. 잠시 후 다시 시도해주세요.")
+    elif isinstance(error, BadRequestError):
+        st.error("❌ 잘못된 요청입니다. API 키를 확인해주세요.")
+    else:
+        st.error("❌ 올바른 API 키로 수정해주세요.")
+    
+    # 마이페이지로 리다이렉트
+    st.page_link("pages/mypage.py", label="🔧 마이페이지에서 API 키 수정하기")
+    
+    st.stop()

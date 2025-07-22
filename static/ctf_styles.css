@@ -1,0 +1,28 @@
+:root {
+    --primary-pink: #f78da7;
+    --primary-yellow: #fbbf24;
+    --primary-blue: #3b82f6;
+    --primary-green: #10b981;
+    --primary-red: #ef4444;
+
+    --bg-light-pink: #ffffff;
+    --bg-light-yellow: #fff7ed;
+    --bg-light-blue: #eff6ff;
+    --bg-light-green: #ecfdf5;
+    --bg-light-red: #fef2f2;
+
+    --text-dark: #1f2937;
+    --text-gray: #6b7280;
+    --border-radius: 0.5rem;
+    --border-width: 6px;
+    --padding-default: 1rem;
+    --margin-default: 1rem;
+}
+
+.scenario-box {
+    border-left: var(--border-width) solid var(--primary-blue);
+    background-color: var(--bg-light-blue);
+    padding: var(--padding-default);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--margin-default);
+}

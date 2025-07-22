@@ -1,7 +1,13 @@
 # pages/signup.py
 import streamlit as st
+import os
+from cryptography.fernet import Fernet
+from dotenv import load_dotenv
 from utils.auth import get_client, current_user
 from utils.ui import render_sidebar_menu
+
+# 환경변수 로드
+load_dotenv()
 
 user = current_user()
 
@@ -59,15 +65,58 @@ if st.button("회원가입", use_container_width=True, disabled=not terms_agreed
         st.error("이메일과 비밀번호를 모두 입력해주세요.")
     else:
         try:
+            # 1. Supabase 회원가입 처리
             response = supabase.auth.sign_up({
                 "email": email, 
                 "password": pwd,
             })
-            st.info("📧 이메일로 발송된 인증 링크를 클릭한 후 로그인해 주세요.")
+            
+            # 2. 회원가입 성공 시 OpenAI API Key 암호화 및 저장
+            if response.user:
+                try:
+                    # .env에서 기본 OpenAI API Key 가져오기
+                    default_openai_key = os.getenv("OPENAI_API_KEY")
+                    fernet_key = os.getenv("FERNET_KEY")
+                    
+                    if default_openai_key and fernet_key:
+                        # Fernet 암호화 객체 생성
+                        fernet = Fernet(fernet_key.encode())
+                        
+                        # OpenAI API Key 암호화
+                        encrypted_api_key = fernet.encrypt(default_openai_key.encode()).decode()
+                        
+                        # profiles 테이블에 암호화된 API Key 저장
+                        profile_data = {
+                            "id": response.user.id,
+                            "email": email,
+                            "api_key": encrypted_api_key
+                        }
+                        
+                        # profiles 테이블에 insert (upsert 사용으로 중복 방지)
+                        profile_result = supabase.table("profiles").upsert(profile_data).execute()
+                        
+                        if profile_result.data:
+                            st.success("✅ 회원가입이 완료되었습니다!")
+                            st.info("📧 이메일로 발송된 인증 링크를 클릭한 후 로그인해 주세요.")
+                        else:
+                            st.warning("⚠️ 회원가입은 성공했지만 API Key 제출에 실패했습니다. 로그인 후 마이페이지에서 API Key를 설정해주세요.")
+                            st.info("📧 이메일로 발송된 인증 링크를 클릭한 후 로그인해 주세요.")
+                    else:
+                        st.warning("⚠️ 기본 API Key 설정이 없습니다. 로그인 후 마이페이지에서 API Key를 설정해주세요.")
+                        st.info("📧 이메일로 발송된 인증 링크를 클릭한 후 로그인해 주세요.")
+                        
+                except Exception as profile_error:
+                    st.warning(f"⚠️ 프로필 생성 중 오류: {profile_error}")
+                    st.info("📧 회원가입은 성공했습니다. 이메일로 발송된 인증 링크를 클릭한 후 로그인해 주세요.")
+                    st.info("💡 로그인 후 마이페이지에서 API Key를 설정해주세요.")
+            else:
+                st.info("📧 이메일로 발송된 인증 링크를 클릭한 후 로그인해 주세요.")
             
             # 성공 시 약관 동의 상태 표시
             with st.expander("✅ 동의 완료 내역"):
                 st.write("- ✅ 개인정보처리방침 동의")
+                if default_openai_key and fernet_key:
+                    st.write("- ✅ 기본 OpenAI API Key 암호화 저장 완료")
                     
         except Exception as e:
             st.error(f"❌ 회원가입 실패: {e}")

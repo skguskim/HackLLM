@@ -863,8 +863,8 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
                 os.remove(temp_file)
             except:
                 pass
-        return success_result
 
+    return success_result
 # ctf06에서 호출하는 함수
 # ctf tool_분류 함수
 def ctf06_classify_tools(user_api_key, user_input=""):

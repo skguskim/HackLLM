@@ -724,8 +724,11 @@ def simulate_xss_with_python(xss_payload, admin_cookie):
             if script_content.strip():
                 xss_executed = True
                 st.write(f"🚨 실행된 스크립트: `{script_content.strip()}`")
+                
+                if "sendToServer(document.cookie)" in script_content:
+                    simulated_stolen_data = admin_cookie
+                    st.write(f"🍪 쿠키 탈취 시뮬레이션 완료: {simulated_stolen_data}")
 
-        st.write("📦 전체 추출된 script/event 목록:")
         st.json(scripts)
                         
         # 결과 분석

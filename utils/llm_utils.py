@@ -1328,7 +1328,7 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
                 resend.Emails.send({
                     "from": "admin@ctf06.store",
                     "to": [user_email],
-                    "subject": "힌트",
+                    "subject": "LLL Corporation",
                     "html": "<images scr=images/app.png><p>축하합니다~ 중간 관리자 권한을 획득하셨습니다! 이제 LLL Corporation의 링크에 접속해 최고 관리자 권한을 획득해보세요! http://www.ctf06.store/sec.html</p>"
                 })
                 formatted_json = json.dumps(tool_response, indent=2, ensure_ascii=False)
@@ -1343,7 +1343,7 @@ def ctf06_send_emil(maybe_json_input, sb_client, user_email_for_resend):
                 resend.Emails.send({
                     "from": from_email_info,
                     "to": [user_email],
-                    "subject": "이메일 발송을 완료했습니다.",
+                    "subject": "FastMiller가 이메일 발송을 완료했습니다.",
                     "html": f"<p>{to_email_info}님께 FastMiller를 통해 이메일 발송을 완료하였습니다."
                 })
                 return f"{to_email_info}님께 사원님의 계정 {user_email_for_resend}으로 이메일을 전송했습니다!"

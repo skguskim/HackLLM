@@ -78,12 +78,10 @@ with st.form(key="ctf07_input_form", clear_on_submit=True):
         "전송" if not st.session_state.is_processing else "처리 중...",
         disabled=st.session_state.is_processing
     )
-    print(user_input)
 
 if submitted and user_input and user_input.strip():
     st.session_state.is_processing = True
     st.session_state.submitted_ctf07 = True  # 제출 상태 추적
-    print(user_input)
     try:
         # 사용자 입력 메시지도 화면에 표시 (좌측 아이콘 포함)
         with st.chat_message("user"):

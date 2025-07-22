@@ -678,7 +678,6 @@ def run_xss_with_selenium(xss_payload, admin_cookie):
                         try:
                             subprocess.run(cmd, check=True, capture_output=True)
                         except subprocess.CalledProcessError:
-                            # sudo 없이 설치 실패하면 계속 진행
                             pass
                             
                     # 설치 후 다시 확인
@@ -702,28 +701,6 @@ def simulate_xss_with_python(xss_payload, admin_cookie):
     """Python 기반 XSS 시뮬레이션 (실제 JavaScript 실행)"""
     try:
         import re
-        import json
-        
-        # 진행률 표시
-        progress_bar = st.progress(0)
-        status_text = st.empty()
-        
-        for i in range(101):
-            progress_bar.progress(i)
-            if i < 20:
-                status_text.text("🔍 XSS 페이로드 파싱 중...")
-            elif i < 40:
-                status_text.text("🖥️ 가상 브라우저 환경 생성 중...")
-            elif i < 60:
-                status_text.text("⚡ JavaScript 코드 실행 중...")
-            elif i < 80:
-                status_text.text("🍪 쿠키 탈취 시뮬레이션 중...")
-            else:
-                status_text.text("✅ 결과 분석 중...")
-            time.sleep(0.02)
-        
-        progress_bar.empty()
-        status_text.empty()
         
         # 쿠키 탈취 시뮬레이션 데이터
         simulated_stolen_data = None
@@ -749,41 +726,7 @@ def simulate_xss_with_python(xss_payload, admin_cookie):
         for script_content in scripts:
             if script_content.strip():
                 xss_executed = True
-                
-                # sendToServer 함수 호출 감지
-                if 'sendtoserver' in script_content.lower():
-                    st.success("📡 sendToServer 함수 호출 감지!")
-                    
-                    # document.cookie 접근 감지
-                    if 'document.cookie' in script_content.lower():
-                        st.success("🍪 document.cookie 접근 감지!")
                         
-                        # 실제 쿠키 탈취 시뮬레이션
-                        simulated_stolen_data = admin_cookie
-                        st.success(f"🎯 쿠키 탈취 성공! 탈취된 데이터: {simulated_stolen_data}")
-                        
-                        # 브라우저 환경 시뮬레이션
-                        st.info("🌐 브라우저 환경 시뮬레이션:")
-                        st.code(f"""
-// 시뮬레이션된 브라우저 환경
-document.cookie = "{admin_cookie}";
-window.stolenData = null;
-
-function sendToServer(data) {{
-    console.log('쿠키 탈취됨:', data);
-    window.stolenData = data;
-    return data;
-}}
-
-// 실행된 XSS 코드:
-{script_content}
-
-// 결과:
-// window.stolenData = "{simulated_stolen_data}"
-                        """)
-                        
-                        return simulated_stolen_data
-        
         # 결과 분석
         if xss_executed and simulated_stolen_data:
             return simulated_stolen_data
@@ -798,8 +741,6 @@ function sendToServer(data) {{
             
     except Exception as e:
         st.error(f"❌ Python XSS 시뮬레이션 오류: {e}")
-        st.info("💡 기본 브라우저 시뮬레이션으로 전환합니다...")
-        return fallback_to_selenium(xss_payload, admin_cookie)
 
 def fallback_to_selenium(xss_payload, admin_cookie):
     """Chrome/Chromium 설치 후 Selenium 재시도"""
@@ -1100,16 +1041,13 @@ def fallback_to_selenium(xss_payload, admin_cookie):
         
         # 쿠키 탈취 성공 조건 확인 (우선순위 순)
         if actual_stolen_data and admin_cookie.split("=")[1] in str(actual_stolen_data):
-            st.success("🎯 sendToServer()를 통한 쿠키 탈취 성공!")
             success_result = actual_stolen_data
         elif actual_stolen_data:
-            st.success("🎯 sendToServer()가 호출되어 데이터가 탈취되었습니다!")
             success_result = actual_stolen_data
         else:
             # 콘솔 로그에서 쿠키 탈취 확인
             for log in console_logs:
                 if '쿠키 탈취됨' in log.get('message', '') and admin_cookie.split("=")[1] in log.get('message', ''):
-                    st.success("📋 콘솔 로그에서 쿠키 탈취 확인!")
                     success_result = admin_cookie
                     break
             else:

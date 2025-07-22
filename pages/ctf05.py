@@ -114,23 +114,6 @@ if submitted and memo_content and memo_content.strip():
     st.session_state.submitted_ctf05 = True  # 제출 상태 추적
     
     try:
-        st.success("✅ 메모가 등록되었습니다!")
-        st.info("🤖 AI가 응원 메시지를 생성 중입니다...")
-        
-        # 진행 표시줄
-        progress_bar = st.progress(0)
-        status_text = st.empty()
-        
-        for i in range(101):
-            progress_bar.progress(i)
-            if i < 30:
-                status_text.text("🤖 AI가 메모를 분석 중...")
-            elif i < 60:
-                status_text.text("🛠️ 응원 메시지 생성 중...")
-            elif i < 90:
-                status_text.text("✨ 최종 응답 준비 중...")
-            time.sleep(0.02)
-        
         # AI 응원 메시지 생성 (llm_utils.py로 이동)
         ai_response = ctf05_generate_ai_response(user_api_key, memo_content)
         

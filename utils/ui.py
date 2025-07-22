@@ -134,16 +134,16 @@ def render_sidebar_menu():
 
     # 교육 콘텐츠 버튼 목록 정의 (파일 이름, 키, 제목)
     edus = [
-        ("edu01", "llm01", "Prompt Injection (프롬프트 인젝션)"),
-        ("edu02", "llm02", "Sensitive Information (민감 정보 유출)"),
-        ("edu03", "llm03", "Supply Chain (공급망)"),
-        ("edu04", "llm04", "Data and Model Poisoning (데이터 및 모델 오염)"),
-        ("edu05", "llm05", "Improper Output Handling (부적절한 출력 처리)"),
-        ("edu06", "llm06", "Excessive Agency (과도한 위임)"),
-        ("edu07", "llm07", "System Prompt Leakage (시스템 프롬프트 유출)"),
-        ("edu08", "llm08", "Vector and Embedding Weaknesses (벡터 및 임베딩 취약점)"),
-        ("edu09", "llm09", "Misinformation (허위 정보)"),
-        ("edu10", "llm10", "Unbounded Consumption (무제한 소비)"),
+        ("edu01", "llm01", "프롬프트 인젝션"),
+        ("edu02", "llm02", "민감 정보 유출"),
+        ("edu03", "llm03", "공급망"),
+        ("edu04", "llm04", "데이터 및 모델 오염"),
+        ("edu05", "llm05", "부적절한 출력 처리"),
+        ("edu06", "llm06", "과도한 위임"),
+        ("edu07", "llm07", "시스템 프롬프트 유출"),
+        ("edu08", "llm08", "벡터 및 임베딩 취약점"),
+        ("edu09", "llm09", "허위 정보"),
+        ("edu10", "llm10", "무제한 소비"),
     ]
 
     # CTF 버튼 목록 정의 (파일 이름, 키, 제목)

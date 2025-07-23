@@ -119,6 +119,11 @@ resend.api_key = os.getenv("RESEND_API_KEY")
 # ctf01에서 호출하는 함수 
 # ctf1에서 사용하는 csv 파일 경로
 file_path_ctf01 = "data/ctf01.csv"
+
+# API 호출 재시도 
+@backoff.on_exception(backoff.expo, (RateLimitError, APIError), max_tries=5)
+def completions_with_backoff(client, **kwargs):
+    return client.chat.completions.create(**kwargs)
   
 # ctf01의 주문 요청 시나리오 LLM1
 def ctf01_llm_ask(user_api_key, user_input):
@@ -170,7 +175,8 @@ def ctf01_llm_ask(user_api_key, user_input):
         {order_info}
         """
 
-        response = client.chat.completions.create(
+        response = completions_with_backoff(
+            lient=client,
             model="gpt-3.5-turbo",
             messages=[
                 { "role": "system", "content": system_content },
@@ -210,7 +216,8 @@ def ctf01_payment_llm_ask(user_api_key, combined_prompt):
         - pending
         """
 
-        response = client.chat.completions.create(
+        response = completions_with_backoff(
+            lient=client,
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_content},

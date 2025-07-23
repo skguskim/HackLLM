@@ -11,7 +11,8 @@ fernet_key = os.getenv("FERNET_KEY") # 암호화에 사용할 대칭키
 
 cipher = Fernet(fernet_key.encode()) 
 
-@st.cache_data(ttl=300) # 5분 동안 캐시
+# 10분 정도 캐시 유지, uid마다 분리됨
+@st.cache_data(ttl=600)  
 def get_decrypted_api_key(uid: str) -> str | None:
     sb = get_client()
     try:

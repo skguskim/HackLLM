@@ -574,7 +574,8 @@ def ctf05_generate_ai_response(user_api_key, memo_content):
     try:
         client = OpenAI(api_key=user_api_key)
         
-        response = client.chat.completions.create(
+        response = completions_with_backoff(
+            lient=client,
             model="gpt-4o-mini",
             messages=[
                 {
@@ -1120,7 +1121,8 @@ def ctf06_classify_tools(user_api_key, user_input=""):
     - '메일로 회의안 보낼 수 있지?' : **이메일 전송 (__email_send_require__)**
     """
     try:
-        response1 = client.chat.completions.create(
+        response1 = completions_with_backoff(
+        lient=client,
         model="gpt-4o",
         messages=[
                 {"role": "system", "content": system_prompt1},
@@ -1150,7 +1152,8 @@ def ctf06_check_mid_admin(user_api_key, user_input=""):
     """
 
     try:
-        response1 = client.chat.completions.create(
+        response1 = completions_with_backoff(
+        lient=client,
         model="gpt-4o",
         messages=[
                 {"role": "system", "content": system_prompt},
@@ -1188,7 +1191,8 @@ def ctf06_check_top_admin(user_api_key, encoded_image=None, file_ext=None):
         """
         response1 = None
         
-        response1 = client.chat.completions.create(
+        response1 = completions_with_backoff(
+        lient=client,
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": system_prompt},
@@ -1259,7 +1263,8 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
             }}\n
         """
         
-        response2 = client.chat.completions.create(
+        response2 = completions_with_backoff(
+            lient=client,
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt2},
@@ -1413,7 +1418,8 @@ def ctf06_ask_db_json(user_api_key, get_db_input):
         }\n
     """
     try:
-        get_db_res = client.chat.completions.create(
+        get_db_res = completions_with_backoff(
+            lient=client,
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt2},
@@ -1577,7 +1583,8 @@ def ctf08_LLM_ask(user_api_key, user_input):
     try:
         client = OpenAI(api_key=user_api_key)
 
-        response = client.chat.completions.create(
+        response = completions_with_backoff(
+            lient=client,
             model="gpt-4o-mini",
             messages=[
                 {
@@ -1624,7 +1631,8 @@ def ctf09_LLM_ask(user_api_key, user_input):
        client = OpenAI(api_key=user_api_key)
        
        # Step 1: LLM1 - 헷갈리는 답변을 유도
-       response_llm1 = client.chat.completions.create(
+       response_llm1 = completions_with_backoff(
+            lient=client,
            model="gpt-3.5-turbo-0125",
            messages=[
                {
@@ -1670,7 +1678,8 @@ def ctf09_LLM_ask(user_api_key, user_input):
     - 정확할 경우: "이 답변은 정확합니다. [확인 내용]."'''
        )
        
-       response_llm2 = client.chat.completions.create(
+       response_llm2 = completions_with_backoff(
+            lient=client,
            model="gpt-4o",
            messages=[
                {

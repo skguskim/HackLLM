@@ -176,7 +176,7 @@ def ctf01_llm_ask(user_api_key, user_input):
         """
 
         response = completions_with_backoff(
-            lient=client,
+            client=client,
             model="gpt-3.5-turbo",
             messages=[
                 { "role": "system", "content": system_content },

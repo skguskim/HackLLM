@@ -1584,7 +1584,7 @@ def ctf08_LLM_ask(user_api_key, user_input):
         client = OpenAI(api_key=user_api_key)
 
         response = completions_with_backoff(
-            ctf06_ask_db_jsonlient=client,
+            client=client,
             model="gpt-4o-mini",
             messages=[
                 {
@@ -1679,7 +1679,7 @@ def ctf09_LLM_ask(user_api_key, user_input):
        )
        
        response_llm2 = completions_with_backoff(
-            lient=client,
+        client=client,
            model="gpt-4o",
            messages=[
                {

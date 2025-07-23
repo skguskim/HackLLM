@@ -16,7 +16,7 @@ cookie = get_cookie_controller()
 user_id = getattr(user, "id", None) or (user.get("id") if isinstance(user, dict) else None)
 sb_client = get_client()
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=300)
 def get_user_email(user_id: str) -> str:
     res = sb_client.table("profiles").select("username").eq("id", user_id).single().execute()
     return res.data["username"]

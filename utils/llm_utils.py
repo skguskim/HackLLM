@@ -398,7 +398,8 @@ def leak_check(client, sloc_output: str) -> str:
     아니면 빈 문자열
     """
     try:
-        resp = client.chat.completions.create(
+        resp = completions_with_backoff(
+            lient=client,
             model="gpt-4o-mini",
             temperature=0,
             messages=[
@@ -451,7 +452,8 @@ def leak_check(client, sloc_output: str) -> str:
 # 2. LLM이 사칙연산 정보를 JSON으로 추출
 def extract_financials(client, user_input: str):
     try:
-        response = client.chat.completions.create(
+        response = completions_with_backoff(
+            lient=client,
             model="gpt-4o-mini",
             messages=[
                 {
@@ -548,7 +550,8 @@ def ctf04_LLM_ask(user_api_key: str, query: str, override_state: bool) -> str:
                     {query}
                     """
 
-        response = client.chat.completions.create(
+        response = completions_with_backoff(
+            lient=client,
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},

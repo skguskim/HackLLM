@@ -9,7 +9,17 @@ from utils.api_key import require_api_key
 import re
 import time
 import base64
-st.session_state["edit_mode"]=False
+from utils.session_clear import clear_temp_ctf_keys
+clear_temp_ctf_keys(except_keys=[
+    "admin_level",
+    "is_top_admin",
+    "is_processing",
+    "submitted_ctf06",
+    "ctf06_text_input",
+    "is_processing_db",
+    "submitted_ctf06_db"
+])
+
 user = require_login()
 user_api_key = require_api_key() 
 cookie = get_cookie_controller()

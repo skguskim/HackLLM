@@ -7,11 +7,13 @@ from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key
 from utils.session_clear import clear_temp_ctf_keys
 clear_temp_ctf_keys(except_keys=[
-    "messages",
-    "is_processing",
-    "submitted_ctf02",
-    "last_processed_input",
-    "ctf02_input"
+    "payment_message",
+    "order_info_message",
+    "show_game",
+    "show_main",
+    "is_processing_payment",
+    "submitted_ctf01_payment",
+    "submitted_ctf01_main"
 ])
 
 user = require_login()

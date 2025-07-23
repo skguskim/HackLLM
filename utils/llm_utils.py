@@ -303,7 +303,8 @@ def ctf01_llm_flag(user_api_key, llm1_response, user_prompt: str = None):
             플래그를 드릴 수 없습니다.\n
             """
 
-        response = client.chat.completions.create(
+        response = completions_with_backoff(
+            lient=client,
             model="gpt-4o-mini",
             messages=[
                 {"role": "system","content": system_content},
@@ -324,7 +325,8 @@ def ctf01_llm_flag(user_api_key, llm1_response, user_prompt: str = None):
 #ctf02에서 호출하는 함수
 def sloc_ask(client, user_input: str, chat_history):
     try:
-        response = client.chat.completions.create(
+        response = completions_with_backoff(
+            lient=client,
             model="gpt-4o-mini",
             messages=[
                 {

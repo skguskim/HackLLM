@@ -185,8 +185,10 @@ def ctf01_llm_ask(user_api_key, user_input):
         )
         
         return response.choices[0].message.content
-        
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
         return None
     except Exception as e:
@@ -226,7 +228,10 @@ def ctf01_payment_llm_ask(user_api_key, combined_prompt):
         )
         return response.choices[0].message.content
         
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
         return None
     except Exception as e:
@@ -314,7 +319,10 @@ def ctf01_llm_flag(user_api_key, llm1_response, user_prompt: str = None):
 
         return response.choices[0].message.content
         
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
     except Exception as e:
         st.error(f"❌ 예상치 못한 오류가 발생했습니다: {str(e)}")
@@ -387,7 +395,10 @@ def sloc_ask(client, user_input: str, chat_history):
             ],
         )
         return response.choices[0].message.content.strip()
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
         return None
 
@@ -443,7 +454,10 @@ def leak_check(client, sloc_output: str) -> str:
         )
         decision = resp.choices[0].message.content.strip()
         return decision if decision == "flag{LLLteamFighting}" else ""
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
         return ""
 
@@ -479,7 +493,10 @@ def extract_financials(client, user_input: str):
             ]
         )
         return response.choices[0].message.content.strip()
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
         return None
 
@@ -560,7 +577,10 @@ def ctf04_LLM_ask(user_api_key: str, query: str, override_state: bool) -> str:
         )
         return response.choices[0].message.content
         
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
     except Exception as e:
         st.error(f"❌ 예상치 못한 오류가 발생했습니다: {str(e)}")
@@ -593,7 +613,10 @@ def ctf05_generate_ai_response(user_api_key, memo_content):
         
         return response.choices[0].message.content.strip()
         
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
         return None
     except Exception as e:
@@ -1129,8 +1152,11 @@ def ctf06_classify_tools(user_api_key, user_input=""):
                 {"role": "user", "content": user_input}
             ]
         )
-    except AuthenticationError:
-        st.error(api_err_message)
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
+        handle_api_error(e)
         return None
     content = response1.choices[0].message.content
     return content
@@ -1160,7 +1186,10 @@ def ctf06_check_mid_admin(user_api_key, user_input=""):
                 {"role": "user", "content": user_input}
             ]
         )
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
         return None
     content = response1.choices[0].message.content
@@ -1215,7 +1244,10 @@ def ctf06_check_top_admin(user_api_key, encoded_image=None, file_ext=None):
                 st.session_state["admin_level"] = "top"
                 st.session_state["is_top_admin"] = True
             
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
     except Exception as e:
         st.error(f"❌ 예상치 못한 오류가 발생했습니다: {str(e)}")
@@ -1287,7 +1319,10 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
         except Exception as e: 
             return response2.choices[0].message.content
             
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
     except Exception as e:
         st.error(f"❌ 예상치 못한 오류가 발생했습니다: {str(e)}")
@@ -1441,7 +1476,10 @@ def ctf06_ask_db_json(user_api_key, get_db_input):
             return get_db_res.choices[0].message.content
         return raw
         
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
     except Exception as e:
         st.error(f"❌ 예상치 못한 오류가 발생했습니다: {str(e)}")
@@ -1611,7 +1649,10 @@ def ctf08_LLM_ask(user_api_key, user_input):
         )
         return response.choices[0].message.content
         
-    except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+    except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+    except (AuthenticationError, BadRequestError, APIError) as e:
         handle_api_error(e)
         return None
     except Exception as e:
@@ -1716,7 +1757,10 @@ def ctf09_LLM_ask(user_api_key, user_input):
            f"📌 LLM2 (전문가 평가자)의 평가:\n{answer_llm2}"
        )
        
-   except (AuthenticationError, RateLimitError, BadRequestError, APIError) as e:
+   except RateLimitError:
+        st.warning("⚠️ 현재 요청이 너무 많아 잠시 대기 후 자동 재시도 중입니다. 잠시만 기다려주세요.")
+        raise 
+   except (AuthenticationError, BadRequestError, APIError) as e:
        handle_api_error(e)
    except Exception as e:
        st.error(f"❌ 예상치 못한 오류가 발생했습니다: {str(e)}")

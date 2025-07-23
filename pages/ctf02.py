@@ -6,7 +6,8 @@ from utils.llm_utils import sloc_ask, leak_check
 from utils.ui import render_main_header, render_sidebar_menu, render_flag_sub
 from utils.auth import require_login
 from utils.api_key import require_api_key
-
+from utils.session_clear import clear_temp_ctf_keys
+clear_temp_ctf_keys(list = ["ctf05_admin_cookie", "ctf05_stolen_cookie", "ctf05_attempt_count", "ctf05_memos", "is_processing_memo"])
 user = require_login()
 api_key = require_api_key()
 client = OpenAI(api_key=api_key)

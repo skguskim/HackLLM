@@ -5,8 +5,8 @@ from utils.llm_utils import ctf07_check_sensitive_info,ctf07_llm_ask
 from utils.ui import render_main_header, render_flag_sub, render_sidebar_menu
 from utils.auth import require_login, get_cookie_controller
 from utils.api_key import require_api_key 
-from utils.session_clear import clear_temp_ctf_keys
-clear_temp_ctf_keys(list = ["ctf05_admin_cookie", "ctf05_stolen_cookie", "ctf05_attempt_count", "counter", "ctf07_admin", "is_processing", "submitted_ctf07"])
+
+st.session_state["edit_mode"]=False
 
 user = require_login()
 user_api_key = require_api_key()

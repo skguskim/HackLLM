@@ -304,7 +304,7 @@ def ctf01_llm_flag(user_api_key, llm1_response, user_prompt: str = None):
             """
 
         response = completions_with_backoff(
-            lient=client,
+            client=client,
             model="gpt-4o-mini",
             messages=[
                 {"role": "system","content": system_content},
@@ -326,7 +326,7 @@ def ctf01_llm_flag(user_api_key, llm1_response, user_prompt: str = None):
 def sloc_ask(client, user_input: str, chat_history):
     try:
         response = completions_with_backoff(
-            lient=client,
+            client=client,
             model="gpt-4o-mini",
             messages=[
                 {
@@ -399,7 +399,7 @@ def leak_check(client, sloc_output: str) -> str:
     """
     try:
         resp = completions_with_backoff(
-            lient=client,
+            client=client,
             model="gpt-4o-mini",
             temperature=0,
             messages=[
@@ -453,7 +453,7 @@ def leak_check(client, sloc_output: str) -> str:
 def extract_financials(client, user_input: str):
     try:
         response = completions_with_backoff(
-            lient=client,
+            client=client,
             model="gpt-4o-mini",
             messages=[
                 {
@@ -551,7 +551,7 @@ def ctf04_LLM_ask(user_api_key: str, query: str, override_state: bool) -> str:
                     """
 
         response = completions_with_backoff(
-            lient=client,
+            client=client,
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -575,7 +575,7 @@ def ctf05_generate_ai_response(user_api_key, memo_content):
         client = OpenAI(api_key=user_api_key)
         
         response = completions_with_backoff(
-            lient=client,
+            client=client,
             model="gpt-4o-mini",
             messages=[
                 {
@@ -1122,7 +1122,7 @@ def ctf06_classify_tools(user_api_key, user_input=""):
     """
     try:
         response1 = completions_with_backoff(
-        lient=client,
+        client=client,
         model="gpt-4o",
         messages=[
                 {"role": "system", "content": system_prompt1},
@@ -1153,7 +1153,7 @@ def ctf06_check_mid_admin(user_api_key, user_input=""):
 
     try:
         response1 = completions_with_backoff(
-        lient=client,
+        client=client,
         model="gpt-4o",
         messages=[
                 {"role": "system", "content": system_prompt},
@@ -1192,7 +1192,7 @@ def ctf06_check_top_admin(user_api_key, encoded_image=None, file_ext=None):
         response1 = None
         
         response1 = completions_with_backoff(
-        lient=client,
+        client=client,
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": system_prompt},
@@ -1264,7 +1264,7 @@ def ctf06_ask_email_json(user_input, user_email_for_resend, user_api_key):
         """
         
         response2 = completions_with_backoff(
-            lient=client,
+            client=client,
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt2},
@@ -1419,7 +1419,7 @@ def ctf06_ask_db_json(user_api_key, get_db_input):
     """
     try:
         get_db_res = completions_with_backoff(
-            lient=client,
+            client=client,
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt2},
@@ -1584,7 +1584,7 @@ def ctf08_LLM_ask(user_api_key, user_input):
         client = OpenAI(api_key=user_api_key)
 
         response = completions_with_backoff(
-            lient=client,
+            ctf06_ask_db_jsonlient=client,
             model="gpt-4o-mini",
             messages=[
                 {
@@ -1632,7 +1632,7 @@ def ctf09_LLM_ask(user_api_key, user_input):
        
        # Step 1: LLM1 - 헷갈리는 답변을 유도
        response_llm1 = completions_with_backoff(
-            lient=client,
+           client=client,
            model="gpt-3.5-turbo-0125",
            messages=[
                {

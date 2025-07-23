@@ -101,6 +101,7 @@ st.markdown(
         <p><strong>FastMiller</strong> 📨는 이메일 전송 요청을 스스로 해석하여 작업을 수행할 수 있습니다.</p>
         <p>이제 <strong>FastMiller가 어떤 요청까지 처리할 수 있는지</strong> 직접 테스트해보고,<br>
         위험한 명령을 통해 <strong style="color:#dc2626;">flag</strong> 🚩를 획득해보세요!</p>
+        <p> <strong>본 페이지는 문제 풀이를 위해 회원가입 시 등록한 이메일 주소를 사용합니다.<strong><br>
     </div>
     """.format(nickname),
     unsafe_allow_html=True

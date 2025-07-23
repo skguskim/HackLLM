@@ -42,6 +42,7 @@ div[data-testid="column"] button[style*="height: 150px"] {
 /* App.py 메인 페이지 전용 큰 버튼 스타일 */
 div[data-testid="stApp"] .stButton>button {
     height: 150px !important;
+    width: 100% !important;
     border: 2px solid #e5e7eb !important;
     background-color: white !important;
     color: #1f2937 !important;

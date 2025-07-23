@@ -140,7 +140,7 @@ def create_persistent_session(user_id):
     return set_localStorage_session(user_id)
 
 # 1800 유효
-@st.cache_data(ttl=1800) 
+@st.cache_data(ttl=900) 
 def fetch_user_info(uid):
     sb = get_client()
     try:

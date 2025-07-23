@@ -217,7 +217,7 @@ def ctf01_payment_llm_ask(user_api_key, combined_prompt):
         """
 
         response = completions_with_backoff(
-            lient=client,
+            client=client,
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_content},

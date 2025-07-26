@@ -89,7 +89,7 @@ LLL Corporation의 내부 지식관리 챗봇 '알파봇'은 업로드된 최신
 사용자는 획득한 Flag를 다음과 같이 제출합니다:
 
 ```
-flag{poison}
+flag{answer}
 ```
 
 정답이면 ✅ `"정답입니다!"` 출력  

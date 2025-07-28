@@ -52,7 +52,7 @@
             <a href="https://github.com/seokjea" target="_blank"><img src="" alt="seokjea" width="100"></a>
         </td>
         <td>
-            <a href="https://github.com/hanataba227" target="_blank"><img src="" alt="hanataba227" width="100"></a>
+            <a href="https://github.com/hanataba227" target="_blank"><img src="https://github.com/user-attachments/assets/3f4e5828-9eb2-48b1-9729-cb61bc7c4378" alt="hanataba227" width="100"></a>
         </td>
         <td>
             <a href="https://github.com/esthervery" target="_blank"><img src="" alt="esthervery" width="100"></a>

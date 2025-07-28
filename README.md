@@ -3,7 +3,6 @@
 <div align="center">
     <img src="" alt="HackLLM" />
     <p>해킹을 통해 배우는 LLM 보안</p>
-    <p>OWASP LLM Top10를 기반으로 한 LLM 취약점 실습 환경</p>
     <a href="https://whs-hackllm.streamlit.app/">
         HackLLM 바로가기
     </a>
@@ -12,6 +11,11 @@
 <br />
 
 ## 📖 Description | 설명
+
+#### HackLLM 은 OWASP LLM Top 10의 취약점 시나리오를 바탕으로 제작된 실습형 CTF 플랫폼입니다.  
+
+본 플랫폼에서는 프롬프트 인젝션부터 벡터 검색 교란, 무제한 소비까지 LLM 취약점 10가지를 직접 체험하고 공부할 수 있습니다. 
+
 
 ### OWASP LLM Top10 이란?
 생성형 AI·LLM에서 자주 발생하고 치명적인 10대 보안·안전 위험을 정리해 개발자와 보안팀이 대응 우선순위를 세울 수 있도록 돕는 공개 표준 목록
@@ -29,13 +33,15 @@
 | 09   | 허위 정보                    | LLM이 생성한 허위 정보, 환각으로 인해 사용자가 잘못된 결정을 내리게 하거나 시스템에 보안상 취약한 동작을 유도 |
 | 10   | 무제한 소비                  | LLM에 반복적으로 쿼리를 보내 시스템 리소스를 고갈시키거나, 재정적 손실과 지적 재산 침해를 유도 |
 
-
 <br />
 
 ## 📱 Features | 기능
 
-1. 기능 1
-    - 이런거 있음
+|  | 기능 | 설명 |
+|---|---------|---------|
+| 1 | **LLM 취약점 CTF 페이지** | OWASP LLM Top 10을 기반으로 각각의 취약점 시나리오를 CTF 문제로 구현
+| 2 | **LLM 취약점 교육 페이지** | OWASP LLM Top 10을 기반으로 각각의 취약점에 대해 세션을 나눠 공부해나갈 수 있는 기반 제공
+| 3 | **사용자 정보 저장** | 회원가입, 로그인, 로그아웃 등의 기능을 통해 사용자 정보를 저장하고, 총 점수, 문제별 풀이 여부 등을 저장
 
 <br />
 
@@ -43,9 +49,9 @@
 <table style="text-align: center">
     <tr>
         <th style="text-align: center;">[ PM ]<br/>개발</th>
-        <th style="text-align: center;">메인 개발</th>
-        <th style="text-align: center;">개발</th>
-        <th style="text-align: center;">개발</th>
+        <th style="text-align: center;">개발 총괄</th>
+        <th style="text-align: center;">리드 개발</th>
+        <th style="text-align: center;">개발, 문서 작업</th>
     <tr>
     <tr>
         <td>
@@ -78,7 +84,7 @@
 </table>
 <table style="text-align: center">
     <tr>
-        <th style="text-align: center;">개발</th>
+        <th style="text-align: center;">개발, 문서 작업</th>
         <th style="text-align: center;">개발</th>
         <th style="text-align: center;">개발</th>
         <th style="text-align: center;">개발</th>
@@ -114,8 +120,8 @@
 </table>
 <table style="text-align: center">
     <tr>
-        <th style="text-align: center;">멘토</th>
-        <th style="text-align: center;">PL</th>
+        <th style="text-align: center;">[ 멘토] </th>
+        <th style="text-align: center;">[ PL ]</th>
     <tr>
     <tr>
         <td>

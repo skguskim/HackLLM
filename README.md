@@ -43,7 +43,7 @@
 <table style="text-align: center">
     <tr>
         <th style="text-align: center;">[ PM ]<br/>개발</th>
-        <th style="text-align: center;">개발</th>
+        <th style="text-align: center;">메인 개발</th>
         <th style="text-align: center;">개발</th>
         <th style="text-align: center;">개발</th>
     <tr>

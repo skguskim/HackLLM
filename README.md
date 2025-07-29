@@ -120,23 +120,22 @@
 </table>
 <table style="text-align: center">
     <tr>
-        <th style="text-align: center;">[ 멘토] </th>
+        <th style="text-align: center;">[ 멘토 ] </th>
         <th style="text-align: center;">[ PL ]</th>
     <tr>
     <tr>
         <td>
-            <a href="https://github.com/멘토" target="_blank"><img src="" alt="멘토" width="100"></a>
         </td>
         <td>
-            <a href="https://github.com/PL" target="_blank"><img src="" alt="PL" width="100"></a>
+            <a href="https://github.com/filime" target="_blank"><img src="https://github.com/user-attachments/assets/2c734527-cade-4cc0-9ca4-07e2c1f727b9" alt="PL" width="100"></a>
         </td>
     </tr>
     <tr>
         <td style="text-align: center;">
-            <a href="=https://github.com/멘토" target="_blank">멘토</a>
+            <a href="https://github.com/s-cu-bot" target="_blank">s-cu-bot</a>
         </td>
         <td style="text-align: center;">
-            <a href="https://github.com/PL" target="_blank">PL</a>
+            <a href="https://github.com/filime" target="_blank">filime</a>
         </td>
     </tr>
 </table>

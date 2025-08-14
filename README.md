@@ -12,7 +12,8 @@
 
 ## 📖 Description | 설명
 
-### HackLLM 은 OWASP LLM Top 10의 취약점 시나리오를 바탕으로 제작된 실습형 CTF 플랫폼입니다.  
+### HackLLM 은 OWASP LLM Top 10 취약점을 **실습형 CTF**로 학습하는 오픈소스 플랫폼입니다.
+
 
 본 플랫폼에서는 프롬프트 인젝션부터 벡터 검색 교란, 무제한 소비까지 LLM 취약점 10가지를 직접 체험하고 공부할 수 있습니다. 
 
@@ -143,15 +144,14 @@
 <br />
 
 ## 🔧 Stack | 기술 스택
-[![Streamlit](https://img.shields.io/badge/STREAMLIT-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Supabase](https://img.shields.io/badge/SUPABASE-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
-[![ChatGPT API](https://img.shields.io/badge/CHATGPT_API-10A37F?style=for-the-badge&logo=openai&logoColor=white)](https://platform.openai.com/docs/api-reference)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit-FF4B4B)](https://whs-hackllm.streamlit.app/)
+[![Made with Streamlit](https://img.shields.io/badge/Framework-Streamlit-FF4B4B)](https://streamlit.io/)
+[![Supabase](https://img.shields.io/badge/Backend-Supabase-3ECF8E)](https://supabase.com/)
+[![OpenAI](https://img.shields.io/badge/LLM-OpenAI-10A37F)](https://platform.openai.com/docs/api-reference)
+[![License](https://img.shields.io/badge/License-MIT-black)](LICENSE)
 
 <br />
 
 ## 🔨 Structure | 구조
 ![HackLLM 구조도](https://github.com/user-attachments/assets/9929643f-d54f-4637-a16c-1624e85864b7)
 
-
-## 🔗 Links
-- [화이트햇 스쿨 공식 홈페이지](https://whitehatschool.kr/home/kor/main.do)
